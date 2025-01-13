@@ -1,4 +1,4 @@
-use super::{Agent, NullAgent};
+use super::Agent;
 use openai_api::{
     completions::Client as OpenAIClient,
     models::{Message, Model},
@@ -113,6 +113,8 @@ impl<T: Agent> Agent for TextAgent<T> {
 //For these tests make sure to set the OPENAI_API_KEY environment variable
 #[cfg(test)]
 mod tests {
+    use crate::agent::NullAgent;
+
     use super::*;
     use openai_api::models::OpenAIModel;
     use std::env;
