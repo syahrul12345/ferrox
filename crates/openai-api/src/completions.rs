@@ -52,7 +52,6 @@ impl Client {
             model: self.model.as_str().to_string(),
             messages: history,
             temperature: Some(0.7),
-            tool_choice: Some("auto".to_string()),
             ..Default::default()
         };
 

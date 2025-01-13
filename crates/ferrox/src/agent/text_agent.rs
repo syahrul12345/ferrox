@@ -110,6 +110,7 @@ impl<T: Agent> Agent for TextAgent<T> {
     }
 }
 
+//For these tests make sure to set the OPENAI_API_KEY environment variable
 #[cfg(test)]
 mod tests {
     use super::*;

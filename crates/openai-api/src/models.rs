@@ -55,7 +55,7 @@ impl Default for CompletionRequest {
             model: Model::OpenAI(OpenAIModel::GPT35Turbo).as_str().to_string(),
             messages: Vec::new(),
             temperature: None,
-            tool_choice: Some("auto".to_string()),
+            tool_choice: None,
             top_p: None,
             n: None,
             stream: None,
