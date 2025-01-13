@@ -1,4 +1,5 @@
 use super::Agent;
+use crate::action::{Action, ActionDefinition};
 use openai_api::{
     completions::Client as OpenAIClient,
     models::{Message, Model},
@@ -18,6 +19,7 @@ where
     pub system_prompt: String,
     pub open_ai_client: OpenAIClient,
     conversation_history: Arc<Mutex<HashMap<String, Vec<Message>>>>,
+    actions: Vec<Box<dyn Action>>,
 }
 
 impl<T: Agent> TextAgent<T> {
@@ -32,6 +34,7 @@ impl<T: Agent> TextAgent<T> {
             system_prompt,
             open_ai_client: OpenAIClient::new(api_key, model),
             conversation_history: Arc::new(Mutex::new(HashMap::new())),
+            actions: Vec::new(),
         }
     }
 
@@ -92,6 +95,18 @@ impl<T: Agent> TextAgent<T> {
 
             Ok(response)
         })
+    }
+
+    pub fn with_action(mut self, action: impl Action + 'static) -> Self {
+        self.actions.push(Box::new(action));
+        self
+    }
+
+    fn get_tool_definitions(&self) -> Vec<ActionDefinition> {
+        self.actions
+            .iter()
+            .map(|action| action.definition())
+            .collect()
     }
 }
 
