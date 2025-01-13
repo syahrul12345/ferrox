@@ -1,6 +1,7 @@
 use crate::models::{CompletionRequest, CompletionResponse, Message, Model};
 use anyhow::Result;
 
+#[derive(Clone)]
 pub struct Client {
     api_key: String,
     model: Model,

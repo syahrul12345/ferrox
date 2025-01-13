@@ -1,5 +1,9 @@
+pub mod null_agent;
 pub mod text_agent;
+
 use std::{future::Future, pin::Pin};
+
+pub use null_agent::NullAgent;
 
 /// Agent trait represents an LLM
 /// It contains only two methods, system prompt and  process_prompt
