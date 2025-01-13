@@ -1,4 +1,4 @@
-use serde::{Deserialize, Serialize};
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use std::{future::Future, pin::Pin};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -18,32 +18,28 @@ pub struct ActionDefinition {
 }
 
 /// An asynchronous action that an agent can perform.
-/// It contains metadata about the action (description, parameters)
-/// and the actual implementation (execute).
 pub trait Action: Send + Sync {
-    /// Returns the definition of this action, including its name,
-    /// description, and parameters
     fn definition(&self) -> ActionDefinition;
-
-    /// Executes the action with the given parameters
     fn execute(
         &self,
         params: serde_json::Value,
     ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send>>;
 }
 
-/// A builder to create actions from async functions
-pub struct ActionBuilder<F> {
+/// A builder to create actions from async functions with typed parameters
+pub struct ActionBuilder<F, P> {
     name: String,
     description: String,
     parameters: Vec<ActionParameter>,
     handler: F,
+    _phantom: std::marker::PhantomData<P>,
 }
 
-impl<F, Fut> ActionBuilder<F>
+impl<F, Fut, P> ActionBuilder<F, P>
 where
-    F: Fn(serde_json::Value) -> Fut + Send + Sync + 'static,
+    F: Fn(P) -> Fut + Send + Sync + Clone + 'static,
     Fut: Future<Output = Result<String, String>> + Send + 'static,
+    P: DeserializeOwned + Send + 'static,
 {
     pub fn new(name: impl Into<String>, handler: F) -> Self {
         Self {
@@ -51,6 +47,7 @@ where
             description: String::new(),
             parameters: Vec::new(),
             handler,
+            _phantom: std::marker::PhantomData,
         }
     }
 
@@ -76,13 +73,21 @@ where
     }
 
     pub fn build(self) -> impl Action {
+        let handler = self.handler;
         FunctionAction {
             definition: ActionDefinition {
                 name: self.name,
                 description: self.description,
                 parameters: self.parameters,
             },
-            handler: Box::new(self.handler),
+            handler: Box::new(move |params: serde_json::Value| {
+                let handler = handler.clone();
+                async move {
+                    let params = serde_json::from_value(params)
+                        .map_err(|e| format!("Invalid parameters: {}", e))?;
+                    handler(params).await
+                }
+            }),
         }
     }
 }
@@ -109,35 +114,61 @@ where
     }
 }
 
-// Example usage:
 #[cfg(test)]
 mod tests {
     use super::*;
 
+    // Define a strongly typed parameter struct
+    #[derive(Debug, Deserialize)]
+    struct WeatherParams {
+        location: String,
+        #[serde(default)]
+        units: Option<String>,
+    }
+
     #[tokio::test]
-    async fn test_function_action() {
-        async fn weather(params: serde_json::Value) -> Result<String, String> {
-            let location = params["location"]
-                .as_str()
-                .ok_or("location parameter required")?;
-            Ok(format!("Weather in {}: Sunny", location))
+    async fn test_typed_function_action() {
+        async fn weather(params: WeatherParams) -> Result<String, String> {
+            let units = params.units.unwrap_or_else(|| "celsius".to_string());
+            Ok(format!("Weather in {} ({}): Sunny", params.location, units))
         }
 
-        let action = ActionBuilder::new("get_weather", weather)
+        let action = ActionBuilder::<_, WeatherParams>::new("get_weather", weather)
             .description("Get the weather for a location")
             .parameter("location", "The city to get weather for", "string", true)
+            .parameter(
+                "units",
+                "Temperature units (celsius/fahrenheit)",
+                "string",
+                false,
+            )
             .build();
 
         // Test the definition
         let def = action.definition();
         assert_eq!(def.name, "get_weather");
-        assert_eq!(def.parameters.len(), 1);
+        assert_eq!(def.parameters.len(), 2);
 
-        // Test execution
+        // Test execution with all parameters
         let params = serde_json::json!({
-            "location": "London"
+            "location": "London",
+            "units": "fahrenheit"
         });
         let result = action.execute(params).await.unwrap();
-        assert_eq!(result, "Weather in London: Sunny");
+        assert_eq!(result, "Weather in London (fahrenheit): Sunny");
+
+        // Test execution with only required parameters
+        let params = serde_json::json!({
+            "location": "Paris"
+        });
+        let result = action.execute(params).await.unwrap();
+        assert_eq!(result, "Weather in Paris (celsius): Sunny");
+
+        // Test execution with invalid parameters
+        let params = serde_json::json!({
+            "wrong_field": "London"
+        });
+        let result = action.execute(params).await;
+        assert!(result.is_err());
     }
 }
