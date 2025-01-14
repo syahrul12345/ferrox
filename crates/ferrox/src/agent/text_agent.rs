@@ -84,7 +84,7 @@ impl<T: Agent> TextAgent<T> {
             .collect();
 
         Box::pin(async move {
-            let history = {
+            let mut conversation = {
                 let mut history_map = conversation_history.lock().map_err(|e| e.to_string())?;
 
                 if let Some(existing_history) = history_map.get(&history_id) {
@@ -95,23 +95,54 @@ impl<T: Agent> TextAgent<T> {
                         role: "system".to_string(),
                         content: Some(system_prompt),
                         tool_calls: None,
+                        tool_call_id: None,
                     });
                     history_map.insert(history_id.clone(), new_history.clone());
                     new_history
                 }
             };
 
-            let response = open_ai_client
-                .send_prompt_with_tools(prompt, history.clone(), tools)
-                .await
-                .map_err(|e| e.to_string())?;
+            // Add user's prompt to conversation
+            conversation.push(Message {
+                role: "user".to_string(),
+                content: Some(prompt.clone()),
+                tool_calls: None,
+                tool_call_id: None,
+            });
 
-            let final_response = if response.tool_call {
+            let mut final_result = String::new();
+            let mut count = 0;
+            while count <= 5 {
+                let response = open_ai_client
+                    .send_prompt_with_tools(
+                        if count == 0 {
+                            Some(prompt.clone())
+                        } else {
+                            None
+                        },
+                        conversation.clone(),
+                        tools.clone(),
+                    )
+                    .await
+                    .map_err(|e| e.to_string())?;
+
+                if !response.tool_call {
+                    final_result = response.content;
+                    break;
+                }
+
                 let tool_calls: Vec<openai_api::models::ToolCall> =
                     serde_json::from_str(&response.content).map_err(|e| e.to_string())?;
 
-                let mut results = Vec::new();
+                // Add assistant's tool calls to conversation
+                conversation.push(Message {
+                    role: "assistant".to_string(),
+                    content: None,
+                    tool_calls: Some(tool_calls.clone()),
+                    tool_call_id: None,
+                });
 
+                // Execute each tool and add results to conversation
                 for tool_call in tool_calls {
                     if let Some(action) = actions
                         .lock()
@@ -128,28 +159,40 @@ impl<T: Agent> TextAgent<T> {
                             .map_err(|e| {
                                 format!("Failed to execute {}: {}", tool_call.function.name, e)
                             })?;
-                        results.push(result);
+
+                        // Add tool result to conversation with the tool_call_id
+                        conversation.push(Message {
+                            role: "tool".to_string(),
+                            content: Some(result.clone()),
+                            tool_calls: None,
+                            tool_call_id: Some(tool_call.id.clone()),
+                        });
                     }
                 }
-                results.join("\n")
-            } else {
-                response.content
-            };
+                count += 1;
+            }
 
-            // Update history with response
+            // Update conversation history with final state
             {
                 let mut history_map = conversation_history.lock().map_err(|e| e.to_string())?;
-                if let Some(conversation) = history_map.get_mut(&history_id) {
-                    conversation.extend(history.iter().skip(conversation.len()).cloned());
+                if let Some(conv) = history_map.get_mut(&history_id) {
+                    // Add the final response as an assistant message
                     conversation.push(Message {
                         role: "assistant".to_string(),
-                        content: Some(final_response.clone()),
+                        content: Some(final_result.clone()),
                         tool_calls: None,
+                        tool_call_id: None,
                     });
+                    *conv = conversation;
                 }
             }
 
-            Ok(final_response)
+            if count == 5 {
+                return Err(
+                    "Failed to get a final response from the AI agent within 5 rounds".to_string(),
+                );
+            }
+            Ok(final_result)
         })
     }
 }
@@ -277,22 +320,27 @@ mod tests {
         // Text reverser action
 
         // Test individual actions through the agent
+
+        println!("--------------------------------");
         let calc_prompt = "Calculate 5 plus 3";
         println!("Testing calculator with prompt: {}", calc_prompt);
         let calc_response = agent.process_prompt(calc_prompt, "test1").await.unwrap();
         println!("Calculator response: {}", calc_response);
 
+        println!("--------------------------------");
         let greet_prompt = "Say hello to Alice in Spanish";
         println!("Testing greeter with prompt: {}", greet_prompt);
         let greet_response = agent.process_prompt(greet_prompt, "test2").await.unwrap();
         println!("Greeter response: {}", greet_response);
 
+        println!("--------------------------------");
         let reverse_prompt = "Reverse the text 'hello world'";
         println!("Testing reverser with prompt: {}", reverse_prompt);
         let reverse_response = agent.process_prompt(reverse_prompt, "test3").await.unwrap();
         println!("Reverser response: {}", reverse_response);
 
         // Test chained actions
+        println!("--------------------------------");
         let chained_prompt = "Calculate 10 plus 5, then greet the result in Spanish, and finally reverse that greeting";
         println!("Testing chained actions with prompt: {}", chained_prompt);
         let chained_response = agent.process_prompt(chained_prompt, "test4").await.unwrap();

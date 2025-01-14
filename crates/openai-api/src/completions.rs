@@ -50,16 +50,19 @@ impl Client {
 
     pub async fn send_prompt_with_tools(
         &self,
-        prompt: String,
+        prompt: Option<String>,
         mut history: Vec<Message>,
         tools: Vec<Tool>,
     ) -> Result<StructuredResponse> {
         // Add the user's prompt to the message history
-        history.push(Message {
-            role: "user".to_string(),
-            content: Some(prompt),
-            tool_calls: None,
-        });
+        if let Some(prompt) = prompt {
+            history.push(Message {
+                role: "user".to_string(),
+                content: Some(prompt),
+                tool_calls: None,
+                tool_call_id: None,
+            });
+        }
 
         let request = CompletionRequest {
             model: self.model.as_str().to_string(),
@@ -94,7 +97,6 @@ impl Client {
             .await?;
 
         let completion: CompletionResponse = response.json().await?;
-        println!("Completion: {}", serde_json::to_string_pretty(&completion)?);
         // Handle both regular responses and tool calls
         let first_choice = completion
             .choices
@@ -191,12 +193,13 @@ mod tests {
             role: "system".to_string(),
             content: Some("You are a helpful assistant.".to_string()),
             tool_calls: None,
+            tool_call_id: None,
         }];
 
         let tools = vec![]; // Empty tools for this test
 
         let result = client
-            .send_prompt_with_tools("Hello!".to_string(), history, tools)
+            .send_prompt_with_tools(Some("Hello!".to_string()), history, tools)
             .await
             .unwrap();
 
@@ -248,6 +251,7 @@ mod tests {
             role: "system".to_string(),
             content: Some("You are a helpful assistant.".to_string()),
             tool_calls: None,
+            tool_call_id: None,
         }];
 
         let tools = vec![Tool {
@@ -268,7 +272,7 @@ mod tests {
         }];
 
         let result = client
-            .send_prompt_with_tools("Calculate 5 plus 3".to_string(), history, tools)
+            .send_prompt_with_tools(Some("Calculate 5 plus 3".to_string()), history, tools)
             .await
             .unwrap();
 

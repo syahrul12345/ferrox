@@ -3,8 +3,12 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Message {
     pub role: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub content: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub tool_calls: Option<Vec<ToolCall>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tool_call_id: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
@@ -94,6 +98,8 @@ pub struct Choice {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ToolCall {
     pub id: String,
+    #[serde(rename = "type")]
+    pub tool_type: String,
     pub function: ToolDefinition,
 }
 
@@ -156,14 +162,14 @@ impl AnthropicModel {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct FunctionDefinition {
     pub name: String,
     pub description: String,
     pub parameters: serde_json::Value, // Using Value for flexibility with JSON Schema
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct Tool {
     #[serde(rename = "type")]
     pub tool_type: String, // Usually "function"
