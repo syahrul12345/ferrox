@@ -1,6 +1,4 @@
-use crate::models::{
-    CompletionRequest, CompletionResponse, Message, Model, Tool,
-};
+use crate::models::{CompletionRequest, CompletionResponse, Message, Model, Tool};
 use anyhow::Result;
 use serde::Serialize;
 
@@ -124,7 +122,7 @@ impl Client {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::models::{AnthropicModel, OpenAIModel};
+    use crate::models::{AnthropicModel, FunctionDefinition, OpenAIModel};
     use mockito;
     use serde_json::json;
 
