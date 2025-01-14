@@ -1,5 +1,5 @@
 use crate::models::{
-    CompletionRequest, CompletionResponse, FunctionDefinition, Message, Model, Tool,
+    CompletionRequest, CompletionResponse, Message, Model, Tool,
 };
 use anyhow::Result;
 use serde::Serialize;

@@ -1,5 +1,5 @@
 use super::Agent;
-use crate::action::{Action, ActionDefinition};
+use crate::action::Action;
 use openai_api::{
     completions::Client as OpenAIClient,
     models::{FunctionDefinition, Message, Model, Tool},
@@ -168,7 +168,7 @@ impl<T: Agent> Agent for TextAgent<T> {
         prompt: &str,
         history_id: &str,
     ) -> Pin<Box<dyn Future<Output = Result<String, String>>>> {
-        self.send_prompt(prompt, &history_id)
+        self.send_prompt(prompt, history_id)
     }
 }
 

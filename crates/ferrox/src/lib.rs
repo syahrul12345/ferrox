@@ -6,6 +6,12 @@ pub struct Ferrox {
     bot: Bot,
 }
 
+impl Default for Ferrox {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Ferrox {
     pub fn new() -> Self {
         Self {
