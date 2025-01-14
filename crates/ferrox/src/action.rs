@@ -99,7 +99,7 @@ struct FunctionAction<F> {
 
 impl<F, Fut> Action for FunctionAction<F>
 where
-    F: Fn(serde_json::Value) -> Fut + Send + Sync + 'static,
+    F: Fn(serde_json::Value) -> Fut + Clone + Send + Sync + 'static,
     Fut: Future<Output = Result<String, String>> + Send + 'static,
 {
     fn definition(&self) -> ActionDefinition {

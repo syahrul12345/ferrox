@@ -3,7 +3,8 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Message {
     pub role: String,
-    pub content: String,
+    pub content: Option<String>,
+    pub tool_calls: Option<Vec<ToolCall>>,
 }
 
 #[derive(Debug, Serialize)]
@@ -47,6 +48,12 @@ pub struct CompletionRequest {
     /// A unique identifier representing your end-user
     #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<String>,
+    /// Available tools/functions that the model can use
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tools: Option<Vec<Tool>>,
+    /// Enable parallel tool calls
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parallel_tool_calls: Option<bool>,
 }
 
 impl Default for CompletionRequest {
@@ -65,21 +72,35 @@ impl Default for CompletionRequest {
             frequency_penalty: None,
             logit_bias: None,
             user: None,
+            tools: None,
+            parallel_tool_calls: None,
         }
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct CompletionResponse {
     pub id: String,
     pub choices: Vec<Choice>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Choice {
     pub message: Message,
     pub finish_reason: String,
     pub index: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct ToolCall {
+    pub id: String,
+    pub function: ToolDefinition,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct ToolDefinition {
+    pub name: String,
+    pub arguments: String,
 }
 
 #[derive(Debug, Clone)]
@@ -133,4 +154,18 @@ impl AnthropicModel {
             AnthropicModel::Claude3Sonnet => "claude-3-sonnet",
         }
     }
+}
+
+#[derive(Debug, Serialize)]
+pub struct FunctionDefinition {
+    pub name: String,
+    pub description: String,
+    pub parameters: serde_json::Value, // Using Value for flexibility with JSON Schema
+}
+
+#[derive(Debug, Serialize)]
+pub struct Tool {
+    #[serde(rename = "type")]
+    pub tool_type: String, // Usually "function"
+    pub function: FunctionDefinition,
 }

@@ -1,5 +1,8 @@
-use crate::models::{CompletionRequest, CompletionResponse, Message, Model};
+use crate::models::{
+    CompletionRequest, CompletionResponse, FunctionDefinition, Message, Model, Tool,
+};
 use anyhow::Result;
+use serde::Serialize;
 
 #[derive(Clone)]
 pub struct Client {
@@ -7,6 +10,12 @@ pub struct Client {
     model: Model,
     client: reqwest::Client,
     base_url: Option<String>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct StructuredResponse {
+    pub tool_call: bool,
+    pub content: String,
 }
 
 impl Client {
@@ -41,17 +50,26 @@ impl Client {
         }
     }
 
-    pub async fn send_prompt(&self, prompt: String, mut history: Vec<Message>) -> Result<String> {
+    pub async fn send_prompt_with_tools(
+        &self,
+        prompt: String,
+        mut history: Vec<Message>,
+        tools: Vec<Tool>,
+    ) -> Result<StructuredResponse> {
         // Add the user's prompt to the message history
         history.push(Message {
             role: "user".to_string(),
-            content: prompt,
+            content: Some(prompt),
+            tool_calls: None,
         });
 
         let request = CompletionRequest {
             model: self.model.as_str().to_string(),
             messages: history,
             temperature: Some(0.7),
+            tools: Some(tools),
+            tool_choice: Some("auto".to_string()),
+            parallel_tool_calls: Some(true),
             ..Default::default()
         };
 
@@ -78,12 +96,28 @@ impl Client {
             .await?;
 
         let completion: CompletionResponse = response.json().await?;
-
-        Ok(completion
+        println!("Completion: {}", serde_json::to_string_pretty(&completion)?);
+        // Handle both regular responses and tool calls
+        let first_choice = completion
             .choices
             .first()
-            .map(|choice| choice.message.content.clone())
-            .unwrap_or_default())
+            .ok_or_else(|| anyhow::anyhow!("No completion choices returned from the API"))?;
+
+        match &first_choice.message.tool_calls {
+            Some(tool_calls) if !tool_calls.is_empty() => Ok(StructuredResponse {
+                tool_call: true,
+                content: serde_json::to_string(&tool_calls)?,
+            }),
+            _ => Ok(StructuredResponse {
+                tool_call: false,
+                content: first_choice
+                    .message
+                    .content
+                    .as_ref()
+                    .unwrap_or(&"".to_string())
+                    .clone(),
+            }),
+        }
     }
 }
 
@@ -93,30 +127,6 @@ mod tests {
     use crate::models::{AnthropicModel, OpenAIModel};
     use mockito;
     use serde_json::json;
-
-    fn setup_mock_response() -> mockito::Mock {
-        let mut mock = mockito::Server::new();
-        mock.mock("POST", "/v1/chat/completions")
-            .with_status(200)
-            .with_header("content-type", "application/json")
-            .with_body(
-                json!({
-                    "id": "chatcmpl-123",
-                    "object": "chat.completion",
-                    "created": 1677652288,
-                    "choices": [{
-                        "index": 0,
-                        "message": {
-                            "role": "assistant",
-                            "content": "Hello! How can I help you today?"
-                        },
-                        "finish_reason": "stop"
-                    }]
-                })
-                .to_string(),
-            )
-            .create()
-    }
 
     #[tokio::test]
     async fn test_new_client() {
@@ -146,7 +156,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_send_prompt() {
+    async fn test_send_prompt_with_tools() {
         let mut server = mockito::Server::new_async().await;
         let url = server.url();
 
@@ -163,7 +173,8 @@ mod tests {
                         "index": 0,
                         "message": {
                             "role": "assistant",
-                            "content": "Hello! How can I help you today?"
+                            "content": "Hello! How can I help you today?",
+                            "tool_calls": null
                         },
                         "finish_reason": "stop"
                     }]
@@ -180,15 +191,92 @@ mod tests {
 
         let history = vec![Message {
             role: "system".to_string(),
-            content: "You are a helpful assistant.".to_string(),
+            content: Some("You are a helpful assistant.".to_string()),
+            tool_calls: None,
         }];
 
+        let tools = vec![]; // Empty tools for this test
+
         let result = client
-            .send_prompt("Hello!".to_string(), history)
+            .send_prompt_with_tools("Hello!".to_string(), history, tools)
             .await
             .unwrap();
 
-        assert_eq!(result, "Hello! How can I help you today?");
+        assert_eq!(result.content, "Hello! How can I help you today?");
+        mock.assert();
+    }
+
+    #[tokio::test]
+    async fn test_send_prompt_with_tool_call_response() {
+        let mut server = mockito::Server::new_async().await;
+        let url = server.url();
+
+        let mock = server
+            .mock("POST", "/v1/chat/completions")
+            .with_status(200)
+            .with_header("content-type", "application/json")
+            .with_body(
+                json!({
+                    "id": "chatcmpl-123",
+                    "object": "chat.completion",
+                    "created": 1677652288,
+                    "choices": [{
+                        "index": 0,
+                        "message": {
+                            "role": "assistant",
+                            "content": null,
+                            "tool_calls": [{
+                                "id": "call_123",
+                                "function": {
+                                    "name": "calculator",
+                                    "arguments": "{\"a\":5,\"b\":3,\"operation\":\"add\"}"
+                                }
+                            }]
+                        },
+                        "finish_reason": "tool_calls"
+                    }]
+                })
+                .to_string(),
+            )
+            .create();
+
+        let client = Client::new(
+            "test-key".to_string(),
+            Model::OpenAI(OpenAIModel::GPT35Turbo),
+        )
+        .with_base_url(url);
+
+        let history = vec![Message {
+            role: "system".to_string(),
+            content: Some("You are a helpful assistant.".to_string()),
+            tool_calls: None,
+        }];
+
+        let tools = vec![Tool {
+            tool_type: "function".to_string(),
+            function: FunctionDefinition {
+                name: "calculator".to_string(),
+                description: "Calculate two numbers".to_string(),
+                parameters: json!({
+                    "type": "object",
+                    "properties": {
+                        "a": {"type": "number"},
+                        "b": {"type": "number"},
+                        "operation": {"type": "string"}
+                    },
+                    "required": ["a", "b", "operation"]
+                }),
+            },
+        }];
+
+        let result = client
+            .send_prompt_with_tools("Calculate 5 plus 3".to_string(), history, tools)
+            .await
+            .unwrap();
+
+        // The result should be the JSON string of the tool calls
+        assert!(result.content.contains("calculator"));
+        assert!(result.content.contains("add"));
         mock.assert();
     }
 
