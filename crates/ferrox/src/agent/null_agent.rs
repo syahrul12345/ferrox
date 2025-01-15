@@ -1,5 +1,5 @@
 use super::Agent;
-use std::{future::Future, pin::Pin};
+use std::{future::Future, pin::Pin, sync::Arc};
 
 /// A no-op agent implementation used primarily for testing
 #[derive(Clone)]
@@ -14,11 +14,11 @@ impl Agent for NullAgent {
         &self,
         _prompt: &str,
         _history_id: &str,
-    ) -> Pin<Box<dyn Future<Output = Result<String, String>>>> {
+    ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Sync + Send>> {
         Box::pin(async { Ok(String::new()) })
     }
 
-    fn add_action(&mut self, _action: Box<dyn crate::action::Action>) {
+    fn add_action(&mut self, _action: Arc<dyn crate::action::Action>) {
         // NullAgent ignores actions
     }
 }
@@ -42,7 +42,7 @@ mod tests {
         fn execute(
             &self,
             _params: serde_json::Value,
-        ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send>> {
+        ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>> {
             Box::pin(async { Ok("mock result".to_string()) })
         }
     }
@@ -68,7 +68,7 @@ mod tests {
     async fn test_add_action() {
         let mut agent = NullAgent;
         // Should not panic or have any effect
-        agent.add_action(Box::new(MockAction));
+        agent.add_action(Arc::new(MockAction));
     }
 
     #[tokio::test]

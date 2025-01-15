@@ -1,7 +1,7 @@
 pub mod null_agent;
 pub mod text_agent;
 
-use std::{future::Future, pin::Pin};
+use std::{future::Future, pin::Pin, sync::Arc};
 
 pub use null_agent::NullAgent;
 
@@ -16,9 +16,9 @@ use crate::action::Action;
 /// `VoiceAgent` and agent that wraps around the whisper-1 model. It's takes in a base64 encoded audio and returns the text
 /// `TextAgent` and agent that wraps around any text based LLM. It takes in a prompt and returns the stringified response. OpenAI and Anthropic models are supported.
 /// `AssistantAgent` and agent that wraps around any text based LLM. It takes in a prompt and returns the stringified response, but uses openAI asssitant API. As such, only openAI models are supported.
-pub trait Agent {
+pub trait Agent: Clone {
     /// Adds an tool to the agent
-    fn add_action(&mut self, action: Box<dyn Action>);
+    fn add_action(&mut self, action: Arc<dyn Action>);
     /// Returns the system prompt for the agent
     fn system_prompt(&self) -> &str;
     /// Takes in a prompt and returns the stringified response. This will automatically add the tool calls to the prompt.
@@ -26,5 +26,5 @@ pub trait Agent {
         &self,
         prompt: &str,
         history_id: &str,
-    ) -> Pin<Box<dyn Future<Output = Result<String, String>>>>;
+    ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Sync + Send>>;
 }

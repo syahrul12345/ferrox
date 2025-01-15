@@ -11,6 +11,7 @@ use std::{
     sync::{Arc, Mutex},
 };
 
+#[derive(Clone)]
 pub struct TextAgent<T>
 where
     T: Agent,
@@ -19,7 +20,7 @@ where
     pub system_prompt: String,
     pub open_ai_client: OpenAIClient,
     conversation_history: Arc<Mutex<HashMap<String, Vec<Message>>>>,
-    actions: Arc<Mutex<Vec<Box<dyn Action>>>>,
+    actions: Arc<Mutex<Vec<Arc<dyn Action>>>>,
 }
 
 impl<T: Agent> TextAgent<T> {
@@ -42,7 +43,7 @@ impl<T: Agent> TextAgent<T> {
         &self,
         prompt: &str,
         history_id: &str,
-    ) -> Pin<Box<dyn Future<Output = Result<String, String>> + 'static>> {
+    ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>> {
         // Clone what we need for the async block
         let conversation_history = self.conversation_history.clone();
         let system_prompt = self.system_prompt.clone();
@@ -51,54 +52,19 @@ impl<T: Agent> TextAgent<T> {
         let history_id = history_id.to_string();
         let prompt = prompt.to_string();
 
-        // Convert actions to OpenAI tools
-        let tools: Vec<Tool> = self
-            .actions
-            .lock()
-            .unwrap()
-            .iter()
-            .map(|action| {
-                let definition = action.definition();
-                Tool {
-                    tool_type: "function".to_string(),
-                    function: FunctionDefinition {
-                        name: definition.name,
-                        description: definition.description,
-                        parameters: serde_json::json!({
-                            "type": "object",
-                            "properties": definition.parameters.clone().into_iter().map(|param| {
-                                (param.name, serde_json::json!({
-                                    "type": param.param_type,
-                                    "description": param.description,
-                                }))
-                            }).collect::<serde_json::Map<String, serde_json::Value>>(),
-                            "required": definition.parameters.clone().into_iter()
-                                .filter(|p| p.required)
-                                .map(|p| p.name.clone())
-                                .collect::<Vec<String>>(),
-                            "additionalProperties": false,
-                        }),
-                    },
-                }
-            })
-            .collect();
-
         Box::pin(async move {
+            // Get or create conversation history
             let mut conversation = {
-                let mut history_map = conversation_history.lock().map_err(|e| e.to_string())?;
-
+                let history_map = conversation_history.lock().map_err(|e| e.to_string())?;
                 if let Some(existing_history) = history_map.get(&history_id) {
                     existing_history.clone()
                 } else {
-                    let mut new_history = Vec::new();
-                    new_history.push(Message {
+                    vec![Message {
                         role: "system".to_string(),
                         content: Some(system_prompt),
                         tool_calls: None,
                         tool_call_id: None,
-                    });
-                    history_map.insert(history_id.clone(), new_history.clone());
-                    new_history
+                    }]
                 }
             };
 
@@ -109,6 +75,38 @@ impl<T: Agent> TextAgent<T> {
                 tool_calls: None,
                 tool_call_id: None,
             });
+
+            // Convert actions to OpenAI tools
+            let tools: Vec<Tool> = {
+                let actions = actions.lock().map_err(|e| e.to_string())?;
+                actions
+                    .iter()
+                    .map(|action| {
+                        let definition = action.definition();
+                        Tool {
+                            tool_type: "function".to_string(),
+                            function: FunctionDefinition {
+                                name: definition.name,
+                                description: definition.description,
+                                parameters: serde_json::json!({
+                                    "type": "object",
+                                    "properties": definition.parameters.clone().into_iter().map(|param| {
+                                        (param.name, serde_json::json!({
+                                            "type": param.param_type,
+                                            "description": param.description,
+                                        }))
+                                    }).collect::<serde_json::Map<String, serde_json::Value>>(),
+                                    "required": definition.parameters.clone().into_iter()
+                                        .filter(|p| p.required)
+                                        .map(|p| p.name.clone())
+                                        .collect::<Vec<String>>(),
+                                    "additionalProperties": false,
+                                }),
+                            },
+                        }
+                    })
+                    .collect()
+            };
 
             let mut final_result = String::new();
             let mut count = 0;
@@ -142,11 +140,15 @@ impl<T: Agent> TextAgent<T> {
                     tool_call_id: None,
                 });
 
-                // Execute each tool and add results to conversation
+                // Execute each tool
+                let actions = {
+                    let actions = actions.lock().map_err(|e| e.to_string())?;
+                    let actions_vec = actions.clone();
+                    drop(actions);
+                    actions_vec
+                };
                 for tool_call in tool_calls {
                     if let Some(action) = actions
-                        .lock()
-                        .unwrap()
                         .iter()
                         .find(|a| a.definition().name == tool_call.function.name)
                     {
@@ -160,23 +162,21 @@ impl<T: Agent> TextAgent<T> {
                                 format!("Failed to execute {}: {}", tool_call.function.name, e)
                             })?;
 
-                        // Add tool result to conversation with the tool_call_id
                         conversation.push(Message {
                             role: "tool".to_string(),
-                            content: Some(result.clone()),
+                            content: Some(result),
                             tool_calls: None,
-                            tool_call_id: Some(tool_call.id.clone()),
+                            tool_call_id: Some(tool_call.id),
                         });
                     }
                 }
                 count += 1;
             }
 
-            // Update conversation history with final state
+            // Update conversation history
             {
                 let mut history_map = conversation_history.lock().map_err(|e| e.to_string())?;
                 if let Some(conv) = history_map.get_mut(&history_id) {
-                    // Add the final response as an assistant message
                     conversation.push(Message {
                         role: "assistant".to_string(),
                         content: Some(final_result.clone()),
@@ -198,7 +198,7 @@ impl<T: Agent> TextAgent<T> {
 }
 
 impl<T: Agent> Agent for TextAgent<T> {
-    fn add_action(&mut self, action: Box<dyn Action>) {
+    fn add_action(&mut self, action: Arc<dyn Action>) {
         self.actions.lock().unwrap().push(action);
     }
 
@@ -210,7 +210,7 @@ impl<T: Agent> Agent for TextAgent<T> {
         &self,
         prompt: &str,
         history_id: &str,
-    ) -> Pin<Box<dyn Future<Output = Result<String, String>>>> {
+    ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>> {
         self.send_prompt(prompt, history_id)
     }
 }
@@ -272,7 +272,7 @@ mod tests {
                     true,
                 )
                 .build();
-            agent.add_action(Box::new(calc_action));
+            agent.add_action(Arc::new(calc_action));
             println!("Added calculator action");
         }
 
@@ -296,7 +296,7 @@ mod tests {
                 .parameter("name", "Name to greet", "string", true)
                 .parameter("language", "Language code (en/es/fr)", "string", false)
                 .build();
-            agent.add_action(Box::new(greet_action));
+            agent.add_action(Arc::new(greet_action));
             println!("Added greeter action");
         }
 
@@ -314,7 +314,7 @@ mod tests {
                 .description("Reverse input text")
                 .parameter("text", "Text to reverse", "string", true)
                 .build();
-            agent.add_action(Box::new(reverse_action));
+            agent.add_action(Arc::new(reverse_action));
             println!("Added reverser action");
         }
         // Text reverser action

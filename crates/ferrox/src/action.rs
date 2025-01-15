@@ -23,7 +23,7 @@ pub trait Action: Send + Sync {
     fn execute(
         &self,
         params: serde_json::Value,
-    ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send>>;
+    ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>>;
 }
 
 /// A builder to create actions from async functions with typed parameters
@@ -38,7 +38,7 @@ pub struct ActionBuilder<F, P> {
 impl<F, Fut, P> ActionBuilder<F, P>
 where
     F: Fn(P) -> Fut + Send + Sync + Clone + 'static,
-    Fut: Future<Output = Result<String, String>> + Send + 'static,
+    Fut: Future<Output = Result<String, String>> + Send + Sync + 'static,
     P: DeserializeOwned + Send + 'static,
 {
     pub fn new(name: impl Into<String>, handler: F) -> Self {
@@ -100,7 +100,7 @@ struct FunctionAction<F> {
 impl<F, Fut> Action for FunctionAction<F>
 where
     F: Fn(serde_json::Value) -> Fut + Clone + Send + Sync + 'static,
-    Fut: Future<Output = Result<String, String>> + Send + 'static,
+    Fut: Future<Output = Result<String, String>> + Send + Sync + 'static,
 {
     fn definition(&self) -> ActionDefinition {
         self.definition.clone()
@@ -109,7 +109,7 @@ where
     fn execute(
         &self,
         params: serde_json::Value,
-    ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send>> {
+    ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>> {
         Box::pin((self.handler)(params))
     }
 }
