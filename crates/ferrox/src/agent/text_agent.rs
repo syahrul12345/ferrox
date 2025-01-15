@@ -197,7 +197,7 @@ impl<T: Agent> TextAgent<T> {
     }
 }
 
-impl<T: Agent> Agent for TextAgent<T> {
+impl<T: Agent + Send + Sync + 'static> Agent for TextAgent<T> {
     fn add_action(&mut self, action: Arc<dyn Action>) {
         self.actions.lock().unwrap().push(action);
     }
@@ -211,7 +211,20 @@ impl<T: Agent> Agent for TextAgent<T> {
         prompt: &str,
         history_id: &str,
     ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>> {
-        self.send_prompt(prompt, history_id)
+        // Clone what we need for the async block
+        let history_id = history_id.to_string();
+        let text_future = self.send_prompt(prompt, &history_id);
+        let inner_agent = self.inner_agent.clone();
+        if let Some(inner) = inner_agent {
+            Box::pin(async move {
+                // Get result from TextAgent
+                let text_result = text_future.await?;
+                let text_result = inner.process_prompt(&text_result, &history_id).await?;
+                Ok(text_result)
+            })
+        } else {
+            text_future
+        }
     }
 }
 
@@ -441,5 +454,47 @@ mod tests {
             conv2[1].content,
             Some("Tell me about JavaScript".to_string())
         );
+    }
+
+    #[tokio::test]
+    async fn test_chained_text_agents() {
+        let api_key = env::var("OPENAI_API_KEY").expect("OPENAI_API_KEY must be set");
+
+        // Create inner agent that adds markdown formatting
+        let inner_agent = TextAgent::<NullAgent>::new(
+            None,
+            "You are a formatting assistant. Your job is to take any text and format it as a markdown quote with emoji bullets. \
+             Always format your response like this:\
+             \n> 🔹 First point\
+             \n> 🔸 Second point\
+             \n> 💠 Final point"
+                .to_string(),
+            api_key.clone(),
+            Model::OpenAI(OpenAIModel::GPT35Turbo),
+        );
+
+        // Create outer agent that generates content
+        let agent = TextAgent::new(
+            Some(inner_agent),
+            "You are a helpful assistant that explains technical concepts. \
+             Break down your explanations into 2-3 key points."
+                .to_string(),
+            api_key,
+            Model::OpenAI(OpenAIModel::GPT35Turbo),
+        );
+
+        // Test the chain
+        let response = agent
+            .process_prompt("What is Rust's ownership system?", "test_chain")
+            .await
+            .expect("Failed to get response");
+
+        println!("Chained response:\n{}", response);
+
+        // Verify the response has the inner agent's formatting
+        assert!(response.contains(">"));
+        assert!(response.contains("🔹"));
+        assert!(response.contains("🔸"));
+        assert!(response.contains("💠"));
     }
 }

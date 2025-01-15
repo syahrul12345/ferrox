@@ -1,0 +1,8 @@
+[package]
+name = "basic-example"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ferrox = { path = "../../crates/ferrox" }
+tokio = { version = "1.43.0", features = ["full"] }

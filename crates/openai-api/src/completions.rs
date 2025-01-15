@@ -68,9 +68,19 @@ impl Client {
             model: self.model.as_str().to_string(),
             messages: history,
             temperature: Some(0.7),
-            tools: Some(tools),
-            tool_choice: Some("auto".to_string()),
-            parallel_tool_calls: Some(true),
+            tool_choice: match tools.is_empty() {
+                true => None,
+                false => Some("auto".to_string()),
+            },
+            parallel_tool_calls: match tools.is_empty() {
+                true => None,
+                false => Some(true),
+            },
+            tools: match tools.is_empty() {
+                true => None,
+                false => Some(tools),
+            },
+
             ..Default::default()
         };
 
