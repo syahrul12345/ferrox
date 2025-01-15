@@ -5,4 +5,5 @@ edition = "2021"
 
 [dependencies]
 ferrox = { path = "../../crates/ferrox" }
+openai-api = { path = "../../crates/openai-api" }
 tokio = { version = "1.43.0", features = ["full"] }
