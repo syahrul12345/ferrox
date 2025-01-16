@@ -4,6 +4,9 @@ use std::{future::Future, pin::Pin};
 use crate::agent::AgentState;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct EmptyParams {}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ActionParameter {
     pub name: String,
     pub description: String,

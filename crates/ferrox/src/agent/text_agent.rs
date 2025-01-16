@@ -103,7 +103,7 @@ where
                                         (param.name, serde_json::json!({
                                             "type": param.param_type,
                                             "description": param.description,
-                                        }))
+                                    }))
                                     }).collect::<serde_json::Map<String, serde_json::Value>>(),
                                     "required": definition.parameters.clone().into_iter()
                                         .filter(|p| p.required)
@@ -247,7 +247,10 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{action::ActionBuilder, agent::NullAgent};
+    use crate::{
+        action::{ActionBuilder, EmptyParams},
+        agent::NullAgent,
+    };
     use openai_api::models::OpenAIModel;
     use serde::Deserialize;
     use std::env;
@@ -537,5 +540,49 @@ mod tests {
         assert!(response.contains("🔹"));
         assert!(response.contains("🔸"));
         assert!(response.contains("💠"));
+    }
+
+    #[tokio::test]
+    async fn test_empty_params_action() {
+        let api_key = env::var("OPENAI_API_KEY").expect("OPENAI_API_KEY must be set");
+
+        let mut agent = TextAgent::<TestState, NullAgent>::new(
+            NullAgent::default(),
+            "You are a helpful assistant that can get the current time. Please use the time action when asked about the current time."
+                .to_string(),
+            api_key,
+            Model::OpenAI(OpenAIModel::GPT35Turbo),
+            TestState { counter: 0 },
+        );
+
+        // Create action that takes EmptyParams
+        async fn get_time(
+            _params: EmptyParams,
+            state: AgentState<TestState>,
+        ) -> Result<String, String> {
+            println!("get_time called. Params: {:?}", _params);
+            state.lock().await.counter += 1;
+            Ok("12:00 PM".to_string())
+        }
+
+        let time_action = ActionBuilder::<_, EmptyParams, TestState>::new("get_time", get_time)
+            .description("Get the current time")
+            .build();
+
+        agent.add_action(Arc::new(time_action));
+
+        // Test the action
+        let response = agent
+            .process_prompt("What time is it?", "test_empty")
+            .await
+            .unwrap();
+
+        println!("Time response: {}", response);
+
+        // Verify the action was called by checking the counter
+        assert_eq!(agent.state().lock().await.counter, 1);
+
+        // Response should contain the time
+        assert!(response.contains("12:00 PM"));
     }
 }
