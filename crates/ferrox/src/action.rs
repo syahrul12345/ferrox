@@ -1,6 +1,8 @@
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use std::{future::Future, pin::Pin};
 
+use crate::agent::AgentState;
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ActionParameter {
     pub name: String,
@@ -22,7 +24,7 @@ pub struct FunctionAction<S: Send + Sync + Clone + 'static> {
     handler: Box<
         dyn Fn(
                 serde_json::Value,
-                S,
+                AgentState<S>,
             ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>>
             + Send
             + Sync,
@@ -37,7 +39,7 @@ impl<S: Send + Sync + Clone + 'static> FunctionAction<S> {
     pub fn execute(
         &self,
         params: serde_json::Value,
-        state: S,
+        state: AgentState<S>,
     ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>> {
         (self.handler)(params, state)
     }
@@ -55,7 +57,7 @@ pub struct ActionBuilder<F, P, S> {
 
 impl<F, Fut, P, S> ActionBuilder<F, P, S>
 where
-    F: Fn(P, S) -> Fut + Send + Sync + Clone + 'static,
+    F: Fn(P, AgentState<S>) -> Fut + Send + Sync + Clone + 'static,
     Fut: Future<Output = Result<String, String>> + Send + Sync + 'static,
     P: DeserializeOwned + Send + 'static,
     S: Send + Sync + Clone + 'static,
@@ -100,7 +102,7 @@ where
                 description: self.description,
                 parameters: self.parameters,
             },
-            handler: Box::new(move |params: serde_json::Value, state: S| {
+            handler: Box::new(move |params: serde_json::Value, state: AgentState<S>| {
                 let handler = handler.clone();
                 Box::pin(async move {
                     let params = serde_json::from_value(params)
@@ -114,6 +116,10 @@ where
 
 #[cfg(test)]
 mod tests {
+    use std::sync::Arc;
+
+    use tokio::sync::Mutex;
+
     use super::*;
 
     // Define a strongly typed parameter struct
@@ -126,7 +132,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_typed_function_action() {
-        async fn weather(params: WeatherParams, _state: ()) -> Result<String, String> {
+        async fn weather(params: WeatherParams, _state: AgentState<()>) -> Result<String, String> {
             let units = params.units.unwrap_or_else(|| "celsius".to_string());
             Ok(format!("Weather in {} ({}): Sunny", params.location, units))
         }
@@ -148,25 +154,26 @@ mod tests {
         assert_eq!(def.parameters.len(), 2);
 
         // Test execution with all parameters
+        let state = Arc::new(Mutex::new(()));
         let params = serde_json::json!({
             "location": "London",
             "units": "fahrenheit"
         });
-        let result = action.execute(params, ()).await.unwrap();
+        let result = action.execute(params, state.clone()).await.unwrap();
         assert_eq!(result, "Weather in London (fahrenheit): Sunny");
 
         // Test execution with only required parameters
         let params = serde_json::json!({
             "location": "Paris"
         });
-        let result = action.execute(params, ()).await.unwrap();
+        let result = action.execute(params, state.clone()).await.unwrap();
         assert_eq!(result, "Weather in Paris (celsius): Sunny");
 
         // Test execution with invalid parameters
         let params = serde_json::json!({
             "wrong_field": "London"
         });
-        let result = action.execute(params, ()).await;
+        let result = action.execute(params, state.clone()).await;
         assert!(result.is_err());
     }
 }

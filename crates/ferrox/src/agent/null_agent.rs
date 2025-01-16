@@ -1,16 +1,20 @@
-use super::Agent;
+use tokio::sync::Mutex;
+
+use super::{Agent, AgentState};
 use crate::action::FunctionAction;
 use std::{future::Future, pin::Pin, sync::Arc};
 
 /// A no-op agent implementation used primarily for testing
 #[derive(Clone)]
 pub struct NullAgent {
-    state: (),
+    state: AgentState<()>,
 }
 
 impl Default for NullAgent {
     fn default() -> Self {
-        Self { state: () }
+        Self {
+            state: Arc::new(Mutex::new(())),
+        }
     }
 }
 
@@ -19,12 +23,8 @@ impl Agent for NullAgent {
         ""
     }
 
-    fn state(&self) -> &() {
+    fn state(&self) -> &AgentState<()> {
         &self.state
-    }
-
-    fn state_mut(&mut self) -> &mut () {
-        &mut self.state
     }
 
     fn process_prompt(
@@ -32,7 +32,6 @@ impl Agent for NullAgent {
         _prompt: &str,
         _history_id: &str,
     ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>> {
-        println!("NULL AGENT: INPUT PROMPT: {}", _prompt);
         let prompt = _prompt.to_string();
         Box::pin(async move { Ok(prompt.to_string()) })
     }
@@ -69,7 +68,7 @@ mod tests {
         let mut agent = NullAgent::default();
 
         // Create a test action using ActionBuilder
-        async fn mock_handler(_: serde_json::Value, _: ()) -> Result<String, String> {
+        async fn mock_handler(_: serde_json::Value, _: AgentState<()>) -> Result<String, String> {
             Ok("mock result".to_string())
         }
 

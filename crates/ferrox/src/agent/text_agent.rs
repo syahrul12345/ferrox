@@ -1,4 +1,4 @@
-use super::Agent;
+use super::{Agent, AgentState};
 use crate::action::FunctionAction;
 use openai_api::{
     completions::Client as OpenAIClient,
@@ -22,7 +22,7 @@ where
     pub open_ai_client: OpenAIClient,
     conversation_history: Arc<Mutex<HashMap<String, Vec<Message>>>>,
     actions: Arc<Mutex<Vec<Arc<FunctionAction<S>>>>>,
-    state: S,
+    state: AgentState<S>,
 }
 
 impl<S, T> TextAgent<S, T>
@@ -43,7 +43,7 @@ where
             open_ai_client: OpenAIClient::new(api_key, model),
             conversation_history: Arc::new(Mutex::new(HashMap::new())),
             actions: Arc::new(Mutex::new(Vec::new())),
-            state,
+            state: Arc::new(tokio::sync::Mutex::new(state)),
         }
     }
 
@@ -220,12 +220,8 @@ where
         &self.system_prompt
     }
 
-    fn state(&self) -> &S {
+    fn state(&self) -> &AgentState<S> {
         &self.state
-    }
-
-    fn state_mut(&mut self) -> &mut S {
-        &mut self.state
     }
 
     fn process_prompt(
@@ -285,7 +281,7 @@ mod tests {
             }
             async fn calculator(
                 params: CalcParams,
-                mut state: TestState,
+                state: AgentState<TestState>,
             ) -> Result<String, String> {
                 println!("Calculator called with params: {:?}", params);
                 let result = match params.operation.as_str() {
@@ -300,7 +296,7 @@ mod tests {
                     }
                     _ => return Err("Invalid operation".to_string()),
                 };
-                state.counter += 1;
+                state.lock().await.counter += 1;
                 Ok(result.to_string())
             }
             let calc_action =
@@ -325,14 +321,17 @@ mod tests {
                 name: String,
                 language: Option<String>,
             }
-            async fn greeter(params: GreetParams, mut state: TestState) -> Result<String, String> {
+            async fn greeter(
+                params: GreetParams,
+                state: AgentState<TestState>,
+            ) -> Result<String, String> {
                 println!("Greeter called with params: {:?}", params);
                 let greeting = match params.language.as_deref() {
                     Some("es") => "¡Hola",
                     Some("fr") => "Bonjour",
                     _ => "Hello",
                 };
-                state.counter += 1;
+                state.lock().await.counter += 1;
                 Ok(format!("{} {}!", greeting, params.name))
             }
             let greet_action = ActionBuilder::<_, GreetParams, TestState>::new("greeter", greeter)
@@ -352,10 +351,10 @@ mod tests {
 
             async fn reverser(
                 params: ReverseParams,
-                mut state: TestState,
+                state: AgentState<TestState>,
             ) -> Result<String, String> {
                 println!("Reverser called with params: {:?}", params);
-                state.counter += 1;
+                state.lock().await.counter += 1;
                 Ok(params.text.chars().rev().collect())
             }
             let reverse_action =
@@ -373,21 +372,21 @@ mod tests {
         println!("Testing calculator with prompt: {}", calc_prompt);
         let calc_response = agent.process_prompt(calc_prompt, "test1").await.unwrap();
         println!("Calculator response: {}", calc_response);
-        assert_eq!(agent.state().counter, 1);
+        assert_eq!(agent.state().lock().await.counter, 1);
 
         println!("--------------------------------");
         let greet_prompt = "Say hello to Alice in Spanish";
         println!("Testing greeter with prompt: {}", greet_prompt);
         let greet_response = agent.process_prompt(greet_prompt, "test2").await.unwrap();
         println!("Greeter response: {}", greet_response);
-        assert_eq!(agent.state().counter, 2);
+        assert_eq!(agent.state().lock().await.counter, 2);
 
         println!("--------------------------------");
         let reverse_prompt = "Reverse the text 'hello world'";
         println!("Testing reverser with prompt: {}", reverse_prompt);
         let reverse_response = agent.process_prompt(reverse_prompt, "test3").await.unwrap();
         println!("Reverser response: {}", reverse_response);
-        assert_eq!(agent.state().counter, 3);
+        assert_eq!(agent.state().lock().await.counter, 3);
 
         // Test chained actions
         println!("--------------------------------");
@@ -395,7 +394,7 @@ mod tests {
         println!("Testing chained actions with prompt: {}", chained_prompt);
         let chained_response = agent.process_prompt(chained_prompt, "test4").await.unwrap();
         println!("Chained actions response: {}", chained_response);
-        assert_eq!(agent.state().counter, 6); // Should have used all 3 actions
+        assert_eq!(agent.state().lock().await.counter, 6); // Should have used all 3 actions
     }
 
     // Keep the existing conversation tests
