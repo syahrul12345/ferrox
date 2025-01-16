@@ -7,24 +7,26 @@ pub use null_agent::NullAgent;
 
 use crate::action::FunctionAction;
 
-/// Agent trait represents an LLM
-/// Agents contains these methods
-/// system_prompt: Returns the system prompt for the agent
-/// process_prompt: Takes in a prompt and returns the stringified response
-/// add_action: Adds an action to the agent
-/// Ferrox comes with these agents already implemented
-/// `VoiceAgent` and agent that wraps around the whisper-1 model. It's takes in a base64 encoded audio and returns the text
-/// `TextAgent` and agent that wraps around any text based LLM. It takes in a prompt and returns the stringified response. OpenAI and Anthropic models are supported.
-/// `AssistantAgent` and agent that wraps around any text based LLM. It takes in a prompt and returns the stringified response, but uses openAI asssitant API. As such, only openAI models are supported.
-pub trait Agent: Clone {
-    /// Adds an tool to the agent
-    fn add_action(&mut self, action: Arc<FunctionAction>);
+/// Agent trait represents an LLM with state management capabilities
+/// The state type S must be Send + Sync + Clone + 'static
+pub trait Agent<S: Send + Sync + Clone + 'static = ()>: Clone {
+    /// Adds a tool to the agent
+    fn add_action(&mut self, action: Arc<FunctionAction<S>>);
+
     /// Returns the system prompt for the agent
     fn system_prompt(&self) -> &str;
-    /// Takes in a prompt and returns the stringified response. This will automatically add the tool calls to the prompt.
+
+    /// Returns a reference to the agent's state
+    fn state(&self) -> &S;
+
+    /// Returns a mutable reference to the agent's state
+    fn state_mut(&mut self) -> &mut S;
+
+    /// Takes in a prompt and returns the stringified response.
+    /// This will automatically add the tool calls to the prompt.
     fn process_prompt(
         &self,
         prompt: &str,
         history_id: &str,
-    ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Sync + Send>>;
+    ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>>;
 }

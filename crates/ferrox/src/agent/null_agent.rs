@@ -4,22 +4,40 @@ use std::{future::Future, pin::Pin, sync::Arc};
 
 /// A no-op agent implementation used primarily for testing
 #[derive(Clone)]
-pub struct NullAgent;
+pub struct NullAgent {
+    state: (),
+}
+
+impl Default for NullAgent {
+    fn default() -> Self {
+        Self { state: () }
+    }
+}
 
 impl Agent for NullAgent {
     fn system_prompt(&self) -> &str {
         ""
     }
 
+    fn state(&self) -> &() {
+        &self.state
+    }
+
+    fn state_mut(&mut self) -> &mut () {
+        &mut self.state
+    }
+
     fn process_prompt(
         &self,
         _prompt: &str,
         _history_id: &str,
-    ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Sync + Send>> {
-        Box::pin(async { Ok(String::new()) })
+    ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>> {
+        println!("NULL AGENT: INPUT PROMPT: {}", _prompt);
+        let prompt = _prompt.to_string();
+        Box::pin(async move { Ok(prompt.to_string()) })
     }
 
-    fn add_action(&mut self, _action: Arc<FunctionAction>) {
+    fn add_action(&mut self, _action: Arc<FunctionAction<()>>) {
         // NullAgent ignores actions
     }
 }
@@ -27,17 +45,17 @@ impl Agent for NullAgent {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::action::{ActionBuilder, ActionDefinition};
+    use crate::action::ActionBuilder;
 
     #[tokio::test]
     async fn test_system_prompt() {
-        let agent = NullAgent;
+        let agent = NullAgent::default();
         assert_eq!(agent.system_prompt(), "");
     }
 
     #[tokio::test]
     async fn test_process_prompt() {
-        let agent = NullAgent;
+        let agent = NullAgent::default();
         let response = agent
             .process_prompt("test prompt", "test_history")
             .await
@@ -48,10 +66,10 @@ mod tests {
 
     #[tokio::test]
     async fn test_add_action() {
-        let mut agent = NullAgent;
+        let mut agent = NullAgent::default();
 
         // Create a test action using ActionBuilder
-        async fn mock_handler(_: serde_json::Value) -> Result<String, String> {
+        async fn mock_handler(_: serde_json::Value, _: ()) -> Result<String, String> {
             Ok("mock result".to_string())
         }
 
@@ -65,7 +83,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_process_prompt_with_empty_input() {
-        let agent = NullAgent;
+        let agent = NullAgent::default();
         let response = agent
             .process_prompt("", "test_history")
             .await
@@ -76,7 +94,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_clone() {
-        let agent = NullAgent;
+        let agent = NullAgent::default();
         let _cloned = agent.clone();
         // If we got here, clone worked
     }

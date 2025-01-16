@@ -12,23 +12,30 @@ use std::{
 };
 
 #[derive(Clone)]
-pub struct TextAgent<T>
+pub struct TextAgent<S, T>
 where
-    T: Agent,
+    S: Send + Sync + Clone + 'static,
+    T: Agent + Send + Sync + 'static,
 {
-    pub inner_agent: Option<T>,
+    pub inner_agent: T,
     pub system_prompt: String,
     pub open_ai_client: OpenAIClient,
     conversation_history: Arc<Mutex<HashMap<String, Vec<Message>>>>,
-    actions: Arc<Mutex<Vec<Arc<FunctionAction>>>>,
+    actions: Arc<Mutex<Vec<Arc<FunctionAction<S>>>>>,
+    state: S,
 }
 
-impl<T: Agent> TextAgent<T> {
+impl<S, T> TextAgent<S, T>
+where
+    S: Send + Sync + Clone + 'static,
+    T: Agent + Send + Sync + 'static,
+{
     pub fn new(
-        inner_agent: Option<T>,
+        inner_agent: T,
         system_prompt: String,
         api_key: String,
         model: Model,
+        state: S,
     ) -> Self {
         Self {
             inner_agent,
@@ -36,6 +43,7 @@ impl<T: Agent> TextAgent<T> {
             open_ai_client: OpenAIClient::new(api_key, model),
             conversation_history: Arc::new(Mutex::new(HashMap::new())),
             actions: Arc::new(Mutex::new(Vec::new())),
+            state,
         }
     }
 
@@ -47,6 +55,7 @@ impl<T: Agent> TextAgent<T> {
         // Clone what we need for the async block
         let conversation_history = self.conversation_history.clone();
         let system_prompt = self.system_prompt.clone();
+        let state = self.state.clone();
         let open_ai_client = self.open_ai_client.clone();
         let actions = self.actions.clone();
         let history_id = history_id.to_string();
@@ -156,6 +165,7 @@ impl<T: Agent> TextAgent<T> {
                             .execute(
                                 serde_json::from_str(&tool_call.function.arguments)
                                     .map_err(|e| e.to_string())?,
+                                state.clone(),
                             )
                             .await
                             .map_err(|e| {
@@ -197,13 +207,25 @@ impl<T: Agent> TextAgent<T> {
     }
 }
 
-impl<T: Agent + Send + Sync + 'static> Agent for TextAgent<T> {
-    fn add_action(&mut self, action: Arc<FunctionAction>) {
+impl<S, T> Agent<S> for TextAgent<S, T>
+where
+    S: Send + Sync + Clone + 'static,
+    T: Agent + Send + Sync + 'static,
+{
+    fn add_action(&mut self, action: Arc<FunctionAction<S>>) {
         self.actions.lock().unwrap().push(action);
     }
 
     fn system_prompt(&self) -> &str {
         &self.system_prompt
+    }
+
+    fn state(&self) -> &S {
+        &self.state
+    }
+
+    fn state_mut(&mut self) -> &mut S {
+        &mut self.state
     }
 
     fn process_prompt(
@@ -214,15 +236,13 @@ impl<T: Agent + Send + Sync + 'static> Agent for TextAgent<T> {
         let history_id = history_id.to_string();
         let text_future = self.send_prompt(prompt, &history_id);
         let inner_agent = self.inner_agent.clone();
-        if let Some(inner) = inner_agent {
-            Box::pin(async move {
-                let text_result = text_future.await?;
-                let text_result = inner.process_prompt(&text_result, &history_id).await?;
-                Ok(text_result)
-            })
-        } else {
-            text_future
-        }
+        Box::pin(async move {
+            let text_result = text_future.await?;
+            let text_result = inner_agent
+                .process_prompt(&text_result, &history_id)
+                .await?;
+            Ok(text_result)
+        })
     }
 }
 
@@ -236,16 +256,22 @@ mod tests {
     use serde::Deserialize;
     use std::env;
 
+    #[derive(Clone, Debug, Default)]
+    struct TestState {
+        counter: i32,
+    }
+
     #[tokio::test]
     async fn test_text_agent_with_actions() {
         let api_key = env::var("OPENAI_API_KEY").expect("OPENAI_API_KEY must be set");
 
-        let mut agent = TextAgent::<NullAgent>::new(
-            None,
+        let mut agent = TextAgent::<TestState, NullAgent>::new(
+            NullAgent::default(),
             "You are a helpful assistant that can perform calculations, generate greetings, and reverse text. \
              Please use the appropriate action when needed.".to_string(),
             api_key,
             Model::OpenAI(OpenAIModel::GPT35Turbo),
+            TestState { counter: 0 },
         );
 
         println!("Created text agent");
@@ -257,7 +283,10 @@ mod tests {
                 b: f64,
                 operation: String,
             }
-            async fn calculator(params: CalcParams) -> Result<String, String> {
+            async fn calculator(
+                params: CalcParams,
+                mut state: TestState,
+            ) -> Result<String, String> {
                 println!("Calculator called with params: {:?}", params);
                 let result = match params.operation.as_str() {
                     "add" => params.a + params.b,
@@ -271,19 +300,21 @@ mod tests {
                     }
                     _ => return Err("Invalid operation".to_string()),
                 };
+                state.counter += 1;
                 Ok(result.to_string())
             }
-            let calc_action = ActionBuilder::<_, CalcParams>::new("calculator", calculator)
-                .description("Perform basic arithmetic operations")
-                .parameter("a", "First number", "number", true)
-                .parameter("b", "Second number", "number", true)
-                .parameter(
-                    "operation",
-                    "Operation to perform (add/subtract/multiply/divide)",
-                    "string",
-                    true,
-                )
-                .build();
+            let calc_action =
+                ActionBuilder::<_, CalcParams, TestState>::new("calculator", calculator)
+                    .description("Perform basic arithmetic operations")
+                    .parameter("a", "First number", "number", true)
+                    .parameter("b", "Second number", "number", true)
+                    .parameter(
+                        "operation",
+                        "Operation to perform (add/subtract/multiply/divide)",
+                        "string",
+                        true,
+                    )
+                    .build();
             agent.add_action(Arc::new(calc_action));
             println!("Added calculator action");
         }
@@ -294,16 +325,17 @@ mod tests {
                 name: String,
                 language: Option<String>,
             }
-            async fn greeter(params: GreetParams) -> Result<String, String> {
+            async fn greeter(params: GreetParams, mut state: TestState) -> Result<String, String> {
                 println!("Greeter called with params: {:?}", params);
                 let greeting = match params.language.as_deref() {
                     Some("es") => "¡Hola",
                     Some("fr") => "Bonjour",
                     _ => "Hello",
                 };
+                state.counter += 1;
                 Ok(format!("{} {}!", greeting, params.name))
             }
-            let greet_action = ActionBuilder::<_, GreetParams>::new("greeter", greeter)
+            let greet_action = ActionBuilder::<_, GreetParams, TestState>::new("greeter", greeter)
                 .description("Generate a greeting message")
                 .parameter("name", "Name to greet", "string", true)
                 .parameter("language", "Language code (en/es/fr)", "string", false)
@@ -318,38 +350,44 @@ mod tests {
                 text: String,
             }
 
-            async fn reverser(params: ReverseParams) -> Result<String, String> {
+            async fn reverser(
+                params: ReverseParams,
+                mut state: TestState,
+            ) -> Result<String, String> {
                 println!("Reverser called with params: {:?}", params);
+                state.counter += 1;
                 Ok(params.text.chars().rev().collect())
             }
-            let reverse_action = ActionBuilder::<_, ReverseParams>::new("reverser", reverser)
-                .description("Reverse input text")
-                .parameter("text", "Text to reverse", "string", true)
-                .build();
+            let reverse_action =
+                ActionBuilder::<_, ReverseParams, TestState>::new("reverser", reverser)
+                    .description("Reverse input text")
+                    .parameter("text", "Text to reverse", "string", true)
+                    .build();
             agent.add_action(Arc::new(reverse_action));
             println!("Added reverser action");
         }
-        // Text reverser action
 
         // Test individual actions through the agent
-
         println!("--------------------------------");
         let calc_prompt = "Calculate 5 plus 3";
         println!("Testing calculator with prompt: {}", calc_prompt);
         let calc_response = agent.process_prompt(calc_prompt, "test1").await.unwrap();
         println!("Calculator response: {}", calc_response);
+        assert_eq!(agent.state().counter, 1);
 
         println!("--------------------------------");
         let greet_prompt = "Say hello to Alice in Spanish";
         println!("Testing greeter with prompt: {}", greet_prompt);
         let greet_response = agent.process_prompt(greet_prompt, "test2").await.unwrap();
         println!("Greeter response: {}", greet_response);
+        assert_eq!(agent.state().counter, 2);
 
         println!("--------------------------------");
         let reverse_prompt = "Reverse the text 'hello world'";
         println!("Testing reverser with prompt: {}", reverse_prompt);
         let reverse_response = agent.process_prompt(reverse_prompt, "test3").await.unwrap();
         println!("Reverser response: {}", reverse_response);
+        assert_eq!(agent.state().counter, 3);
 
         // Test chained actions
         println!("--------------------------------");
@@ -357,6 +395,7 @@ mod tests {
         println!("Testing chained actions with prompt: {}", chained_prompt);
         let chained_response = agent.process_prompt(chained_prompt, "test4").await.unwrap();
         println!("Chained actions response: {}", chained_response);
+        assert_eq!(agent.state().counter, 6); // Should have used all 3 actions
     }
 
     // Keep the existing conversation tests
@@ -364,11 +403,12 @@ mod tests {
     async fn test_text_agent_conversation() {
         let api_key = env::var("OPENAI_API_KEY").expect("OPENAI_API_KEY must be set");
 
-        let agent = TextAgent::<NullAgent>::new(
-            None,
+        let agent = TextAgent::<_, NullAgent>::new(
+            NullAgent::default(),
             "You are a helpful assistant that provides concise responses.".to_string(),
             api_key,
             Model::OpenAI(OpenAIModel::GPT35Turbo),
+            (),
         );
 
         // Test first message
@@ -406,11 +446,12 @@ mod tests {
     async fn test_text_agent_multiple_conversations() {
         let api_key = env::var("OPENAI_API_KEY").expect("OPENAI_API_KEY must be set");
 
-        let agent = TextAgent::<NullAgent>::new(
-            None,
+        let agent = TextAgent::<_, NullAgent>::new(
+            NullAgent::default(),
             "You are a helpful assistant.".to_string(),
             api_key,
             Model::OpenAI(OpenAIModel::GPT35Turbo),
+            (),
         );
 
         // Test sending prompts with different conversation IDs
@@ -460,8 +501,8 @@ mod tests {
         let api_key = env::var("OPENAI_API_KEY").expect("OPENAI_API_KEY must be set");
 
         // Create inner agent that adds markdown formatting
-        let inner_agent = TextAgent::<NullAgent>::new(
-            None,
+        let inner_agent = TextAgent::<_, NullAgent>::new(
+            NullAgent::default(),
             "You are a formatting assistant. Your job is to take any text and format it as a markdown quote with emoji bullets. \
              Always format your response like this:\
              \n> 🔹 First point\
@@ -470,16 +511,18 @@ mod tests {
                 .to_string(),
             api_key.clone(),
             Model::OpenAI(OpenAIModel::GPT35Turbo),
+            (),
         );
 
         // Create outer agent that generates content
         let agent = TextAgent::new(
-            Some(inner_agent),
+            inner_agent,
             "You are a helpful assistant that explains technical concepts. \
              Break down your explanations into 2-3 key points."
                 .to_string(),
             api_key,
             Model::OpenAI(OpenAIModel::GPT35Turbo),
+            (),
         );
 
         // Test the chain

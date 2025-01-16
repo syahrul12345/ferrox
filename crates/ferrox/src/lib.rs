@@ -6,23 +6,33 @@ use std::sync::Arc;
 use agent::Agent;
 use teloxide::{prelude::*, types::Message};
 
-pub struct Ferrox<P> {
+pub struct Ferrox<A, S>
+where
+    A: Agent<S> + Send + Sync + Clone + 'static,
+    S: Send + Sync + Clone + 'static,
+{
     bot: Bot,
-    agent: P,
+    agent: A,
+    _state: std::marker::PhantomData<S>,
 }
 
-impl<P: Agent + Clone + Send + Sync + 'static> Ferrox<P> {
-    pub fn new(agent: P) -> Self {
+impl<A, S> Ferrox<A, S>
+where
+    A: Agent<S> + Send + Sync + Clone + 'static,
+    S: Send + Sync + Clone + 'static,
+{
+    pub fn new(agent: A) -> Self {
         Self {
             bot: Bot::from_env(),
-            agent: agent.clone(),
+            agent,
+            _state: std::marker::PhantomData,
         }
     }
 
     /// Starts the Telegram bot and handles incoming messages
-    pub async fn start(self) {
-        let bot = self.bot;
-        let agent = Arc::new(self.agent);
+    pub async fn start(&self) {
+        let bot = self.bot.clone();
+        let agent = Arc::new(self.agent.clone());
 
         teloxide::repl(bot, move |bot: Bot, msg: Message| {
             let agent = agent.clone();
