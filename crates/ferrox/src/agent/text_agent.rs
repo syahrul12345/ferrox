@@ -1,5 +1,5 @@
 use super::Agent;
-use crate::action::Action;
+use crate::action::FunctionAction;
 use openai_api::{
     completions::Client as OpenAIClient,
     models::{FunctionDefinition, Message, Model, Tool},
@@ -20,7 +20,7 @@ where
     pub system_prompt: String,
     pub open_ai_client: OpenAIClient,
     conversation_history: Arc<Mutex<HashMap<String, Vec<Message>>>>,
-    actions: Arc<Mutex<Vec<Arc<dyn Action>>>>,
+    actions: Arc<Mutex<Vec<Arc<FunctionAction>>>>,
 }
 
 impl<T: Agent> TextAgent<T> {
@@ -198,7 +198,7 @@ impl<T: Agent> TextAgent<T> {
 }
 
 impl<T: Agent + Send + Sync + 'static> Agent for TextAgent<T> {
-    fn add_action(&mut self, action: Arc<dyn Action>) {
+    fn add_action(&mut self, action: Arc<FunctionAction>) {
         self.actions.lock().unwrap().push(action);
     }
 
@@ -211,13 +211,11 @@ impl<T: Agent + Send + Sync + 'static> Agent for TextAgent<T> {
         prompt: &str,
         history_id: &str,
     ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>> {
-        // Clone what we need for the async block
         let history_id = history_id.to_string();
         let text_future = self.send_prompt(prompt, &history_id);
         let inner_agent = self.inner_agent.clone();
         if let Some(inner) = inner_agent {
             Box::pin(async move {
-                // Get result from TextAgent
                 let text_result = text_future.await?;
                 let text_result = inner.process_prompt(&text_result, &history_id).await?;
                 Ok(text_result)
@@ -228,6 +226,7 @@ impl<T: Agent + Send + Sync + 'static> Agent for TextAgent<T> {
     }
 }
 
+//Tests remain the same but need to be updated to use ActionBuilder instead of MockAction
 //For these tests make sure to set the OPENAI_API_KEY environment variable
 #[cfg(test)]
 mod tests {

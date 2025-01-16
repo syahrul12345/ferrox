@@ -1,4 +1,5 @@
 use super::Agent;
+use crate::action::FunctionAction;
 use std::{future::Future, pin::Pin, sync::Arc};
 
 /// A no-op agent implementation used primarily for testing
@@ -18,7 +19,7 @@ impl Agent for NullAgent {
         Box::pin(async { Ok(String::new()) })
     }
 
-    fn add_action(&mut self, _action: Arc<dyn crate::action::Action>) {
+    fn add_action(&mut self, _action: Arc<FunctionAction>) {
         // NullAgent ignores actions
     }
 }
@@ -26,26 +27,7 @@ impl Agent for NullAgent {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::action::{Action, ActionDefinition};
-
-    // Mock action for testing
-    struct MockAction;
-    impl Action for MockAction {
-        fn definition(&self) -> ActionDefinition {
-            ActionDefinition {
-                name: "mock_action".to_string(),
-                description: "A mock action for testing".to_string(),
-                parameters: vec![],
-            }
-        }
-
-        fn execute(
-            &self,
-            _params: serde_json::Value,
-        ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>> {
-            Box::pin(async { Ok("mock result".to_string()) })
-        }
-    }
+    use crate::action::{ActionBuilder, ActionDefinition};
 
     #[tokio::test]
     async fn test_system_prompt() {
@@ -67,8 +49,18 @@ mod tests {
     #[tokio::test]
     async fn test_add_action() {
         let mut agent = NullAgent;
+
+        // Create a test action using ActionBuilder
+        async fn mock_handler(_: serde_json::Value) -> Result<String, String> {
+            Ok("mock result".to_string())
+        }
+
+        let action = ActionBuilder::new("mock_action", mock_handler)
+            .description("A mock action for testing")
+            .build();
+
         // Should not panic or have any effect
-        agent.add_action(Arc::new(MockAction));
+        agent.add_action(Arc::new(action));
     }
 
     #[tokio::test]

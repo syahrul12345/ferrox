@@ -5,7 +5,7 @@ use std::{future::Future, pin::Pin, sync::Arc};
 
 pub use null_agent::NullAgent;
 
-use crate::action::Action;
+use crate::action::FunctionAction;
 
 /// Agent trait represents an LLM
 /// Agents contains these methods
@@ -18,7 +18,7 @@ use crate::action::Action;
 /// `AssistantAgent` and agent that wraps around any text based LLM. It takes in a prompt and returns the stringified response, but uses openAI asssitant API. As such, only openAI models are supported.
 pub trait Agent: Clone {
     /// Adds an tool to the agent
-    fn add_action(&mut self, action: Arc<dyn Action>);
+    fn add_action(&mut self, action: Arc<FunctionAction>);
     /// Returns the system prompt for the agent
     fn system_prompt(&self) -> &str;
     /// Takes in a prompt and returns the stringified response. This will automatically add the tool calls to the prompt.

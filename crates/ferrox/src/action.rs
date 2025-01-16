@@ -17,13 +17,28 @@ pub struct ActionDefinition {
     pub parameters: Vec<ActionParameter>,
 }
 
-/// An asynchronous action that an agent can perform.
-pub trait Action: Send + Sync {
-    fn definition(&self) -> ActionDefinition;
-    fn execute(
+pub struct FunctionAction {
+    definition: ActionDefinition,
+    handler: Box<
+        dyn Fn(
+                serde_json::Value,
+            ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>>
+            + Send
+            + Sync,
+    >,
+}
+
+impl FunctionAction {
+    pub fn definition(&self) -> ActionDefinition {
+        self.definition.clone()
+    }
+
+    pub fn execute(
         &self,
         params: serde_json::Value,
-    ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>>;
+    ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>> {
+        (self.handler)(params)
+    }
 }
 
 /// A builder to create actions from async functions with typed parameters
@@ -72,7 +87,7 @@ where
         self
     }
 
-    pub fn build(self) -> impl Action {
+    pub fn build(self) -> FunctionAction {
         let handler = self.handler;
         FunctionAction {
             definition: ActionDefinition {
@@ -82,35 +97,13 @@ where
             },
             handler: Box::new(move |params: serde_json::Value| {
                 let handler = handler.clone();
-                async move {
+                Box::pin(async move {
                     let params = serde_json::from_value(params)
                         .map_err(|e| format!("Invalid parameters: {}", e))?;
                     handler(params).await
-                }
+                })
             }),
         }
-    }
-}
-
-struct FunctionAction<F> {
-    definition: ActionDefinition,
-    handler: Box<F>,
-}
-
-impl<F, Fut> Action for FunctionAction<F>
-where
-    F: Fn(serde_json::Value) -> Fut + Clone + Send + Sync + 'static,
-    Fut: Future<Output = Result<String, String>> + Send + Sync + 'static,
-{
-    fn definition(&self) -> ActionDefinition {
-        self.definition.clone()
-    }
-
-    fn execute(
-        &self,
-        params: serde_json::Value,
-    ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>> {
-        Box::pin((self.handler)(params))
     }
 }
 
