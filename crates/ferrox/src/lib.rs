@@ -38,9 +38,11 @@ where
             async move {
                 if let Some(text) = msg.text() {
                     let history_id = msg.chat.id.to_string();
+                    let sent_message = bot.send_message(msg.chat.id, "Thinking...").await?;
                     match agent.process_prompt(text, &history_id).await {
                         Ok(response) => {
-                            bot.send_message(msg.chat.id, response).await?;
+                            bot.edit_message_text(sent_message.chat.id, sent_message.id, response)
+                                .await?;
                         }
                         Err(e) => {
                             println!("Error processing prompt");

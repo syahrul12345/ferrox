@@ -55,6 +55,7 @@ impl Client {
         mut history: Vec<Message>,
         mut tools: Vec<Tool>,
     ) -> Result<StructuredResponse> {
+        println!("Sending prompt with tools");
         // Add the user's prompt to the message history
         if let Some(prompt) = prompt {
             history.push(Message {

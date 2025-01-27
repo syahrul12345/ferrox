@@ -77,7 +77,7 @@ impl CoinGeckoProClient {
             .send()
             .await
             .map_err(|e| e.to_string())?;
-
+        println!("Got response from {}", url);
         if response.status().is_success() {
             let text = response.text().await.map_err(|e| e.to_string())?;
             Ok(text)
