@@ -66,7 +66,9 @@ impl CoinGeckoProClient {
         endpoint: &str,
         params: Option<HashMap<String, String>>,
     ) -> Result<String, String> {
+        println!("Making coingecko request to {}", endpoint);
         let url = format!("{}{}", BASE_URL, endpoint);
+        println!("URL: {} params {:?}", url, params);
         let response = self
             .client
             .get(&url)
@@ -77,7 +79,8 @@ impl CoinGeckoProClient {
             .map_err(|e| e.to_string())?;
 
         if response.status().is_success() {
-            response.text().await.map_err(|e| e.to_string())
+            let text = response.text().await.map_err(|e| e.to_string())?;
+            Ok(text)
         } else {
             Err(format!("Request failed with status: {}", response.status()))
         }

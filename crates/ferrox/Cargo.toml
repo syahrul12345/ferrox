@@ -10,3 +10,4 @@ openai-api = { path = "../openai-api" }
 tokio = { version = "1.43.0", features = ["full"] }
 serde = "1.0.217"
 serde_json = "1.0.135"
+ferrox-actions = { path = "../ferrox-actions" }

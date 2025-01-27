@@ -1,4 +1,3 @@
-pub mod action;
 pub mod agent;
 
 use std::sync::Arc;
@@ -39,8 +38,16 @@ where
             async move {
                 if let Some(text) = msg.text() {
                     let history_id = msg.chat.id.to_string();
-                    if let Ok(response) = agent.process_prompt(text, &history_id).await {
-                        bot.send_message(msg.chat.id, response).await?;
+                    match agent.process_prompt(text, &history_id).await {
+                        Ok(response) => {
+                            bot.send_message(msg.chat.id, response).await?;
+                        }
+                        Err(e) => {
+                            println!("Error processing prompt");
+                            println!("Error: {:?}", e);
+                            bot.send_message(msg.chat.id, "Error processing prompt")
+                                .await?;
+                        }
                     }
                 }
                 Ok(())

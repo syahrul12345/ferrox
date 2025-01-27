@@ -1,7 +1,7 @@
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
-use std::{future::Future, pin::Pin};
+use std::{future::Future, pin::Pin, sync::Arc};
 
-use crate::agent::AgentState;
+use crate::AgentState;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct EmptyParams {}
@@ -115,6 +115,11 @@ where
             }),
         }
     }
+}
+
+/// Represents a group of related actions
+pub trait ActionGroup<S: Send + Sync + Clone + 'static> {
+    fn actions(&self) -> &[Arc<FunctionAction<S>>];
 }
 
 #[cfg(test)]

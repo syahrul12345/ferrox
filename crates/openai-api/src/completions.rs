@@ -1,6 +1,7 @@
 use crate::models::{CompletionRequest, CompletionResponse, Message, Model, Tool};
 use anyhow::Result;
 use serde::Serialize;
+use serde_json::json;
 
 #[derive(Clone)]
 pub struct Client {
@@ -52,7 +53,7 @@ impl Client {
         &self,
         prompt: Option<String>,
         mut history: Vec<Message>,
-        tools: Vec<Tool>,
+        mut tools: Vec<Tool>,
     ) -> Result<StructuredResponse> {
         // Add the user's prompt to the message history
         if let Some(prompt) = prompt {
@@ -62,6 +63,29 @@ impl Client {
                 tool_calls: None,
                 tool_call_id: None,
             });
+        }
+
+        // Process array parameters in tools
+        for tool in &mut tools {
+            if let Some(properties) = tool.function.parameters.get_mut("properties") {
+                if let Some(obj) = properties.as_object_mut() {
+                    for (_, value) in obj.iter_mut() {
+                        if let Some(param_obj) = value.as_object_mut() {
+                            if param_obj.get("type").and_then(|t| t.as_str()) == Some("array") {
+                                // Add items field for array type if not present
+                                if !param_obj.contains_key("items") {
+                                    param_obj.insert(
+                                        "items".to_string(),
+                                        json!({
+                                            "type": "string"  // Default to string array
+                                        }),
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         let request = CompletionRequest {
@@ -80,7 +104,6 @@ impl Client {
                 true => None,
                 false => Some(tools),
             },
-
             ..Default::default()
         };
 
@@ -106,7 +129,8 @@ impl Client {
             .send()
             .await?;
 
-        let completion: CompletionResponse = response.json().await?;
+        let text = response.text().await?;
+        let completion: CompletionResponse = serde_json::from_str(&text)?;
         // Handle both regular responses and tool calls
         let first_choice = completion
             .choices

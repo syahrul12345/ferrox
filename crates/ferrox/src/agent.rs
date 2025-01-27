@@ -3,17 +3,21 @@ pub mod text_agent;
 
 use std::{future::Future, pin::Pin, sync::Arc};
 
+use ferrox_actions::{ActionGroup, AgentState, FunctionAction};
 pub use null_agent::NullAgent;
-use tokio::sync::Mutex;
-
-use crate::action::FunctionAction;
-pub type AgentState<S> = Arc<Mutex<S>>;
 
 /// Agent trait represents an LLM with state management capabilities
 /// The state type S must be Send + Sync + Clone + 'static
 pub trait Agent<S: Send + Sync + Clone + 'static = ()>: Clone {
     /// Adds a tool to the agent
     fn add_action(&mut self, action: Arc<FunctionAction<S>>);
+
+    /// Adds all actions from an action group
+    fn add_action_group<G: ActionGroup<S>>(&mut self, group: &G) {
+        for action in group.actions() {
+            self.add_action(action.clone());
+        }
+    }
 
     /// Returns the system prompt for the agent
     fn system_prompt(&self) -> &str;

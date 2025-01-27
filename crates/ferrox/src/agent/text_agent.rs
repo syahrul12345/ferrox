@@ -1,5 +1,5 @@
-use super::{Agent, AgentState};
-use crate::action::FunctionAction;
+use super::Agent;
+use ferrox_actions::{AgentState, FunctionAction};
 use openai_api::{
     completions::Client as OpenAIClient,
     models::{FunctionDefinition, Message, Model, Tool},
@@ -53,6 +53,7 @@ where
         history_id: &str,
     ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>> {
         // Clone what we need for the async block
+        println!("Sending prompt: {}", prompt);
         let conversation_history = self.conversation_history.clone();
         let system_prompt = self.system_prompt.clone();
         let state = self.state.clone();
@@ -213,6 +214,7 @@ where
     T: Agent + Send + Sync + 'static,
 {
     fn add_action(&mut self, action: Arc<FunctionAction<S>>) {
+        println!("Adding action: {:?}", action.definition().name);
         self.actions.lock().unwrap().push(action);
     }
 
@@ -247,10 +249,8 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{
-        action::{ActionBuilder, EmptyParams},
-        agent::NullAgent,
-    };
+    use crate::agent::NullAgent;
+    use ferrox_actions::{ActionBuilder, EmptyParams};
     use openai_api::models::OpenAIModel;
     use serde::Deserialize;
     use std::env;

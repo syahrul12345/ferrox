@@ -1,8 +1,9 @@
 use tokio::sync::Mutex;
 
-use super::{Agent, AgentState};
-use crate::action::FunctionAction;
+use ferrox_actions::{AgentState, FunctionAction};
 use std::{future::Future, pin::Pin, sync::Arc};
+
+use super::Agent;
 
 /// A no-op agent implementation used primarily for testing
 #[derive(Clone)]
@@ -44,8 +45,7 @@ impl Agent for NullAgent {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::action::ActionBuilder;
-
+    use ferrox_actions::ActionBuilder;
     #[tokio::test]
     async fn test_system_prompt() {
         let agent = NullAgent::default();

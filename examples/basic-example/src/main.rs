@@ -1,10 +1,10 @@
 use std::{env, sync::Arc};
 
 use ferrox::{
-    action::{ActionBuilder, EmptyParams},
-    agent::{text_agent::TextAgent, Agent, AgentState, NullAgent},
+    agent::{text_agent::TextAgent, Agent, NullAgent},
     Ferrox,
 };
+use ferrox_actions::{ActionBuilder, AgentState, CoinGeckoActionGroup, EmptyParams};
 use openai_api::models::{Model, OpenAIModel};
 use serde::Deserialize;
 
@@ -80,6 +80,9 @@ async fn main() {
                 .build();
         decision_agent.add_action(Arc::new(get_counter_action));
     }
+
+    let coingecko_group = CoinGeckoActionGroup::new();
+    decision_agent.add_action_group(&coingecko_group);
 
     let ferrox = Ferrox::<_, TestState>::new(decision_agent);
     ferrox.start().await;
