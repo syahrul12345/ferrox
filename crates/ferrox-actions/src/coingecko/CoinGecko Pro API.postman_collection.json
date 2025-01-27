@@ -1,0 +1,4945 @@
+{
+	"info": {
+		"_postman_id": "5836a1ee-08b5-427a-866a-b1bb1f0a5557",
+		"name": "CoinGecko Pro API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "9148457",
+		"_collection_link": "https://www.postman.com/cg-api-postman/coingecko-api/collection/u7a1fap/coingecko-pro-api?action=share&source=collection_link&creator=9148457"
+	},
+	"item": [
+		{
+			"name": "Ping",
+			"item": [
+				{
+					"name": "Check API server status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/ping",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"ping"
+							]
+						},
+						"description": "This endpoint allows you to **check the API server status**."
+					},
+					"response": [
+						{
+							"name": "Status OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/ping",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"ping"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"gecko_says\": \"<string>\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Key",
+			"item": [
+				{
+					"name": "💼 API Usage",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/key",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"key"
+							]
+						},
+						"description": "This endpoint allows you to **monitor your account's API usage, including rate limits, monthly total credits, remaining credits, and more**."
+					},
+					"response": [
+						{
+							"name": "API Usage",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/key",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"key"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"plan\": \"<string>\",\n  \"rate_limit_request_per_minute\": \"<number>\",\n  \"monthly_call_credit\": \"<number>\",\n  \"current_total_monthly_calls\": \"<number>\",\n  \"current_remaining_monthly_calls\": \"<number>\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Simple",
+			"item": [
+				{
+					"name": "Coin Price by IDs",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/simple/price?ids=<string>&vs_currencies=<string>&include_market_cap=<boolean>&include_24hr_vol=<boolean>&include_24hr_change=<boolean>&include_last_updated_at=<boolean>&precision=full",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"simple",
+								"price"
+							],
+							"query": [
+								{
+									"key": "ids",
+									"value": "<string>",
+									"description": "(Required) coins' ids, comma-separated if querying more than 1 coin.  <br>*refers to [`/coins/list`](/reference/coins-list)."
+								},
+								{
+									"key": "vs_currencies",
+									"value": "<string>",
+									"description": "(Required) target currency of coins, comma-separated if querying more than 1 currency.  <br>*refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies)."
+								},
+								{
+									"key": "include_market_cap",
+									"value": "<boolean>",
+									"description": "include market cap, default: false "
+								},
+								{
+									"key": "include_24hr_vol",
+									"value": "<boolean>",
+									"description": "include 24hr volume, default: false"
+								},
+								{
+									"key": "include_24hr_change",
+									"value": "<boolean>",
+									"description": "include 24hr change, default: false"
+								},
+								{
+									"key": "include_last_updated_at",
+									"value": "<boolean>",
+									"description": "include last updated price time in UNIX, default: false"
+								},
+								{
+									"key": "precision",
+									"value": "full",
+									"description": "decimal place for currency price value "
+								}
+							]
+						},
+						"description": "This endpoint allows you to **query the prices of one or more coins by using their unique Coin API IDs**."
+					},
+					"response": [
+						{
+							"name": "price(s) of cryptocurrency",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/simple/price?ids=<string>&vs_currencies=<string>&include_market_cap=<boolean>&include_24hr_vol=<boolean>&include_24hr_change=<boolean>&include_last_updated_at=<boolean>&precision=full",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"simple",
+										"price"
+									],
+									"query": [
+										{
+											"key": "ids",
+											"value": "<string>",
+											"description": "(Required) coins' ids, comma-separated if querying more than 1 coin.  <br>*refers to [`/coins/list`](/reference/coins-list)."
+										},
+										{
+											"key": "vs_currencies",
+											"value": "<string>",
+											"description": "(Required) target currency of coins, comma-separated if querying more than 1 currency.  <br>*refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies)."
+										},
+										{
+											"key": "include_market_cap",
+											"value": "<boolean>",
+											"description": "include market cap, default: false "
+										},
+										{
+											"key": "include_24hr_vol",
+											"value": "<boolean>",
+											"description": "include 24hr volume, default: false"
+										},
+										{
+											"key": "include_24hr_change",
+											"value": "<boolean>",
+											"description": "include 24hr change, default: false"
+										},
+										{
+											"key": "include_last_updated_at",
+											"value": "<boolean>",
+											"description": "include last updated price time in UNIX, default: false"
+										},
+										{
+											"key": "precision",
+											"value": "full",
+											"description": "decimal place for currency price value "
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"bitcoin\": {\n    \"usd\": \"<number>\",\n    \"usd_market_cap\": \"<number>\",\n    \"usd_24h_vol\": \"<number>\",\n    \"usd_24h_change\": \"<number>\",\n    \"last_updated_at\": \"<number>\"\n  }\n}"
+						}
+					]
+				},
+				{
+					"name": "Coin Price by Token Addresses",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/simple/token_price/:id?contract_addresses=<string>&vs_currencies=<string>&include_market_cap=<boolean>&include_24hr_vol=<boolean>&include_24hr_change=<boolean>&include_last_updated_at=<boolean>&precision=full",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"simple",
+								"token_price",
+								":id"
+							],
+							"query": [
+								{
+									"key": "contract_addresses",
+									"value": "<string>",
+									"description": "(Required) the contract addresses of tokens, comma-separated if querying more than 1 token's contract address"
+								},
+								{
+									"key": "vs_currencies",
+									"value": "<string>",
+									"description": "(Required) target currency of coins, comma-separated if querying more than 1 currency.  <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies)."
+								},
+								{
+									"key": "include_market_cap",
+									"value": "<boolean>",
+									"description": "include market capitalization, default: false"
+								},
+								{
+									"key": "include_24hr_vol",
+									"value": "<boolean>",
+									"description": "include 24hr volume, default: false"
+								},
+								{
+									"key": "include_24hr_change",
+									"value": "<boolean>",
+									"description": "include 24hr change  default: false"
+								},
+								{
+									"key": "include_last_updated_at",
+									"value": "<boolean>",
+									"description": "include last updated price time in UNIX , default: false"
+								},
+								{
+									"key": "precision",
+									"value": "full",
+									"description": "decimal place for currency price value "
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "<string>",
+									"description": "(Required) asset platform's id  <br>*refers to [`/asset_platforms`](/reference/asset-platforms-list)."
+								}
+							]
+						},
+						"description": "This endpoint allows you to **query a token price by using token contract address**."
+					},
+					"response": [
+						{
+							"name": "price(s) of cryptocurrency",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/simple/token_price/:id?contract_addresses=<string>&vs_currencies=<string>&include_market_cap=<boolean>&include_24hr_vol=<boolean>&include_24hr_change=<boolean>&include_last_updated_at=<boolean>&precision=full",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"simple",
+										"token_price",
+										":id"
+									],
+									"query": [
+										{
+											"key": "contract_addresses",
+											"value": "<string>",
+											"description": "(Required) the contract addresses of tokens, comma-separated if querying more than 1 token's contract address"
+										},
+										{
+											"key": "vs_currencies",
+											"value": "<string>",
+											"description": "(Required) target currency of coins, comma-separated if querying more than 1 currency.  <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies)."
+										},
+										{
+											"key": "include_market_cap",
+											"value": "<boolean>",
+											"description": "include market capitalization, default: false"
+										},
+										{
+											"key": "include_24hr_vol",
+											"value": "<boolean>",
+											"description": "include 24hr volume, default: false"
+										},
+										{
+											"key": "include_24hr_change",
+											"value": "<boolean>",
+											"description": "include 24hr change  default: false"
+										},
+										{
+											"key": "include_last_updated_at",
+											"value": "<boolean>",
+											"description": "include last updated price time in UNIX , default: false"
+										},
+										{
+											"key": "precision",
+											"value": "full",
+											"description": "decimal place for currency price value "
+										}
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"0x2260fac5e5542a773aa44fbcfedf7c193bc2c599\": {\n    \"usd\": \"<number>\",\n    \"usd_market_cap\": \"<number>\",\n    \"usd_24h_vol\": \"<number>\",\n    \"usd_24h_change\": \"<number>\",\n    \"last_updated_at\": \"<number>\"\n  }\n}"
+						}
+					]
+				},
+				{
+					"name": "Supported Currencies List",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/simple/supported_vs_currencies",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"simple",
+								"supported_vs_currencies"
+							]
+						},
+						"description": "This endpoint allows you to **query all the supported currencies on CoinGecko**."
+					},
+					"response": [
+						{
+							"name": "list of supported currencies",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/simple/supported_vs_currencies",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"simple",
+										"supported_vs_currencies"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "[\n  \"<string>\",\n  \"<string>\"\n]"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Coins",
+			"item": [
+				{
+					"name": "Coins List (ID Map)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/coins/list?include_platform=<boolean>&status=inactive",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"coins",
+								"list"
+							],
+							"query": [
+								{
+									"key": "include_platform",
+									"value": "<boolean>",
+									"description": "include platform and token's contract addresses, default: false"
+								},
+								{
+									"key": "status",
+									"value": "inactive",
+									"description": "filter by status of coins, default: active"
+								}
+							]
+						},
+						"description": "This endpoint allows you to **query all the supported coins on CoinGecko with coins id, name and symbol**."
+					},
+					"response": [
+						{
+							"name": "List all coins with id, name, and symbol",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/coins/list?include_platform=<boolean>&status=inactive",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"coins",
+										"list"
+									],
+									"query": [
+										{
+											"key": "include_platform",
+											"value": "<boolean>",
+											"description": "include platform and token's contract addresses, default: false"
+										},
+										{
+											"key": "status",
+											"value": "inactive",
+											"description": "filter by status of coins, default: active"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "[\n  {\n    \"id\": \"<string>\",\n    \"symbol\": \"<string>\",\n    \"name\": \"<string>\",\n    \"platforms\": {\n      \"adipisicing5\": \"<string>\",\n      \"Lorem_635\": \"<string>\",\n      \"in_2\": \"<string>\"\n    }\n  },\n  {\n    \"id\": \"<string>\",\n    \"symbol\": \"<string>\",\n    \"name\": \"<string>\",\n    \"platforms\": {\n      \"in_d8\": \"<string>\"\n    }\n  }\n]"
+						}
+					]
+				},
+				{
+					"name": "💼 Top Gainers & Losers",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/coins/top_gainers_losers?vs_currency=<string>&duration=1h&top_coins=300",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"coins",
+								"top_gainers_losers"
+							],
+							"query": [
+								{
+									"key": "vs_currency",
+									"value": "<string>",
+									"description": "(Required) target currency of coins  <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies)."
+								},
+								{
+									"key": "duration",
+									"value": "1h",
+									"description": "filter result by time range <br> Default value: `24h`"
+								},
+								{
+									"key": "top_coins",
+									"value": "300",
+									"description": "filter result by market cap ranking (top 300 to 1000) or all coins (including coins that do not have market cap)  <br> Default value: `1000`"
+								}
+							]
+						},
+						"description": "This endpoint allows you to **query the top 30 coins with largest price gain and loss by a specific time duration**"
+					},
+					"response": [
+						{
+							"name": "List top 30 gainers and losers",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/coins/top_gainers_losers?vs_currency=<string>&duration=1h&top_coins=300",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"coins",
+										"top_gainers_losers"
+									],
+									"query": [
+										{
+											"key": "vs_currency",
+											"value": "<string>",
+											"description": "(Required) target currency of coins  <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies)."
+										},
+										{
+											"key": "duration",
+											"value": "1h",
+											"description": "filter result by time range <br> Default value: `24h`"
+										},
+										{
+											"key": "top_coins",
+											"value": "300",
+											"description": "filter result by market cap ranking (top 300 to 1000) or all coins (including coins that do not have market cap)  <br> Default value: `1000`"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "[\n  {\n    \"id\": \"<string>\",\n    \"symbol\": \"<string>\",\n    \"name\": \"<string>\",\n    \"image\": \"<string>\",\n    \"market_cap_rank\": \"<number>\",\n    \"usd\": \"<number>\",\n    \"usd_24h_vol\": \"<number>\",\n    \"usd_1y_change\": \"<number>\"\n  },\n  {\n    \"id\": \"<string>\",\n    \"symbol\": \"<string>\",\n    \"name\": \"<string>\",\n    \"image\": \"<string>\",\n    \"market_cap_rank\": \"<number>\",\n    \"usd\": \"<number>\",\n    \"usd_24h_vol\": \"<number>\",\n    \"usd_1y_change\": \"<number>\"\n  }\n]"
+						}
+					]
+				},
+				{
+					"name": "💼 Recently Added Coins",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/coins/list/new",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"coins",
+								"list",
+								"new"
+							]
+						},
+						"description": "This endpoint allows you to **query the latest 200 coins that recently listed on CoinGecko**"
+					},
+					"response": [
+						{
+							"name": "List latest 200 coins",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/coins/list/new",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"coins",
+										"list",
+										"new"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "[\n  {\n    \"id\": \"<string>\",\n    \"symbol\": \"<string>\",\n    \"name\": \"<string>\",\n    \"activated_at\": \"<number>\"\n  },\n  {\n    \"id\": \"<string>\",\n    \"symbol\": \"<string>\",\n    \"name\": \"<string>\",\n    \"activated_at\": \"<number>\"\n  }\n]"
+						}
+					]
+				},
+				{
+					"name": "Coins List with Market Data",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/coins/markets?vs_currency=<string>&ids=<string>&category=<string>&order=id_desc&per_page=<number>&page=<number>&sparkline=<boolean>&price_change_percentage=<string>&locale=hi&precision=full",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"coins",
+								"markets"
+							],
+							"query": [
+								{
+									"key": "vs_currency",
+									"value": "<string>",
+									"description": "(Required) target currency of coins and market data <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies)."
+								},
+								{
+									"key": "ids",
+									"value": "<string>",
+									"description": "coins' ids, comma-separated if querying more than 1 coin.  <br> *refers to [`/coins/list`](/reference/coins-list)."
+								},
+								{
+									"key": "category",
+									"value": "<string>",
+									"description": "filter based on coins' category <br> *refers to [`/coins/categories/list`](/reference/coins-categories-list)."
+								},
+								{
+									"key": "order",
+									"value": "id_desc",
+									"description": "sort result by field, default: market_cap_desc"
+								},
+								{
+									"key": "per_page",
+									"value": "<number>",
+									"description": "total results per page, default: 100 <br> Valid values: 1...250"
+								},
+								{
+									"key": "page",
+									"value": "<number>",
+									"description": "page through results, default: 1"
+								},
+								{
+									"key": "sparkline",
+									"value": "<boolean>",
+									"description": "include sparkline 7 days data, default: false"
+								},
+								{
+									"key": "price_change_percentage",
+									"value": "<string>",
+									"description": "include price change percentage timeframe, comma-separated if query more than 1 price change percentage timeframe <br> Valid values: 1h, 24h, 7d, 14d, 30d, 200d, 1y"
+								},
+								{
+									"key": "locale",
+									"value": "hi",
+									"description": "language background, default: en"
+								},
+								{
+									"key": "precision",
+									"value": "full",
+									"description": "decimal place for currency price value"
+								}
+							]
+						},
+						"description": "This endpoint allows you to **query all the supported coins with price, market cap, volume and market related data**."
+					},
+					"response": [
+						{
+							"name": "List all coins with market data",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/coins/markets?vs_currency=<string>&ids=<string>&category=<string>&order=id_desc&per_page=<number>&page=<number>&sparkline=<boolean>&price_change_percentage=<string>&locale=hi&precision=full",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"coins",
+										"markets"
+									],
+									"query": [
+										{
+											"key": "vs_currency",
+											"value": "<string>",
+											"description": "(Required) target currency of coins and market data <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies)."
+										},
+										{
+											"key": "ids",
+											"value": "<string>",
+											"description": "coins' ids, comma-separated if querying more than 1 coin.  <br> *refers to [`/coins/list`](/reference/coins-list)."
+										},
+										{
+											"key": "category",
+											"value": "<string>",
+											"description": "filter based on coins' category <br> *refers to [`/coins/categories/list`](/reference/coins-categories-list)."
+										},
+										{
+											"key": "order",
+											"value": "id_desc",
+											"description": "sort result by field, default: market_cap_desc"
+										},
+										{
+											"key": "per_page",
+											"value": "<number>",
+											"description": "total results per page, default: 100 <br> Valid values: 1...250"
+										},
+										{
+											"key": "page",
+											"value": "<number>",
+											"description": "page through results, default: 1"
+										},
+										{
+											"key": "sparkline",
+											"value": "<boolean>",
+											"description": "include sparkline 7 days data, default: false"
+										},
+										{
+											"key": "price_change_percentage",
+											"value": "<string>",
+											"description": "include price change percentage timeframe, comma-separated if query more than 1 price change percentage timeframe <br> Valid values: 1h, 24h, 7d, 14d, 30d, 200d, 1y"
+										},
+										{
+											"key": "locale",
+											"value": "hi",
+											"description": "language background, default: en"
+										},
+										{
+											"key": "precision",
+											"value": "full",
+											"description": "decimal place for currency price value"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"id\": \"<string>\",\n  \"symbol\": \"<string>\",\n  \"name\": \"<string>\",\n  \"image\": \"<string>\",\n  \"current_price\": \"<number>\",\n  \"market_cap\": \"<number>\",\n  \"market_cap_rank\": \"<number>\",\n  \"fully_diluted_valuation\": \"<number>\",\n  \"total_volume\": \"<number>\",\n  \"high_24h\": \"<number>\",\n  \"low_24h\": \"<number>\",\n  \"price_change_24h\": \"<number>\",\n  \"price_change_percentage_24h\": \"<number>\",\n  \"market_cap_change_24h\": \"<number>\",\n  \"market_cap_change_percentage_24h\": \"<number>\",\n  \"circulating_supply\": \"<number>\",\n  \"total_supply\": \"<number>\",\n  \"max_supply\": \"<number>\",\n  \"ath\": \"<number>\",\n  \"ath_change_percentage\": \"<number>\",\n  \"ath_date\": \"<dateTime>\",\n  \"atl\": \"<number>\",\n  \"atl_change_percentage\": \"<number>\",\n  \"atl_date\": \"<dateTime>\",\n  \"roi\": \"<string>\",\n  \"last_updated\": \"<dateTime>\",\n  \"price_change_percentage_1h\": \"<number>\",\n  \"sparkline_in_7d\": {\n    \"price\": [\n      \"<number>\",\n      \"<number>\"\n    ]\n  }\n}"
+						}
+					]
+				},
+				{
+					"name": "Coin Data by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/coins/:id?localization=<boolean>&tickers=<boolean>&market_data=<boolean>&community_data=<boolean>&developer_data=<boolean>&sparkline=<boolean>",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"coins",
+								":id"
+							],
+							"query": [
+								{
+									"key": "localization",
+									"value": "<boolean>",
+									"description": "include all the localized languages in the response, default: true"
+								},
+								{
+									"key": "tickers",
+									"value": "<boolean>",
+									"description": "include tickers data, default: true"
+								},
+								{
+									"key": "market_data",
+									"value": "<boolean>",
+									"description": "include market data, default: true"
+								},
+								{
+									"key": "community_data",
+									"value": "<boolean>",
+									"description": "include community data, default: true"
+								},
+								{
+									"key": "developer_data",
+									"value": "<boolean>",
+									"description": "include developer data, default: true"
+								},
+								{
+									"key": "sparkline",
+									"value": "<boolean>",
+									"description": "include sparkline 7 days data, default: false"
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "<string>",
+									"description": "(Required) coin id <br> *refers to [`/coins/list`](/reference/coins-list)."
+								}
+							]
+						},
+						"description": "This endpoint allows you to **query all the coin data of a coin (name, price, market .... including exchange tickers) on CoinGecko coin page based on a particular coin id**."
+					},
+					"response": [
+						{
+							"name": "Get current data for a coin",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/coins/:id?localization=<boolean>&tickers=<boolean>&market_data=<boolean>&community_data=<boolean>&developer_data=<boolean>&sparkline=<boolean>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"coins",
+										":id"
+									],
+									"query": [
+										{
+											"key": "localization",
+											"value": "<boolean>",
+											"description": "include all the localized languages in the response, default: true"
+										},
+										{
+											"key": "tickers",
+											"value": "<boolean>",
+											"description": "include tickers data, default: true"
+										},
+										{
+											"key": "market_data",
+											"value": "<boolean>",
+											"description": "include market data, default: true"
+										},
+										{
+											"key": "community_data",
+											"value": "<boolean>",
+											"description": "include community data, default: true"
+										},
+										{
+											"key": "developer_data",
+											"value": "<boolean>",
+											"description": "include developer data, default: true"
+										},
+										{
+											"key": "sparkline",
+											"value": "<boolean>",
+											"description": "include sparkline 7 days data, default: false"
+										}
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"id\": \"<string>\",\n  \"symbol\": \"<string>\",\n  \"name\": \"<string>\",\n  \"web_slug\": \"<string>\",\n  \"asset_platform_id\": \"<string>\",\n  \"platforms\": {\n    \"aliquip_2d\": \"<string>\"\n  },\n  \"detail_platforms\": {\n    \"ipsuma\": \"<string>\",\n    \"consequat_94c\": \"<string>\"\n  },\n  \"block_time_in_minutes\": \"<number>\",\n  \"hashing_algorithm\": \"<string>\",\n  \"categories\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"preview_listing\": \"<boolean>\",\n  \"public_notice\": \"<string>\",\n  \"additional_notices\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"localization\": {\n    \"culpad\": \"<string>\",\n    \"cillum_ec\": \"<string>\"\n  },\n  \"description\": {\n    \"officia4a\": \"<string>\",\n    \"sunt03\": \"<string>\",\n    \"essece\": \"<string>\",\n    \"este_7\": \"<string>\"\n  },\n  \"links\": {\n    \"homepage\": [\n      \"<string>\",\n      \"<string>\"\n    ],\n    \"whitepaper\": [\n      \"<string>\",\n      \"<string>\"\n    ],\n    \"blockchain_site\": [\n      \"<string>\",\n      \"<string>\"\n    ],\n    \"official_forum_url\": [\n      \"<string>\",\n      \"<string>\"\n    ],\n    \"chat_url\": [\n      \"<string>\",\n      \"<string>\"\n    ],\n    \"announcement_url\": [\n      \"<string>\",\n      \"<string>\"\n    ],\n    \"twitter_screen_name\": \"<string>\",\n    \"facebook_username\": \"<string>\",\n    \"bitcointalk_thread_identifier\": \"<string>\",\n    \"telegram_channel_identifier\": \"<string>\",\n    \"subreddit_url\": \"<string>\",\n    \"repos_url\": {\n      \"github\": [\n        \"<string>\",\n        \"<string>\"\n      ],\n      \"bitbucket\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    }\n  },\n  \"image\": {\n    \"thumb\": \"<string>\",\n    \"small\": \"<string>\",\n    \"large\": \"<string>\"\n  },\n  \"country_origin\": \"<string>\",\n  \"genesis_date\": \"<dateTime>\",\n  \"sentiment_votes_up_percentage\": \"<number>\",\n  \"sentiment_votes_down_percentage\": \"<number>\",\n  \"market_cap_rank\": \"<number>\",\n  \"market_data\": {\n    \"current_price\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"total_value_locked\": \"<number>\",\n    \"mcap_to_tvl_ratio\": \"<number>\",\n    \"fdv_to_tvl_ratio\": \"<number>\",\n    \"roi\": \"<number>\",\n    \"ath\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"ath_change_percentage\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"ath_date\": {\n      \"btc\": \"<string>\",\n      \"eur\": \"<string>\",\n      \"usd\": \"<string>\"\n    },\n    \"atl\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"atl_change_percentage\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"atl_date\": {\n      \"btc\": \"<string>\",\n      \"eur\": \"<string>\",\n      \"usd\": \"<string>\"\n    },\n    \"market_cap\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"market_cap_rank\": \"<number>\",\n    \"fully_diluted_valuation\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"market_cap_fdv_ratio\": \"<number>\",\n    \"total_volume\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"high_24h\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"low_24h\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"price_change_24h\": \"<number>\",\n    \"price_change_percentage_24h\": \"<number>\",\n    \"price_change_percentage_7d\": \"<number>\",\n    \"price_change_percentage_14d\": \"<number>\",\n    \"price_change_percentage_30d\": \"<number>\",\n    \"price_change_percentage_60d\": \"<number>\",\n    \"price_change_percentage_200d\": \"<number>\",\n    \"price_change_percentage_1y\": \"<number>\",\n    \"market_cap_change_24h\": \"<number>\",\n    \"market_cap_change_percentage_24h\": \"<number>\",\n    \"price_change_percentage_1h_in_currency\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"price_change_percentage_24h_in_currency\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"price_change_percentage_7d_in_currency\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"price_change_percentage_14d_in_currency\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"price_change_percentage_30d_in_currency\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"price_change_percentage_60d_in_currency\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"price_change_percentage_200d_in_currency\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"price_change_percentage_1y_in_currency\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"market_cap_change_24h_in_currency\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"market_cap_change_percentage_24h_in_currency\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"total_supply\": \"<number>\",\n    \"max_supply\": \"<number>\",\n    \"circulating_supply\": \"<number>\",\n    \"last_updated\": \"<dateTime>\"\n  },\n  \"community_data\": {\n    \"facebook_likes\": \"<number>\",\n    \"twitter_followers\": \"<number>\",\n    \"reddit_average_posts_48h\": \"<number>\",\n    \"reddit_average_comments_48h\": \"<number>\",\n    \"reddit_subscribers\": \"<number>\",\n    \"reddit_accounts_active_48h\": \"<number>\",\n    \"telegram_channel_user_count\": \"<number>\"\n  },\n  \"developer_data\": {\n    \"forks\": \"<number>\",\n    \"stars\": \"<number>\",\n    \"subscribers\": \"<number>\",\n    \"total_issues\": \"<number>\",\n    \"closed_issues\": \"<number>\",\n    \"pull_requests_merged\": \"<number>\",\n    \"pull_request_contributors\": \"<number>\",\n    \"code_additions_deletions_4_weeks\": {\n      \"additions\": \"<number>\",\n      \"deletions\": \"<number>\"\n    },\n    \"commit_count_4_weeks\": \"<number>\",\n    \"last_4_weeks_commit_activity_series\": [\n      \"<number>\",\n      \"<number>\"\n    ]\n  },\n  \"last_updated\": \"<dateTime>\",\n  \"tickers\": [\n    {\n      \"base\": \"<string>\",\n      \"target\": \"<string>\",\n      \"market\": {\n        \"name\": \"<string>\",\n        \"identifier\": \"<string>\",\n        \"has_trading_incentive\": \"<boolean>\"\n      },\n      \"last\": \"<number>\",\n      \"volume\": \"<number>\",\n      \"converted_last\": {\n        \"btc\": \"<number>\",\n        \"eth\": \"<number>\",\n        \"usd\": \"<number>\"\n      },\n      \"converted_volume\": {\n        \"btc\": \"<number>\",\n        \"eth\": \"<number>\",\n        \"usd\": \"<number>\"\n      },\n      \"trust_score\": \"<string>\",\n      \"bid_ask_spread_percentage\": \"<number>\",\n      \"timestamp\": \"<dateTime>\",\n      \"last_traded_at\": \"<dateTime>\",\n      \"last_fetch_at\": \"<dateTime>\",\n      \"is_anomaly\": \"<boolean>\",\n      \"is_stale\": \"<boolean>\",\n      \"trade_url\": \"<string>\",\n      \"token_info_url\": \"<string>\",\n      \"coin_id\": \"<string>\",\n      \"target_coin_id\": \"<string>\"\n    },\n    {\n      \"base\": \"<string>\",\n      \"target\": \"<string>\",\n      \"market\": {\n        \"name\": \"<string>\",\n        \"identifier\": \"<string>\",\n        \"has_trading_incentive\": \"<boolean>\"\n      },\n      \"last\": \"<number>\",\n      \"volume\": \"<number>\",\n      \"converted_last\": {\n        \"btc\": \"<number>\",\n        \"eth\": \"<number>\",\n        \"usd\": \"<number>\"\n      },\n      \"converted_volume\": {\n        \"btc\": \"<number>\",\n        \"eth\": \"<number>\",\n        \"usd\": \"<number>\"\n      },\n      \"trust_score\": \"<string>\",\n      \"bid_ask_spread_percentage\": \"<number>\",\n      \"timestamp\": \"<dateTime>\",\n      \"last_traded_at\": \"<dateTime>\",\n      \"last_fetch_at\": \"<dateTime>\",\n      \"is_anomaly\": \"<boolean>\",\n      \"is_stale\": \"<boolean>\",\n      \"trade_url\": \"<string>\",\n      \"token_info_url\": \"<string>\",\n      \"coin_id\": \"<string>\",\n      \"target_coin_id\": \"<string>\"\n    }\n  ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Coin Tickers by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/coins/:id/tickers?exchange_ids=<string>&include_exchange_logo=<boolean>&page=<number>&order=volume_desc&depth=<boolean>",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"coins",
+								":id",
+								"tickers"
+							],
+							"query": [
+								{
+									"key": "exchange_ids",
+									"value": "<string>",
+									"description": "exchange id <br> *refers to [`/exchanges/list`](/reference/exchanges-list)."
+								},
+								{
+									"key": "include_exchange_logo",
+									"value": "<boolean>",
+									"description": "include exchange logo, default: false"
+								},
+								{
+									"key": "page",
+									"value": "<number>",
+									"description": "page through results"
+								},
+								{
+									"key": "order",
+									"value": "volume_desc",
+									"description": "use this to sort the order of responses, default: trust_score_desc"
+								},
+								{
+									"key": "depth",
+									"value": "<boolean>",
+									"description": "include 2% orderbook depth, ie. `cost_to_move_up_usd` and `cost_to_move_down_usd` <br> default: false"
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "<string>",
+									"description": "(Required) coin id <br> *refers to [`/coins/list`](/reference/coins-list)."
+								}
+							]
+						},
+						"description": "This endpoint allows you to **query the coin tickers on both centralized exchange (cex) and decentralized exchange (dex) based on a particular coin id**."
+					},
+					"response": [
+						{
+							"name": "Get coin tickers",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/coins/:id/tickers?exchange_ids=<string>&include_exchange_logo=<boolean>&page=<number>&order=volume_desc&depth=<boolean>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"coins",
+										":id",
+										"tickers"
+									],
+									"query": [
+										{
+											"key": "exchange_ids",
+											"value": "<string>",
+											"description": "exchange id <br> *refers to [`/exchanges/list`](/reference/exchanges-list)."
+										},
+										{
+											"key": "include_exchange_logo",
+											"value": "<boolean>",
+											"description": "include exchange logo, default: false"
+										},
+										{
+											"key": "page",
+											"value": "<number>",
+											"description": "page through results"
+										},
+										{
+											"key": "order",
+											"value": "volume_desc",
+											"description": "use this to sort the order of responses, default: trust_score_desc"
+										},
+										{
+											"key": "depth",
+											"value": "<boolean>",
+											"description": "include 2% orderbook depth, ie. `cost_to_move_up_usd` and `cost_to_move_down_usd` <br> default: false"
+										}
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"name\": \"<string>\",\n  \"tickers\": [\n    {\n      \"base\": \"<string>\",\n      \"target\": \"<string>\",\n      \"market\": {\n        \"name\": \"<string>\",\n        \"identifier\": \"<string>\",\n        \"has_trading_incentive\": \"<boolean>\",\n        \"logo\": \"<string>\"\n      },\n      \"last\": \"<number>\",\n      \"volume\": \"<number>\",\n      \"cost_to_move_up_usd\": \"<number>\",\n      \"cost_to_move_down_usd\": \"<number>\",\n      \"converted_last\": {\n        \"btc\": \"<number>\",\n        \"eth\": \"<number>\",\n        \"usd\": \"<number>\"\n      },\n      \"converted_volume\": {\n        \"btc\": \"<number>\",\n        \"eth\": \"<number>\",\n        \"usd\": \"<number>\"\n      },\n      \"trust_score\": \"<string>\",\n      \"bid_ask_spread_percentage\": \"<number>\",\n      \"timestamp\": \"<string>\",\n      \"last_traded_at\": \"<string>\",\n      \"last_fetch_at\": \"<string>\",\n      \"is_anomaly\": \"<boolean>\",\n      \"is_stale\": \"<boolean>\",\n      \"trade_url\": \"<string>\",\n      \"token_info_url\": \"<string>\",\n      \"coin_id\": \"<string>\",\n      \"target_coin_id\": \"<string>\"\n    },\n    {\n      \"base\": \"<string>\",\n      \"target\": \"<string>\",\n      \"market\": {\n        \"name\": \"<string>\",\n        \"identifier\": \"<string>\",\n        \"has_trading_incentive\": \"<boolean>\",\n        \"logo\": \"<string>\"\n      },\n      \"last\": \"<number>\",\n      \"volume\": \"<number>\",\n      \"cost_to_move_up_usd\": \"<number>\",\n      \"cost_to_move_down_usd\": \"<number>\",\n      \"converted_last\": {\n        \"btc\": \"<number>\",\n        \"eth\": \"<number>\",\n        \"usd\": \"<number>\"\n      },\n      \"converted_volume\": {\n        \"btc\": \"<number>\",\n        \"eth\": \"<number>\",\n        \"usd\": \"<number>\"\n      },\n      \"trust_score\": \"<string>\",\n      \"bid_ask_spread_percentage\": \"<number>\",\n      \"timestamp\": \"<string>\",\n      \"last_traded_at\": \"<string>\",\n      \"last_fetch_at\": \"<string>\",\n      \"is_anomaly\": \"<boolean>\",\n      \"is_stale\": \"<boolean>\",\n      \"trade_url\": \"<string>\",\n      \"token_info_url\": \"<string>\",\n      \"coin_id\": \"<string>\",\n      \"target_coin_id\": \"<string>\"\n    }\n  ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Coin Historical Data by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/coins/:id/history?date=<string>&localization=<boolean>",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"coins",
+								":id",
+								"history"
+							],
+							"query": [
+								{
+									"key": "date",
+									"value": "<string>",
+									"description": "(Required) the date of data snapshot <br> Format: `dd-mm-yyyy`"
+								},
+								{
+									"key": "localization",
+									"value": "<boolean>",
+									"description": "include all the localized languages in response, default: true"
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "<string>",
+									"description": "(Required) coin id <br> *refers to [`/coins/list`](/reference/coins-list)."
+								}
+							]
+						},
+						"description": "This endpoint allows you to **query the historical data (price, market cap, 24hrs volume, etc) at a given date for a coin based on a particular coin id**."
+					},
+					"response": [
+						{
+							"name": "Get historical data (name, price, market, stats) at a given date for a coin",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/coins/:id/history?date=<string>&localization=<boolean>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"coins",
+										":id",
+										"history"
+									],
+									"query": [
+										{
+											"key": "date",
+											"value": "<string>",
+											"description": "(Required) the date of data snapshot <br> Format: `dd-mm-yyyy`"
+										},
+										{
+											"key": "localization",
+											"value": "<boolean>",
+											"description": "include all the localized languages in response, default: true"
+										}
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"id\": \"<string>\",\n  \"symbol\": \"<string>\",\n  \"name\": \"<string>\",\n  \"localization\": {\n    \"dolore_7d4\": \"<string>\"\n  },\n  \"image\": {\n    \"thumb\": \"<string>\",\n    \"small\": \"<string>\"\n  },\n  \"market_data\": {\n    \"current_price\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"market_cap\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"total_volume\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    }\n  },\n  \"community_data\": {\n    \"facebook_likes\": \"<number>\",\n    \"twitter_followers\": \"<number>\",\n    \"reddit_average_posts_48h\": \"<number>\",\n    \"reddit_average_comments_48h\": \"<number>\",\n    \"reddit_subscribers\": \"<number>\",\n    \"reddit_accounts_active_48h\": \"<number>\"\n  },\n  \"developer_data\": {\n    \"forks\": \"<number>\",\n    \"stars\": \"<number>\",\n    \"subscribers\": \"<number>\",\n    \"total_issues\": \"<number>\",\n    \"closed_issues\": \"<number>\",\n    \"pull_requests_merged\": \"<number>\",\n    \"pull_request_contributors\": \"<number>\",\n    \"code_additions_deletions_4_weeks\": {\n      \"additions\": \"<number>\",\n      \"deletions\": \"<number>\"\n    },\n    \"commit_count_4_weeks\": \"<number>\"\n  },\n  \"public_interest_stats\": {\n    \"alexa_rank\": \"<number>\",\n    \"bing_matches\": \"<number>\"\n  }\n}"
+						}
+					]
+				},
+				{
+					"name": "Coin Historical Chart Data by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/coins/:id/market_chart?vs_currency=<string>&days=<string>&interval=5m&precision=full",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"coins",
+								":id",
+								"market_chart"
+							],
+							"query": [
+								{
+									"key": "vs_currency",
+									"value": "<string>",
+									"description": "(Required) target currency of market data <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies)."
+								},
+								{
+									"key": "days",
+									"value": "<string>",
+									"description": "(Required) data up to number of days ago <br> you may use any integer or `max` for number of days"
+								},
+								{
+									"key": "interval",
+									"value": "5m",
+									"description": "data interval, leave empty for auto granularity"
+								},
+								{
+									"key": "precision",
+									"value": "full",
+									"description": "decimal place for currency price value"
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "<string>",
+									"description": "(Required) coin id <br> *refers to [`/coins/list`](/reference/coins-list)."
+								}
+							]
+						},
+						"description": "This endpoint allows you to **get the historical chart data of a coin including time in UNIX, price, market cap and 24hrs volume based on particular coin id**."
+					},
+					"response": [
+						{
+							"name": "Get historical market data include price, market cap, and 24h volume (granularity auto)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/coins/:id/market_chart?vs_currency=<string>&days=<string>&interval=5m&precision=full",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"coins",
+										":id",
+										"market_chart"
+									],
+									"query": [
+										{
+											"key": "vs_currency",
+											"value": "<string>",
+											"description": "(Required) target currency of market data <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies)."
+										},
+										{
+											"key": "days",
+											"value": "<string>",
+											"description": "(Required) data up to number of days ago <br> you may use any integer or `max` for number of days"
+										},
+										{
+											"key": "interval",
+											"value": "5m",
+											"description": "data interval, leave empty for auto granularity"
+										},
+										{
+											"key": "precision",
+											"value": "full",
+											"description": "decimal place for currency price value"
+										}
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"prices\": [\n    [\n      \"<number>\",\n      \"<number>\"\n    ],\n    [\n      \"<number>\",\n      \"<number>\"\n    ]\n  ],\n  \"market_caps\": [\n    [\n      \"<number>\",\n      \"<number>\"\n    ],\n    [\n      \"<number>\",\n      \"<number>\"\n    ]\n  ],\n  \"total_volumes\": [\n    [\n      \"<number>\",\n      \"<number>\"\n    ],\n    [\n      \"<number>\",\n      \"<number>\"\n    ]\n  ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Coin Historical Chart Data within Time Range by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/coins/:id/market_chart/range?vs_currency=<string>&from=<number>&to=<number>&interval=5m&precision=full",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"coins",
+								":id",
+								"market_chart",
+								"range"
+							],
+							"query": [
+								{
+									"key": "vs_currency",
+									"value": "<string>",
+									"description": "(Required) target currency of market data <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies)."
+								},
+								{
+									"key": "from",
+									"value": "<number>",
+									"description": "(Required) starting date in UNIX timestamp "
+								},
+								{
+									"key": "to",
+									"value": "<number>",
+									"description": "(Required) ending date in UNIX timestamp"
+								},
+								{
+									"key": "interval",
+									"value": "5m",
+									"description": "data interval, leave empty for auto granularity "
+								},
+								{
+									"key": "precision",
+									"value": "full",
+									"description": "decimal place for currency price value"
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "<string>",
+									"description": "(Required) coin id <br> *refers to [`/coins/list`](/reference/coins-list)."
+								}
+							]
+						},
+						"description": "This endpoint allows you to **get the historical chart data of a coin within certain time range in UNIX along with price, market cap and 24hrs volume based on particular coin id**."
+					},
+					"response": [
+						{
+							"name": "Get historical market data include price, market cap, and 24h volume (granularity auto)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/coins/:id/market_chart/range?vs_currency=<string>&from=<number>&to=<number>&interval=5m&precision=full",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"coins",
+										":id",
+										"market_chart",
+										"range"
+									],
+									"query": [
+										{
+											"key": "vs_currency",
+											"value": "<string>",
+											"description": "(Required) target currency of market data <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies)."
+										},
+										{
+											"key": "from",
+											"value": "<number>",
+											"description": "(Required) starting date in UNIX timestamp "
+										},
+										{
+											"key": "to",
+											"value": "<number>",
+											"description": "(Required) ending date in UNIX timestamp"
+										},
+										{
+											"key": "interval",
+											"value": "5m",
+											"description": "data interval, leave empty for auto granularity "
+										},
+										{
+											"key": "precision",
+											"value": "full",
+											"description": "decimal place for currency price value"
+										}
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"prices\": [\n    [\n      \"<number>\",\n      \"<number>\"\n    ],\n    [\n      \"<number>\",\n      \"<number>\"\n    ]\n  ],\n  \"market_caps\": [\n    [\n      \"<number>\",\n      \"<number>\"\n    ],\n    [\n      \"<number>\",\n      \"<number>\"\n    ]\n  ],\n  \"total_volumes\": [\n    [\n      \"<number>\",\n      \"<number>\"\n    ],\n    [\n      \"<number>\",\n      \"<number>\"\n    ]\n  ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Coin OHLC Chart by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/coins/:id/ohlc?vs_currency=<string>&days=14&interval=daily&precision=full",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"coins",
+								":id",
+								"ohlc"
+							],
+							"query": [
+								{
+									"key": "vs_currency",
+									"value": "<string>",
+									"description": "(Required) target currency of price data <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies)."
+								},
+								{
+									"key": "days",
+									"value": "14",
+									"description": "(Required) data up to number of days ago "
+								},
+								{
+									"key": "interval",
+									"value": "daily",
+									"description": "data interval, leave empty for auto granularity"
+								},
+								{
+									"key": "precision",
+									"value": "full",
+									"description": "decimal place for currency price value"
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "<string>",
+									"description": "(Required) coin id <br> *refers to [`/coins/list`](/reference/coins-list)."
+								}
+							]
+						},
+						"description": "This endpoint allows you to **get the OHLC chart (Open, High, Low, Close) of a coin based on particular coin id**."
+					},
+					"response": [
+						{
+							"name": "Get coin's OHLC",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/coins/:id/ohlc?vs_currency=<string>&days=14&interval=daily&precision=full",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"coins",
+										":id",
+										"ohlc"
+									],
+									"query": [
+										{
+											"key": "vs_currency",
+											"value": "<string>",
+											"description": "(Required) target currency of price data <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies)."
+										},
+										{
+											"key": "days",
+											"value": "14",
+											"description": "(Required) data up to number of days ago "
+										},
+										{
+											"key": "interval",
+											"value": "daily",
+											"description": "data interval, leave empty for auto granularity"
+										},
+										{
+											"key": "precision",
+											"value": "full",
+											"description": "decimal place for currency price value"
+										}
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "[\n  [\n    \"<number>\",\n    \"<number>\"\n  ],\n  [\n    \"<number>\",\n    \"<number>\"\n  ]\n]"
+						}
+					]
+				},
+				{
+					"name": "💼 Coin OHLC Chart within Time Range by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/coins/:id/ohlc/range?vs_currency=<string>&from=<number>&to=<number>&interval=daily",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"coins",
+								":id",
+								"ohlc",
+								"range"
+							],
+							"query": [
+								{
+									"key": "vs_currency",
+									"value": "<string>",
+									"description": "(Required) target currency of price data <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies)."
+								},
+								{
+									"key": "from",
+									"value": "<number>",
+									"description": "(Required) starting date in UNIX timestamp"
+								},
+								{
+									"key": "to",
+									"value": "<number>",
+									"description": "(Required) ending date in UNIX timestamp"
+								},
+								{
+									"key": "interval",
+									"value": "daily",
+									"description": "(Required) data interval"
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "<string>",
+									"description": "(Required) coin id <br> *refers to [`/coins/list`](/reference/coins-list)."
+								}
+							]
+						},
+						"description": "This endpoint allows you to **get the OHLC chart (Open, High, Low, Close) of a coin within a range of timestamp based on particular coin id**."
+					},
+					"response": [
+						{
+							"name": "Get coin's OHLC within time range",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/coins/:id/ohlc/range?vs_currency=<string>&from=<number>&to=<number>&interval=daily",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"coins",
+										":id",
+										"ohlc",
+										"range"
+									],
+									"query": [
+										{
+											"key": "vs_currency",
+											"value": "<string>",
+											"description": "(Required) target currency of price data <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies)."
+										},
+										{
+											"key": "from",
+											"value": "<number>",
+											"description": "(Required) starting date in UNIX timestamp"
+										},
+										{
+											"key": "to",
+											"value": "<number>",
+											"description": "(Required) ending date in UNIX timestamp"
+										},
+										{
+											"key": "interval",
+											"value": "daily",
+											"description": "(Required) data interval"
+										}
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "[\n  [\n    \"<number>\",\n    \"<number>\"\n  ],\n  [\n    \"<number>\",\n    \"<number>\"\n  ]\n]"
+						}
+					]
+				},
+				{
+					"name": "👑 Circulating Supply Chart by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/coins/:id/circulating_supply_chart?days=<string>&interval=daily",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"coins",
+								":id",
+								"circulating_supply_chart"
+							],
+							"query": [
+								{
+									"key": "days",
+									"value": "<string>",
+									"description": "(Required) data up to number of days ago  <br> Valid values: any integer or `max`"
+								},
+								{
+									"key": "interval",
+									"value": "daily",
+									"description": "data interval"
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "<string>",
+									"description": "(Required) coin id <br> *refers to [`/coins/list`](/reference/coins-list)."
+								}
+							]
+						},
+						"description": "This endpoint allows you to **query historical circulating supply of a coin by number of days away from now based on provided coin id**"
+					},
+					"response": [
+						{
+							"name": "Get historical circulating supply chart of a coin",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/coins/:id/circulating_supply_chart?days=<string>&interval=daily",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"coins",
+										":id",
+										"circulating_supply_chart"
+									],
+									"query": [
+										{
+											"key": "days",
+											"value": "<string>",
+											"description": "(Required) data up to number of days ago  <br> Valid values: any integer or `max`"
+										},
+										{
+											"key": "interval",
+											"value": "daily",
+											"description": "data interval"
+										}
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "[\n  [\n    \"<number>\",\n    \"<number>\"\n  ],\n  [\n    \"<number>\",\n    \"<number>\"\n  ]\n]"
+						}
+					]
+				},
+				{
+					"name": "👑 Circulating Supply chart within Time Range by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/coins/:id/circulating_supply_chart/range?from=<number>&to=<number>",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"coins",
+								":id",
+								"circulating_supply_chart",
+								"range"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "<number>",
+									"description": "(Required) starting date in UNIX timestamp "
+								},
+								{
+									"key": "to",
+									"value": "<number>",
+									"description": "(Required) ending date in UNIX timestamp "
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "<string>",
+									"description": "(Required) coin id <br> *refers to [`/coins/list`](/reference/coins-list)."
+								}
+							]
+						},
+						"description": "This endpoint allows you to **query historical circulating supply of a coin, within a range of timestamp based on the provided coin id**"
+					},
+					"response": [
+						{
+							"name": "Get historical circulating supply chart of a coin",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/coins/:id/circulating_supply_chart/range?from=<number>&to=<number>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"coins",
+										":id",
+										"circulating_supply_chart",
+										"range"
+									],
+									"query": [
+										{
+											"key": "from",
+											"value": "<number>",
+											"description": "(Required) starting date in UNIX timestamp "
+										},
+										{
+											"key": "to",
+											"value": "<number>",
+											"description": "(Required) ending date in UNIX timestamp "
+										}
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "[\n  [\n    \"<number>\",\n    \"<number>\"\n  ],\n  [\n    \"<number>\",\n    \"<number>\"\n  ]\n]"
+						}
+					]
+				},
+				{
+					"name": "👑 Total Supply Chart by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/coins/:id/total_supply_chart?days=<string>&interval=daily",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"coins",
+								":id",
+								"total_supply_chart"
+							],
+							"query": [
+								{
+									"key": "days",
+									"value": "<string>",
+									"description": "(Required) data up to number of days ago  <br> Valid values: any integer or `max`"
+								},
+								{
+									"key": "interval",
+									"value": "daily",
+									"description": "data interval"
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "<string>",
+									"description": "(Required) coin id  <br> *refers to [`/coins/list`](/reference/coins-list)."
+								}
+							]
+						},
+						"description": "This endpoint allows you to **query historical total supply of a coin by number of days away from now based on provided coin id**"
+					},
+					"response": [
+						{
+							"name": "Get historical total supply chart of a coin",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/coins/:id/total_supply_chart?days=<string>&interval=daily",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"coins",
+										":id",
+										"total_supply_chart"
+									],
+									"query": [
+										{
+											"key": "days",
+											"value": "<string>",
+											"description": "(Required) data up to number of days ago  <br> Valid values: any integer or `max`"
+										},
+										{
+											"key": "interval",
+											"value": "daily",
+											"description": "data interval"
+										}
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "[\n  [\n    \"<number>\",\n    \"<number>\"\n  ],\n  [\n    \"<number>\",\n    \"<number>\"\n  ]\n]"
+						}
+					]
+				},
+				{
+					"name": "👑 Total Supply chart within time range by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/coins/:id/total_supply_chart/range?from=<number>&to=<number>",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"coins",
+								":id",
+								"total_supply_chart",
+								"range"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "<number>",
+									"description": "(Required) starting date in UNIX timestamp "
+								},
+								{
+									"key": "to",
+									"value": "<number>",
+									"description": "(Required) ending date in UNIX timestamp "
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "<string>",
+									"description": "(Required) coin id  <br> *refers to [`/coins/list`](/reference/coins-list)."
+								}
+							]
+						},
+						"description": "This endpoint allows you to **query historical total supply of a coin, within a range of timestamp based on the provided coin id**"
+					},
+					"response": [
+						{
+							"name": "Get historical total supply chart range of a coin",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/coins/:id/total_supply_chart/range?from=<number>&to=<number>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"coins",
+										":id",
+										"total_supply_chart",
+										"range"
+									],
+									"query": [
+										{
+											"key": "from",
+											"value": "<number>",
+											"description": "(Required) starting date in UNIX timestamp "
+										},
+										{
+											"key": "to",
+											"value": "<number>",
+											"description": "(Required) ending date in UNIX timestamp "
+										}
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "[\n  [\n    \"<number>\",\n    \"<number>\"\n  ],\n  [\n    \"<number>\",\n    \"<number>\"\n  ]\n]"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Contract",
+			"item": [
+				{
+					"name": "Coin Data by Token Address",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/coins/:id/contract/:contract_address",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"coins",
+								":id",
+								"contract",
+								":contract_address"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "<string>",
+									"description": "(Required) asset platform id <br> *refers to [`/asset_platforms`](/reference/asset-platforms-list)."
+								},
+								{
+									"key": "contract_address",
+									"value": "<string>",
+									"description": "(Required) the contract address of token"
+								}
+							]
+						},
+						"description": "This endpoint allows you to **query all the coin data (name, price, market .... including exchange tickers) on CoinGecko coin page based on asset platform and particular token contract address**."
+					},
+					"response": [
+						{
+							"name": "Get current data for a coin",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/coins/:id/contract/:contract_address",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"coins",
+										":id",
+										"contract",
+										":contract_address"
+									],
+									"variable": [
+										{
+											"key": "id"
+										},
+										{
+											"key": "contract_address"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"id\": \"<string>\",\n  \"symbol\": \"<string>\",\n  \"name\": \"<string>\",\n  \"web_slug\": \"<string>\",\n  \"asset_platform_id\": \"<string>\",\n  \"platforms\": {\n    \"Duis_65\": \"<string>\",\n    \"minime\": \"<string>\",\n    \"reprehenderit5\": \"<string>\",\n    \"non8d\": \"<string>\",\n    \"labore8\": \"<string>\"\n  },\n  \"detail_platforms\": {\n    \"aliquip4\": \"<string>\",\n    \"ex__\": \"<string>\"\n  },\n  \"block_time_in_minutes\": \"<number>\",\n  \"hashing_algorithm\": \"<string>\",\n  \"categories\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"preview_listing\": \"<boolean>\",\n  \"public_notice\": \"<string>\",\n  \"additional_notices\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"localization\": {\n    \"irure_b\": \"<string>\",\n    \"laborum_a\": \"<string>\"\n  },\n  \"description\": {\n    \"consectetur_e6\": \"<string>\",\n    \"aliqua5\": \"<string>\",\n    \"nisi_e3\": \"<string>\"\n  },\n  \"links\": {\n    \"homepage\": [\n      \"<string>\",\n      \"<string>\"\n    ],\n    \"whitepaper\": [\n      \"<string>\",\n      \"<string>\"\n    ],\n    \"blockchain_site\": [\n      \"<string>\",\n      \"<string>\"\n    ],\n    \"official_forum_url\": [\n      \"<string>\",\n      \"<string>\"\n    ],\n    \"chat_url\": [\n      \"<string>\",\n      \"<string>\"\n    ],\n    \"announcement_url\": [\n      \"<string>\",\n      \"<string>\"\n    ],\n    \"twitter_screen_name\": \"<string>\",\n    \"facebook_username\": \"<string>\",\n    \"bitcointalk_thread_identifier\": \"<string>\",\n    \"telegram_channel_identifier\": \"<string>\",\n    \"subreddit_url\": \"<string>\",\n    \"repos_url\": {\n      \"github\": [\n        \"<string>\",\n        \"<string>\"\n      ],\n      \"bitbucket\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    }\n  },\n  \"image\": {\n    \"thumb\": \"<string>\",\n    \"small\": \"<string>\",\n    \"large\": \"<string>\"\n  },\n  \"country_origin\": \"<string>\",\n  \"genesis_date\": \"<dateTime>\",\n  \"sentiment_votes_up_percentage\": \"<number>\",\n  \"sentiment_votes_down_percentage\": \"<number>\",\n  \"market_cap_rank\": \"<number>\",\n  \"market_data\": {\n    \"current_price\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"total_value_locked\": \"<number>\",\n    \"mcap_to_tvl_ratio\": \"<number>\",\n    \"fdv_to_tvl_ratio\": \"<number>\",\n    \"roi\": \"<number>\",\n    \"ath\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"ath_change_percentage\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"ath_date\": {\n      \"btc\": \"<string>\",\n      \"eur\": \"<string>\",\n      \"usd\": \"<string>\"\n    },\n    \"atl\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"atl_change_percentage\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"atl_date\": {\n      \"btc\": \"<string>\",\n      \"eur\": \"<string>\",\n      \"usd\": \"<string>\"\n    },\n    \"market_cap\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"market_cap_rank\": \"<number>\",\n    \"fully_diluted_valuation\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"market_cap_fdv_ratio\": \"<number>\",\n    \"total_volume\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"high_24h\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"low_24h\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"price_change_24h\": \"<number>\",\n    \"price_change_percentage_24h\": \"<number>\",\n    \"price_change_percentage_7d\": \"<number>\",\n    \"price_change_percentage_14d\": \"<number>\",\n    \"price_change_percentage_30d\": \"<number>\",\n    \"price_change_percentage_60d\": \"<number>\",\n    \"price_change_percentage_200d\": \"<number>\",\n    \"price_change_percentage_1y\": \"<number>\",\n    \"market_cap_change_24h\": \"<number>\",\n    \"market_cap_change_percentage_24h\": \"<number>\",\n    \"price_change_percentage_1h_in_currency\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"price_change_percentage_24h_in_currency\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"price_change_percentage_7d_in_currency\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"price_change_percentage_14d_in_currency\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"price_change_percentage_30d_in_currency\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"price_change_percentage_60d_in_currency\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"price_change_percentage_200d_in_currency\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"price_change_percentage_1y_in_currency\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"market_cap_change_24h_in_currency\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"market_cap_change_percentage_24h_in_currency\": {\n      \"btc\": \"<number>\",\n      \"eur\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"total_supply\": \"<number>\",\n    \"max_supply\": \"<number>\",\n    \"circulating_supply\": \"<number>\",\n    \"last_updated\": \"<dateTime>\"\n  },\n  \"community_data\": {\n    \"facebook_likes\": \"<number>\",\n    \"twitter_followers\": \"<number>\",\n    \"reddit_average_posts_48h\": \"<number>\",\n    \"reddit_average_comments_48h\": \"<number>\",\n    \"reddit_subscribers\": \"<number>\",\n    \"reddit_accounts_active_48h\": \"<number>\",\n    \"telegram_channel_user_count\": \"<number>\"\n  },\n  \"developer_data\": {\n    \"forks\": \"<number>\",\n    \"stars\": \"<number>\",\n    \"subscribers\": \"<number>\",\n    \"total_issues\": \"<number>\",\n    \"closed_issues\": \"<number>\",\n    \"pull_requests_merged\": \"<number>\",\n    \"pull_request_contributors\": \"<number>\",\n    \"code_additions_deletions_4_weeks\": {\n      \"additions\": \"<number>\",\n      \"deletions\": \"<number>\"\n    },\n    \"commit_count_4_weeks\": \"<number>\",\n    \"last_4_weeks_commit_activity_series\": [\n      \"<number>\",\n      \"<number>\"\n    ]\n  },\n  \"last_updated\": \"<dateTime>\",\n  \"tickers\": [\n    {\n      \"base\": \"<string>\",\n      \"target\": \"<string>\",\n      \"market\": {\n        \"name\": \"<string>\",\n        \"identifier\": \"<string>\",\n        \"has_trading_incentive\": \"<boolean>\"\n      },\n      \"last\": \"<number>\",\n      \"volume\": \"<number>\",\n      \"converted_last\": {\n        \"btc\": \"<number>\",\n        \"eth\": \"<number>\",\n        \"usd\": \"<number>\"\n      },\n      \"converted_volume\": {\n        \"btc\": \"<number>\",\n        \"eth\": \"<number>\",\n        \"usd\": \"<number>\"\n      },\n      \"trust_score\": \"<string>\",\n      \"bid_ask_spread_percentage\": \"<number>\",\n      \"timestamp\": \"<dateTime>\",\n      \"last_traded_at\": \"<dateTime>\",\n      \"last_fetch_at\": \"<dateTime>\",\n      \"is_anomaly\": \"<boolean>\",\n      \"is_stale\": \"<boolean>\",\n      \"trade_url\": \"<string>\",\n      \"token_info_url\": \"<string>\",\n      \"coin_id\": \"<string>\",\n      \"target_coin_id\": \"<string>\"\n    },\n    {\n      \"base\": \"<string>\",\n      \"target\": \"<string>\",\n      \"market\": {\n        \"name\": \"<string>\",\n        \"identifier\": \"<string>\",\n        \"has_trading_incentive\": \"<boolean>\"\n      },\n      \"last\": \"<number>\",\n      \"volume\": \"<number>\",\n      \"converted_last\": {\n        \"btc\": \"<number>\",\n        \"eth\": \"<number>\",\n        \"usd\": \"<number>\"\n      },\n      \"converted_volume\": {\n        \"btc\": \"<number>\",\n        \"eth\": \"<number>\",\n        \"usd\": \"<number>\"\n      },\n      \"trust_score\": \"<string>\",\n      \"bid_ask_spread_percentage\": \"<number>\",\n      \"timestamp\": \"<dateTime>\",\n      \"last_traded_at\": \"<dateTime>\",\n      \"last_fetch_at\": \"<dateTime>\",\n      \"is_anomaly\": \"<boolean>\",\n      \"is_stale\": \"<boolean>\",\n      \"trade_url\": \"<string>\",\n      \"token_info_url\": \"<string>\",\n      \"coin_id\": \"<string>\",\n      \"target_coin_id\": \"<string>\"\n    }\n  ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Coin Historical Chart Data by Token Address",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/coins/:id/contract/:contract_address/market_chart?vs_currency=<string>&days=<string>&interval=5m&precision=full",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"coins",
+								":id",
+								"contract",
+								":contract_address",
+								"market_chart"
+							],
+							"query": [
+								{
+									"key": "vs_currency",
+									"value": "<string>",
+									"description": "(Required) target currency of market data <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies)."
+								},
+								{
+									"key": "days",
+									"value": "<string>",
+									"description": "(Required) data up to number of days ago <br> you may use any integer or `max` for number of days"
+								},
+								{
+									"key": "interval",
+									"value": "5m",
+									"description": "data interval, leave empty for auto granularity"
+								},
+								{
+									"key": "precision",
+									"value": "full",
+									"description": "decimal place for currency price value"
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "<string>",
+									"description": "(Required) asset platform id <br> *refers to [`/asset_platforms`](/reference/asset-platforms-list)."
+								},
+								{
+									"key": "contract_address",
+									"value": "<string>",
+									"description": "(Required) the contract address of token"
+								}
+							]
+						},
+						"description": "This endpoint allows you to **get the historical chart data including time in UNIX, price, market cap and 24hrs volume based on asset platform and particular token contract address**."
+					},
+					"response": [
+						{
+							"name": "Get historical market data include price, market cap, and 24h volume",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/coins/:id/contract/:contract_address/market_chart?vs_currency=<string>&days=<string>&interval=5m&precision=full",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"coins",
+										":id",
+										"contract",
+										":contract_address",
+										"market_chart"
+									],
+									"query": [
+										{
+											"key": "vs_currency",
+											"value": "<string>",
+											"description": "(Required) target currency of market data <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies)."
+										},
+										{
+											"key": "days",
+											"value": "<string>",
+											"description": "(Required) data up to number of days ago <br> you may use any integer or `max` for number of days"
+										},
+										{
+											"key": "interval",
+											"value": "5m",
+											"description": "data interval, leave empty for auto granularity"
+										},
+										{
+											"key": "precision",
+											"value": "full",
+											"description": "decimal place for currency price value"
+										}
+									],
+									"variable": [
+										{
+											"key": "id"
+										},
+										{
+											"key": "contract_address"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"prices\": [\n    [\n      \"<number>\",\n      \"<number>\"\n    ],\n    [\n      \"<number>\",\n      \"<number>\"\n    ]\n  ],\n  \"market_caps\": [\n    [\n      \"<number>\",\n      \"<number>\"\n    ],\n    [\n      \"<number>\",\n      \"<number>\"\n    ]\n  ],\n  \"total_volumes\": [\n    [\n      \"<number>\",\n      \"<number>\"\n    ],\n    [\n      \"<number>\",\n      \"<number>\"\n    ]\n  ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Coin Historical Chart Data within Time Range by Token Address",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/coins/:id/contract/:contract_address/market_chart/range?vs_currency=<string>&from=<number>&to=<number>&interval=5m&precision=full",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"coins",
+								":id",
+								"contract",
+								":contract_address",
+								"market_chart",
+								"range"
+							],
+							"query": [
+								{
+									"key": "vs_currency",
+									"value": "<string>",
+									"description": "(Required) target currency of market data <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies)."
+								},
+								{
+									"key": "from",
+									"value": "<number>",
+									"description": "(Required) starting date in UNIX timestamp"
+								},
+								{
+									"key": "to",
+									"value": "<number>",
+									"description": "(Required) ending date in UNIX timestamp"
+								},
+								{
+									"key": "interval",
+									"value": "5m",
+									"description": "data interval, leave empty for auto granularity"
+								},
+								{
+									"key": "precision",
+									"value": "full",
+									"description": "decimal place for currency price value"
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "<string>",
+									"description": "(Required) asset platform id <br> *refers to [`/asset_platforms`](/reference/asset-platforms-list)"
+								},
+								{
+									"key": "contract_address",
+									"value": "<string>",
+									"description": "(Required) the contract address of token"
+								}
+							]
+						},
+						"description": "This endpoint allows you to **get the historical chart data within certain time range in UNIX along with price, market cap and 24hrs volume  based on asset platform and particular token contract address**."
+					},
+					"response": [
+						{
+							"name": "Get historical market data include price, market cap, and 24h volume",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/coins/:id/contract/:contract_address/market_chart/range?vs_currency=<string>&from=<number>&to=<number>&interval=5m&precision=full",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"coins",
+										":id",
+										"contract",
+										":contract_address",
+										"market_chart",
+										"range"
+									],
+									"query": [
+										{
+											"key": "vs_currency",
+											"value": "<string>",
+											"description": "(Required) target currency of market data <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies)."
+										},
+										{
+											"key": "from",
+											"value": "<number>",
+											"description": "(Required) starting date in UNIX timestamp"
+										},
+										{
+											"key": "to",
+											"value": "<number>",
+											"description": "(Required) ending date in UNIX timestamp"
+										},
+										{
+											"key": "interval",
+											"value": "5m",
+											"description": "data interval, leave empty for auto granularity"
+										},
+										{
+											"key": "precision",
+											"value": "full",
+											"description": "decimal place for currency price value"
+										}
+									],
+									"variable": [
+										{
+											"key": "id"
+										},
+										{
+											"key": "contract_address"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"prices\": [\n    [\n      \"<number>\",\n      \"<number>\"\n    ],\n    [\n      \"<number>\",\n      \"<number>\"\n    ]\n  ],\n  \"market_caps\": [\n    [\n      \"<number>\",\n      \"<number>\"\n    ],\n    [\n      \"<number>\",\n      \"<number>\"\n    ]\n  ],\n  \"total_volumes\": [\n    [\n      \"<number>\",\n      \"<number>\"\n    ],\n    [\n      \"<number>\",\n      \"<number>\"\n    ]\n  ]\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Asset Platforms",
+			"item": [
+				{
+					"name": "Asset Platforms List (ID Map)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/asset_platforms?filter=nft",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"asset_platforms"
+							],
+							"query": [
+								{
+									"key": "filter",
+									"value": "nft",
+									"description": "apply relevant filters to results"
+								}
+							]
+						},
+						"description": "This endpoint allows you to **query all the asset platforms on CoinGecko**."
+					},
+					"response": [
+						{
+							"name": "List all asset platforms",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/asset_platforms?filter=nft",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"asset_platforms"
+									],
+									"query": [
+										{
+											"key": "filter",
+											"value": "nft",
+											"description": "apply relevant filters to results"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"id\": \"<string>\",\n  \"chain_identifier\": \"<number>\",\n  \"name\": \"<string>\",\n  \"shortname\": \"<string>\",\n  \"native_coin_id\": \"<string>\"\n}"
+						}
+					]
+				},
+				{
+					"name": "👑 Token Lists by Asset Platform ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/token_lists/:asset_platform_id/all.json",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"token_lists",
+								":asset_platform_id",
+								"all.json"
+							],
+							"variable": [
+								{
+									"key": "asset_platform_id",
+									"value": "<string>",
+									"description": "(Required) asset platform id <br> *refers to [`/asset_platforms`](/reference/asset-platforms-list)"
+								}
+							]
+						},
+						"description": "This endpoint allows you to **get full list of tokens of a blockchain network (asset platform) that is supported by [Ethereum token list standard](https://tokenlists.org/)**"
+					},
+					"response": [
+						{
+							"name": "List all tokens on CoinGecko based on asset platform id",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/token_lists/:asset_platform_id/all.json",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"token_lists",
+										":asset_platform_id",
+										"all.json"
+									],
+									"variable": [
+										{
+											"key": "asset_platform_id"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"name\": \"<string>\",\n  \"logoURI\": \"<string>\",\n  \"keywords\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"timestamp\": \"<dateTime>\",\n  \"tokens\": [\n    {\n      \"chainId\": \"<number>\",\n      \"address\": \"<string>\",\n      \"name\": \"<string>\",\n      \"symbol\": \"<string>\",\n      \"decimals\": \"<number>\",\n      \"logoURI\": \"<string>\"\n    },\n    {\n      \"chainId\": \"<number>\",\n      \"address\": \"<string>\",\n      \"name\": \"<string>\",\n      \"symbol\": \"<string>\",\n      \"decimals\": \"<number>\",\n      \"logoURI\": \"<string>\"\n    }\n  ]\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Categories",
+			"item": [
+				{
+					"name": "Coins Categories List (ID Map)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/coins/categories/list",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"coins",
+								"categories",
+								"list"
+							]
+						},
+						"description": "This endpoint allows you to **query all the coins categories on CoinGecko**."
+					},
+					"response": [
+						{
+							"name": "List all categories",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/coins/categories/list",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"coins",
+										"categories",
+										"list"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"category_id\": \"<string>\",\n  \"name\": \"<string>\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Coins Categories List with Market Data",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/coins/categories?order=market_cap_change_24h_desc",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"coins",
+								"categories"
+							],
+							"query": [
+								{
+									"key": "order",
+									"value": "market_cap_change_24h_desc",
+									"description": "sort results by field, default: market_cap_desc"
+								}
+							]
+						},
+						"description": "This endpoint allows you to **query all the coins categories with market data (market cap, volume, etc.) on CoinGecko**."
+					},
+					"response": [
+						{
+							"name": "List all categories with market data",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/coins/categories?order=market_cap_change_24h_desc",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"coins",
+										"categories"
+									],
+									"query": [
+										{
+											"key": "order",
+											"value": "market_cap_change_24h_desc",
+											"description": "sort results by field, default: market_cap_desc"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"id\": \"<string>\",\n  \"name\": \"<string>\",\n  \"market_cap\": \"<number>\",\n  \"market_cap_change_24h\": \"<number>\",\n  \"content\": \"<string>\",\n  \"top_3_coins\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"volume_24h\": \"<number>\",\n  \"updated_at\": \"<string>\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Exchanges",
+			"item": [
+				{
+					"name": "Exchanges List with data",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/exchanges?per_page=<number>&page=<number>",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"exchanges"
+							],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "<number>",
+									"description": "total results per page, default: 100 <br> Valid values: 1...250"
+								},
+								{
+									"key": "page",
+									"value": "<number>",
+									"description": "page through results, default: 1"
+								}
+							]
+						},
+						"description": "This endpoint allows you to **query all the supported exchanges with exchanges’ data (id, name, country, .... etc) that have active trading volumes on CoinGecko**."
+					},
+					"response": [
+						{
+							"name": "List all exchanges",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/exchanges?per_page=<number>&page=<number>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"exchanges"
+									],
+									"query": [
+										{
+											"key": "per_page",
+											"value": "<number>",
+											"description": "total results per page, default: 100 <br> Valid values: 1...250"
+										},
+										{
+											"key": "page",
+											"value": "<number>",
+											"description": "page through results, default: 1"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"id\": \"<string>\",\n  \"name\": \"<string>\",\n  \"year_established\": \"<number>\",\n  \"country\": \"<string>\",\n  \"description\": \"<string>\",\n  \"url\": \"<string>\",\n  \"image\": \"<string>\",\n  \"has_trading_incentive\": \"<boolean>\",\n  \"trust_score\": \"<number>\",\n  \"trust_score_rank\": \"<number>\",\n  \"trade_volume_24h_btc\": \"<number>\",\n  \"trade_volume_24h_btc_normalized\": \"<number>\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Exchanges List (ID Map)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/exchanges/list",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"exchanges",
+								"list"
+							]
+						},
+						"description": "This endpoint allows you to **query all the exchanges with id and name**."
+					},
+					"response": [
+						{
+							"name": "List all exchanges with id and name",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/exchanges/list",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"exchanges",
+										"list"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"id\": \"<string>\",\n  \"name\": \"<string>\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Exchange Data by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/exchanges/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"exchanges",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "<string>",
+									"description": "(Required) exchange id <br> *refers to [`/exchanges/list`](/reference/exchanges-list)."
+								}
+							]
+						},
+						"description": "This endpoint allows you to **query exchange’s data (name, year established, country, .... etc), exchange volume in BTC and top 100 tickers based on exchange’s id**."
+					},
+					"response": [
+						{
+							"name": "Get exchange volume in BTC and top 100 tickers only",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/exchanges/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"exchanges",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"name\": \"<string>\",\n  \"year_established\": \"<number>\",\n  \"country\": \"<string>\",\n  \"description\": \"<string>\",\n  \"url\": \"<string>\",\n  \"image\": \"<string>\",\n  \"facebook_url\": \"<string>\",\n  \"reddit_url\": \"<string>\",\n  \"telegram_url\": \"<string>\",\n  \"slack_url\": \"<string>\",\n  \"other_url_1\": \"<string>\",\n  \"other_url_2\": \"<string>\",\n  \"twitter_handle\": \"<string>\",\n  \"has_trading_incentive\": \"<boolean>\",\n  \"centralized\": \"<boolean>\",\n  \"public_notice\": \"<string>\",\n  \"alert_notice\": \"<string>\",\n  \"trust_score\": \"<number>\",\n  \"trust_score_rank\": \"<number>\",\n  \"trade_volume_24h_btc\": \"<number>\",\n  \"trade_volume_24h_btc_normalized\": \"<number>\",\n  \"tickers\": [\n    {\n      \"name\": \"<string>\",\n      \"tickers\": [\n        {\n          \"base\": \"<string>\",\n          \"target\": \"<string>\",\n          \"market\": {\n            \"name\": \"<string>\",\n            \"identifier\": \"<string>\",\n            \"has_trading_incentive\": \"<boolean>\",\n            \"logo\": \"<string>\"\n          },\n          \"last\": \"<number>\",\n          \"volume\": \"<number>\",\n          \"cost_to_move_up_usd\": \"<number>\",\n          \"cost_to_move_down_usd\": \"<number>\",\n          \"converted_last\": {\n            \"btc\": \"<number>\",\n            \"eth\": \"<number>\",\n            \"usd\": \"<number>\"\n          },\n          \"converted_volume\": {\n            \"btc\": \"<number>\",\n            \"eth\": \"<number>\",\n            \"usd\": \"<number>\"\n          },\n          \"trust_score\": \"<string>\",\n          \"bid_ask_spread_percentage\": \"<number>\",\n          \"timestamp\": \"<string>\",\n          \"last_traded_at\": \"<string>\",\n          \"last_fetch_at\": \"<string>\",\n          \"is_anomaly\": \"<boolean>\",\n          \"is_stale\": \"<boolean>\",\n          \"trade_url\": \"<string>\",\n          \"token_info_url\": \"<string>\",\n          \"coin_id\": \"<string>\",\n          \"target_coin_id\": \"<string>\"\n        },\n        {\n          \"base\": \"<string>\",\n          \"target\": \"<string>\",\n          \"market\": {\n            \"name\": \"<string>\",\n            \"identifier\": \"<string>\",\n            \"has_trading_incentive\": \"<boolean>\",\n            \"logo\": \"<string>\"\n          },\n          \"last\": \"<number>\",\n          \"volume\": \"<number>\",\n          \"cost_to_move_up_usd\": \"<number>\",\n          \"cost_to_move_down_usd\": \"<number>\",\n          \"converted_last\": {\n            \"btc\": \"<number>\",\n            \"eth\": \"<number>\",\n            \"usd\": \"<number>\"\n          },\n          \"converted_volume\": {\n            \"btc\": \"<number>\",\n            \"eth\": \"<number>\",\n            \"usd\": \"<number>\"\n          },\n          \"trust_score\": \"<string>\",\n          \"bid_ask_spread_percentage\": \"<number>\",\n          \"timestamp\": \"<string>\",\n          \"last_traded_at\": \"<string>\",\n          \"last_fetch_at\": \"<string>\",\n          \"is_anomaly\": \"<boolean>\",\n          \"is_stale\": \"<boolean>\",\n          \"trade_url\": \"<string>\",\n          \"token_info_url\": \"<string>\",\n          \"coin_id\": \"<string>\",\n          \"target_coin_id\": \"<string>\"\n        }\n      ]\n    },\n    {\n      \"name\": \"<string>\",\n      \"tickers\": [\n        {\n          \"base\": \"<string>\",\n          \"target\": \"<string>\",\n          \"market\": {\n            \"name\": \"<string>\",\n            \"identifier\": \"<string>\",\n            \"has_trading_incentive\": \"<boolean>\",\n            \"logo\": \"<string>\"\n          },\n          \"last\": \"<number>\",\n          \"volume\": \"<number>\",\n          \"cost_to_move_up_usd\": \"<number>\",\n          \"cost_to_move_down_usd\": \"<number>\",\n          \"converted_last\": {\n            \"btc\": \"<number>\",\n            \"eth\": \"<number>\",\n            \"usd\": \"<number>\"\n          },\n          \"converted_volume\": {\n            \"btc\": \"<number>\",\n            \"eth\": \"<number>\",\n            \"usd\": \"<number>\"\n          },\n          \"trust_score\": \"<string>\",\n          \"bid_ask_spread_percentage\": \"<number>\",\n          \"timestamp\": \"<string>\",\n          \"last_traded_at\": \"<string>\",\n          \"last_fetch_at\": \"<string>\",\n          \"is_anomaly\": \"<boolean>\",\n          \"is_stale\": \"<boolean>\",\n          \"trade_url\": \"<string>\",\n          \"token_info_url\": \"<string>\",\n          \"coin_id\": \"<string>\",\n          \"target_coin_id\": \"<string>\"\n        },\n        {\n          \"base\": \"<string>\",\n          \"target\": \"<string>\",\n          \"market\": {\n            \"name\": \"<string>\",\n            \"identifier\": \"<string>\",\n            \"has_trading_incentive\": \"<boolean>\",\n            \"logo\": \"<string>\"\n          },\n          \"last\": \"<number>\",\n          \"volume\": \"<number>\",\n          \"cost_to_move_up_usd\": \"<number>\",\n          \"cost_to_move_down_usd\": \"<number>\",\n          \"converted_last\": {\n            \"btc\": \"<number>\",\n            \"eth\": \"<number>\",\n            \"usd\": \"<number>\"\n          },\n          \"converted_volume\": {\n            \"btc\": \"<number>\",\n            \"eth\": \"<number>\",\n            \"usd\": \"<number>\"\n          },\n          \"trust_score\": \"<string>\",\n          \"bid_ask_spread_percentage\": \"<number>\",\n          \"timestamp\": \"<string>\",\n          \"last_traded_at\": \"<string>\",\n          \"last_fetch_at\": \"<string>\",\n          \"is_anomaly\": \"<boolean>\",\n          \"is_stale\": \"<boolean>\",\n          \"trade_url\": \"<string>\",\n          \"token_info_url\": \"<string>\",\n          \"coin_id\": \"<string>\",\n          \"target_coin_id\": \"<string>\"\n        }\n      ]\n    }\n  ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Exchange Tickers by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/exchanges/:id/tickers?coin_ids=<string>&include_exchange_logo=<boolean>&page=<number>&depth=<boolean>&order=volume_desc",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"exchanges",
+								":id",
+								"tickers"
+							],
+							"query": [
+								{
+									"key": "coin_ids",
+									"value": "<string>",
+									"description": "filter tickers by coin_ids, comma-separated if querying more than 1 coin <br> *refers to [`/coins/list`](/reference/coins-list)."
+								},
+								{
+									"key": "include_exchange_logo",
+									"value": "<boolean>",
+									"description": "include exchange logo, default: false"
+								},
+								{
+									"key": "page",
+									"value": "<number>",
+									"description": "page through results"
+								},
+								{
+									"key": "depth",
+									"value": "<boolean>",
+									"description": "include 2% orderbook depth (Example: cost_to_move_up_usd & cost_to_move_down_usd),default: false"
+								},
+								{
+									"key": "order",
+									"value": "volume_desc",
+									"description": "use this to sort the order of responses, default: trust_score_desc"
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "<string>",
+									"description": "(Required) exchange id <br> *refers to [`/exchanges/list`](/reference/exchanges-list)."
+								}
+							]
+						},
+						"description": "This endpoint allows you to **query exchange's tickers based on exchange’s id**."
+					},
+					"response": [
+						{
+							"name": "Get exchange tickers",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/exchanges/:id/tickers?coin_ids=<string>&include_exchange_logo=<boolean>&page=<number>&depth=<boolean>&order=volume_desc",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"exchanges",
+										":id",
+										"tickers"
+									],
+									"query": [
+										{
+											"key": "coin_ids",
+											"value": "<string>",
+											"description": "filter tickers by coin_ids, comma-separated if querying more than 1 coin <br> *refers to [`/coins/list`](/reference/coins-list)."
+										},
+										{
+											"key": "include_exchange_logo",
+											"value": "<boolean>",
+											"description": "include exchange logo, default: false"
+										},
+										{
+											"key": "page",
+											"value": "<number>",
+											"description": "page through results"
+										},
+										{
+											"key": "depth",
+											"value": "<boolean>",
+											"description": "include 2% orderbook depth (Example: cost_to_move_up_usd & cost_to_move_down_usd),default: false"
+										},
+										{
+											"key": "order",
+											"value": "volume_desc",
+											"description": "use this to sort the order of responses, default: trust_score_desc"
+										}
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"name\": \"<string>\",\n  \"tickers\": [\n    {\n      \"base\": \"<string>\",\n      \"target\": \"<string>\",\n      \"market\": {\n        \"name\": \"<string>\",\n        \"identifier\": \"<string>\",\n        \"has_trading_incentive\": \"<boolean>\",\n        \"logo\": \"<string>\"\n      },\n      \"last\": \"<number>\",\n      \"volume\": \"<number>\",\n      \"cost_to_move_up_usd\": \"<number>\",\n      \"cost_to_move_down_usd\": \"<number>\",\n      \"converted_last\": {\n        \"btc\": \"<number>\",\n        \"eth\": \"<number>\",\n        \"usd\": \"<number>\"\n      },\n      \"converted_volume\": {\n        \"btc\": \"<number>\",\n        \"eth\": \"<number>\",\n        \"usd\": \"<number>\"\n      },\n      \"trust_score\": \"<string>\",\n      \"bid_ask_spread_percentage\": \"<number>\",\n      \"timestamp\": \"<string>\",\n      \"last_traded_at\": \"<string>\",\n      \"last_fetch_at\": \"<string>\",\n      \"is_anomaly\": \"<boolean>\",\n      \"is_stale\": \"<boolean>\",\n      \"trade_url\": \"<string>\",\n      \"token_info_url\": \"<string>\",\n      \"coin_id\": \"<string>\",\n      \"target_coin_id\": \"<string>\"\n    },\n    {\n      \"base\": \"<string>\",\n      \"target\": \"<string>\",\n      \"market\": {\n        \"name\": \"<string>\",\n        \"identifier\": \"<string>\",\n        \"has_trading_incentive\": \"<boolean>\",\n        \"logo\": \"<string>\"\n      },\n      \"last\": \"<number>\",\n      \"volume\": \"<number>\",\n      \"cost_to_move_up_usd\": \"<number>\",\n      \"cost_to_move_down_usd\": \"<number>\",\n      \"converted_last\": {\n        \"btc\": \"<number>\",\n        \"eth\": \"<number>\",\n        \"usd\": \"<number>\"\n      },\n      \"converted_volume\": {\n        \"btc\": \"<number>\",\n        \"eth\": \"<number>\",\n        \"usd\": \"<number>\"\n      },\n      \"trust_score\": \"<string>\",\n      \"bid_ask_spread_percentage\": \"<number>\",\n      \"timestamp\": \"<string>\",\n      \"last_traded_at\": \"<string>\",\n      \"last_fetch_at\": \"<string>\",\n      \"is_anomaly\": \"<boolean>\",\n      \"is_stale\": \"<boolean>\",\n      \"trade_url\": \"<string>\",\n      \"token_info_url\": \"<string>\",\n      \"coin_id\": \"<string>\",\n      \"target_coin_id\": \"<string>\"\n    }\n  ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Exchange Volume Chart by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/exchanges/:id/volume_chart?days=180",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"exchanges",
+								":id",
+								"volume_chart"
+							],
+							"query": [
+								{
+									"key": "days",
+									"value": "180",
+									"description": "(Required) data up to number of days ago"
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "<string>",
+									"description": "(Required) exchange id or derivatives exchange id <br> *refers to [`/exchanges/list`](/reference/exchanges-list) or [`/derivatives/exchanges/list`](/reference/derivatives-exchanges-list)."
+								}
+							]
+						},
+						"description": "This endpoint allows you to **query the historical volume chart data with time in UNIX and trading volume data in BTC based on exchange’s id**."
+					},
+					"response": [
+						{
+							"name": "Get exchange volume chart data",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/exchanges/:id/volume_chart?days=180",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"exchanges",
+										":id",
+										"volume_chart"
+									],
+									"query": [
+										{
+											"key": "days",
+											"value": "180",
+											"description": "(Required) data up to number of days ago"
+										}
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "[\n  [\n    \"<number>\",\n    \"<number>\"\n  ],\n  [\n    \"<number>\",\n    \"<number>\"\n  ]\n]"
+						}
+					]
+				},
+				{
+					"name": "💼 Exchange Volume Chart within Time Range by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/exchanges/:id/volume_chart/range?from=<number>&to=<number>",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"exchanges",
+								":id",
+								"volume_chart",
+								"range"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "<number>",
+									"description": "(Required) starting date in UNIX timestamp "
+								},
+								{
+									"key": "to",
+									"value": "<number>",
+									"description": "(Required) ending date in UNIX timestamp"
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "<string>",
+									"description": "(Required) exchange id or derivative exchange id <br> *refers to [`/exchanges/list`](/reference/exchanges-list) or [`/derivatives/exchanges/list`](/reference/derivatives-exchanges-list)."
+								}
+							]
+						},
+						"description": "This endpoint allows you to **query the historical volume chart data in BTC by specifying date range in UNIX based on exchange’s id**"
+					},
+					"response": [
+						{
+							"name": "Get exchange volume chart data",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/exchanges/:id/volume_chart/range?from=<number>&to=<number>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"exchanges",
+										":id",
+										"volume_chart",
+										"range"
+									],
+									"query": [
+										{
+											"key": "from",
+											"value": "<number>",
+											"description": "(Required) starting date in UNIX timestamp "
+										},
+										{
+											"key": "to",
+											"value": "<number>",
+											"description": "(Required) ending date in UNIX timestamp"
+										}
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "[\n  [\n    \"<number>\",\n    \"<number>\"\n  ],\n  [\n    \"<number>\",\n    \"<number>\"\n  ]\n]"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Derivatives",
+			"item": [
+				{
+					"name": "Derivatives Tickers List",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/derivatives",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"derivatives"
+							]
+						},
+						"description": "This endpoint allows you to **query all the tickers from derivatives exchanges on CoinGecko**."
+					},
+					"response": [
+						{
+							"name": "List all derivative tickers",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/derivatives",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"derivatives"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"market\": \"<string>\",\n  \"symbol\": \"<string>\",\n  \"index_id\": \"<string>\",\n  \"price\": \"<string>\",\n  \"price_percentage_change_24h\": \"<number>\",\n  \"contract_type\": \"<string>\",\n  \"index\": \"<number>\",\n  \"basis\": \"<number>\",\n  \"spread\": \"<number>\",\n  \"funding_rate\": \"<number>\",\n  \"open_interest\": \"<number>\",\n  \"volume_24h\": \"<number>\",\n  \"last_traded_at\": \"<number>\",\n  \"expired_at\": \"<string>\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Derivatives Exchanges List with Data",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/derivatives/exchanges?order=name_asc&per_page=<number>&page=<number>",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"derivatives",
+								"exchanges"
+							],
+							"query": [
+								{
+									"key": "order",
+									"value": "name_asc",
+									"description": "use this to sort the order of responses, default: open_interest_btc_desc"
+								},
+								{
+									"key": "per_page",
+									"value": "<number>",
+									"description": "total results per page"
+								},
+								{
+									"key": "page",
+									"value": "<number>",
+									"description": "page through results, default: 1"
+								}
+							]
+						},
+						"description": "This endpoint allows you to **query all the derivatives exchanges with related data (id, name, open interest, .... etc) on CoinGecko**."
+					},
+					"response": [
+						{
+							"name": "List all derivative exchanges",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/derivatives/exchanges?order=name_asc&per_page=<number>&page=<number>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"derivatives",
+										"exchanges"
+									],
+									"query": [
+										{
+											"key": "order",
+											"value": "name_asc",
+											"description": "use this to sort the order of responses, default: open_interest_btc_desc"
+										},
+										{
+											"key": "per_page",
+											"value": "<number>",
+											"description": "total results per page"
+										},
+										{
+											"key": "page",
+											"value": "<number>",
+											"description": "page through results, default: 1"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"name\": \"<string>\",\n  \"id\": \"<string>\",\n  \"open_interest_btc\": \"<number>\",\n  \"trade_volume_24h_btc\": \"<string>\",\n  \"number_of_perpetual_pairs\": \"<number>\",\n  \"number_of_futures_pairs\": \"<number>\",\n  \"image\": \"<string>\",\n  \"year_established\": \"<number>\",\n  \"country\": \"<string>\",\n  \"description\": \"<string>\",\n  \"url\": \"<string>\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Derivatives Exchange Data by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/derivatives/exchanges/:id?include_tickers=unexpired",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"derivatives",
+								"exchanges",
+								":id"
+							],
+							"query": [
+								{
+									"key": "include_tickers",
+									"value": "unexpired",
+									"description": "include tickers data"
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "<string>",
+									"description": "(Required) derivative exchange id <br> *refers to [`/derivatives/exchanges/list`](/reference/derivatives-exchanges-list)."
+								}
+							]
+						},
+						"description": "This endpoint allows you to **query the derivatives exchange’s related data (id, name, open interest, .... etc) based on the exchanges’ id**."
+					},
+					"response": [
+						{
+							"name": "Get derivative exchange data",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/derivatives/exchanges/:id?include_tickers=unexpired",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"derivatives",
+										"exchanges",
+										":id"
+									],
+									"query": [
+										{
+											"key": "include_tickers",
+											"value": "unexpired",
+											"description": "include tickers data"
+										}
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"name\": \"<string>\",\n  \"open_interest_btc\": \"<number>\",\n  \"trade_volume_24h_btc\": \"<string>\",\n  \"number_of_perpetual_pairs\": \"<number>\",\n  \"number_of_futures_pairs\": \"<number>\",\n  \"image\": \"<string>\",\n  \"year_established\": \"<number>\",\n  \"country\": \"<string>\",\n  \"description\": \"<string>\",\n  \"url\": \"<string>\",\n  \"tickers\": [\n    {\n      \"market\": \"<string>\",\n      \"symbol\": \"<string>\",\n      \"index_id\": \"<string>\",\n      \"price\": \"<string>\",\n      \"price_percentage_change_24h\": \"<number>\",\n      \"contract_type\": \"<string>\",\n      \"index\": \"<number>\",\n      \"basis\": \"<number>\",\n      \"spread\": \"<number>\",\n      \"funding_rate\": \"<number>\",\n      \"open_interest\": \"<number>\",\n      \"volume_24h\": \"<number>\",\n      \"last_traded_at\": \"<number>\",\n      \"expired_at\": \"<string>\"\n    },\n    {\n      \"market\": \"<string>\",\n      \"symbol\": \"<string>\",\n      \"index_id\": \"<string>\",\n      \"price\": \"<string>\",\n      \"price_percentage_change_24h\": \"<number>\",\n      \"contract_type\": \"<string>\",\n      \"index\": \"<number>\",\n      \"basis\": \"<number>\",\n      \"spread\": \"<number>\",\n      \"funding_rate\": \"<number>\",\n      \"open_interest\": \"<number>\",\n      \"volume_24h\": \"<number>\",\n      \"last_traded_at\": \"<number>\",\n      \"expired_at\": \"<string>\"\n    }\n  ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Derivatives Exchanges List (ID Map)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/derivatives/exchanges/list",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"derivatives",
+								"exchanges",
+								"list"
+							]
+						},
+						"description": "This endpoint allows you to **query all the derivatives exchanges with id and name on CoinGecko**."
+					},
+					"response": [
+						{
+							"name": "List all derivative exchanges name and identifier",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/derivatives/exchanges/list",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"derivatives",
+										"exchanges",
+										"list"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"id\": \"<string>\",\n  \"name\": \"<string>\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "NFTs (Beta)",
+			"item": [
+				{
+					"name": "NFTs List (ID Map)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/nfts/list?order=floor_price_native_desc&per_page=<number>&page=<number>",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"nfts",
+								"list"
+							],
+							"query": [
+								{
+									"key": "order",
+									"value": "floor_price_native_desc",
+									"description": "use this to sort the order of responses"
+								},
+								{
+									"key": "per_page",
+									"value": "<number>",
+									"description": "total results per page <br> Valid values: 1...250"
+								},
+								{
+									"key": "page",
+									"value": "<number>",
+									"description": "page through results"
+								}
+							]
+						},
+						"description": "This endpoint allows you to **query all supported NFTs with id, contract address, name, asset platform id and symbol on CoinGecko**."
+					},
+					"response": [
+						{
+							"name": "List all NFTs categories",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/nfts/list?order=floor_price_native_desc&per_page=<number>&page=<number>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"nfts",
+										"list"
+									],
+									"query": [
+										{
+											"key": "order",
+											"value": "floor_price_native_desc",
+											"description": "use this to sort the order of responses"
+										},
+										{
+											"key": "per_page",
+											"value": "<number>",
+											"description": "total results per page <br> Valid values: 1...250"
+										},
+										{
+											"key": "page",
+											"value": "<number>",
+											"description": "page through results"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"id\": \"<string>\",\n  \"contract_address\": \"<string>\",\n  \"name\": \"<string>\",\n  \"asset_platform_id\": \"<string>\",\n  \"symbol\": \"<string>\"\n}"
+						}
+					]
+				},
+				{
+					"name": "NFTs Collection Data by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/nfts/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"nfts",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "<string>",
+									"description": "(Required) NFTs id <br> *refers to [`/nfts/list`](/reference/nfts-list)."
+								}
+							]
+						},
+						"description": "This endpoint allows you to **query all the NFT data (name, floor price, 24 hr volume....) based on the nft collection id**."
+					},
+					"response": [
+						{
+							"name": "Get NFTs data",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/nfts/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"nfts",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"id\": \"<string>\",\n  \"contract_address\": \"<string>\",\n  \"asset_platform_id\": \"<string>\",\n  \"name\": \"<string>\",\n  \"symbol\": \"<string>\",\n  \"image\": {\n    \"small\": \"<string>\"\n  },\n  \"description\": \"<string>\",\n  \"native_currency\": \"<string>\",\n  \"native_currency_symbol\": \"<string>\",\n  \"floor_price\": {\n    \"native_currency\": \"<number>\",\n    \"usd\": \"<number>\"\n  },\n  \"market_cap\": {\n    \"native_currency\": \"<number>\",\n    \"usd\": \"<number>\"\n  },\n  \"volume_24h\": {\n    \"native_currency\": \"<number>\",\n    \"usd\": \"<number>\"\n  },\n  \"floor_price_in_usd_24h_percentage_change\": \"<number>\",\n  \"floor_price_24h_percentage_change\": {\n    \"usd\": \"<number>\",\n    \"native_currency\": \"<number>\"\n  },\n  \"market_cap_24h_percentage_change\": {\n    \"usd\": \"<number>\",\n    \"native_currency\": \"<number>\"\n  },\n  \"volume_24h_percentage_change\": {\n    \"usd\": \"<number>\",\n    \"native_currency\": \"<number>\"\n  },\n  \"number_of_unique_addresses\": \"<number>\",\n  \"number_of_unique_addresses_24h_percentage_change\": \"<number>\",\n  \"volume_in_usd_24h_percentage_change\": \"<number>\",\n  \"total_supply\": \"<number>\",\n  \"one_day_sales\": \"<number>\",\n  \"one_day_sales_24h_percentage_change\": \"<number>\",\n  \"one_day_average_sale_price\": \"<number>\",\n  \"one_day_average_sale_price_24h_percentage_change\": \"<number>\",\n  \"links\": {\n    \"homepage\": \"<string>\",\n    \"twitter\": \"<string>\",\n    \"discord\": \"<string>\"\n  },\n  \"floor_price_7d_percentage_change\": {\n    \"usd\": \"<number>\",\n    \"native_currency\": \"<number>\"\n  },\n  \"floor_price_14d_percentage_change\": {\n    \"usd\": \"<number>\",\n    \"native_currency\": \"<number>\"\n  },\n  \"floor_price_30d_percentage_change\": {\n    \"usd\": \"<number>\",\n    \"native_currency\": \"<number>\"\n  },\n  \"floor_price_60d_percentage_change\": {\n    \"usd\": \"<number>\",\n    \"native_currency\": \"<number>\"\n  },\n  \"floor_price_1y_percentage_change\": {\n    \"usd\": \"<number>\",\n    \"native_currency\": \"<number>\"\n  },\n  \"explorers\": [\n    {\n      \"name\": \"<string>\",\n      \"link\": \"<string>\"\n    },\n    {\n      \"name\": \"<string>\",\n      \"link\": \"<string>\"\n    }\n  ]\n}"
+						}
+					]
+				},
+				{
+					"name": "NFTs Collection Data by Contract Address",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/nfts/:asset_platform_id/contract/:contract_address",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"nfts",
+								":asset_platform_id",
+								"contract",
+								":contract_address"
+							],
+							"variable": [
+								{
+									"key": "asset_platform_id",
+									"value": "<string>",
+									"description": "(Required) asset platform id <br> *refers to [`/asset_platforms`](/reference/asset-platforms-list)"
+								},
+								{
+									"key": "contract_address",
+									"value": "<string>",
+									"description": "(Required) the contract address of token"
+								}
+							]
+						},
+						"description": "This endpoint allows you to **query all the NFT data (name, floor price, 24 hr volume....) based on the nft collection contract address and respective asset platform**."
+					},
+					"response": [
+						{
+							"name": "Get NFTs data",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/nfts/:asset_platform_id/contract/:contract_address",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"nfts",
+										":asset_platform_id",
+										"contract",
+										":contract_address"
+									],
+									"variable": [
+										{
+											"key": "asset_platform_id"
+										},
+										{
+											"key": "contract_address"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"id\": \"<string>\",\n  \"contract_address\": \"<string>\",\n  \"asset_platform_id\": \"<string>\",\n  \"name\": \"<string>\",\n  \"symbol\": \"<string>\",\n  \"image\": {\n    \"small\": \"<string>\"\n  },\n  \"description\": \"<string>\",\n  \"native_currency\": \"<string>\",\n  \"native_currency_symbol\": \"<string>\",\n  \"floor_price\": {\n    \"native_currency\": \"<number>\",\n    \"usd\": \"<number>\"\n  },\n  \"market_cap\": {\n    \"native_currency\": \"<number>\",\n    \"usd\": \"<number>\"\n  },\n  \"volume_24h\": {\n    \"native_currency\": \"<number>\",\n    \"usd\": \"<number>\"\n  },\n  \"floor_price_in_usd_24h_percentage_change\": \"<number>\",\n  \"floor_price_24h_percentage_change\": {\n    \"usd\": \"<number>\",\n    \"native_currency\": \"<number>\"\n  },\n  \"market_cap_24h_percentage_change\": {\n    \"usd\": \"<number>\",\n    \"native_currency\": \"<number>\"\n  },\n  \"volume_24h_percentage_change\": {\n    \"usd\": \"<number>\",\n    \"native_currency\": \"<number>\"\n  },\n  \"number_of_unique_addresses\": \"<number>\",\n  \"number_of_unique_addresses_24h_percentage_change\": \"<number>\",\n  \"volume_in_usd_24h_percentage_change\": \"<number>\",\n  \"total_supply\": \"<number>\",\n  \"one_day_sales\": \"<number>\",\n  \"one_day_sales_24h_percentage_change\": \"<number>\",\n  \"one_day_average_sale_price\": \"<number>\",\n  \"one_day_average_sale_price_24h_percentage_change\": \"<number>\",\n  \"links\": {\n    \"homepage\": \"<string>\",\n    \"twitter\": \"<string>\",\n    \"discord\": \"<string>\"\n  },\n  \"floor_price_7d_percentage_change\": {\n    \"usd\": \"<number>\",\n    \"native_currency\": \"<number>\"\n  },\n  \"floor_price_14d_percentage_change\": {\n    \"usd\": \"<number>\",\n    \"native_currency\": \"<number>\"\n  },\n  \"floor_price_30d_percentage_change\": {\n    \"usd\": \"<number>\",\n    \"native_currency\": \"<number>\"\n  },\n  \"floor_price_60d_percentage_change\": {\n    \"usd\": \"<number>\",\n    \"native_currency\": \"<number>\"\n  },\n  \"floor_price_1y_percentage_change\": {\n    \"usd\": \"<number>\",\n    \"native_currency\": \"<number>\"\n  },\n  \"explorers\": [\n    {\n      \"name\": \"<string>\",\n      \"link\": \"<string>\"\n    },\n    {\n      \"name\": \"<string>\",\n      \"link\": \"<string>\"\n    }\n  ]\n}"
+						}
+					]
+				},
+				{
+					"name": "💼 NFTs List with Market Data",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/nfts/markets?asset_platform_id=<string>&order=h24_volume_usd_asc&per_page=<number>&page=<number>",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"nfts",
+								"markets"
+							],
+							"query": [
+								{
+									"key": "asset_platform_id",
+									"value": "<string>",
+									"description": "filter result by asset platform (blockchain network)  <br> *refers to [`/asset_platforms`](/reference/asset-platforms-list) filter=`nft` "
+								},
+								{
+									"key": "order",
+									"value": "h24_volume_usd_asc",
+									"description": "sort results by field  <br> Default: `market_cap_usd_desc`"
+								},
+								{
+									"key": "per_page",
+									"value": "<number>",
+									"description": "total results per page  <br> Valid values: any integer between 1 and 250  <br> Default: `100`"
+								},
+								{
+									"key": "page",
+									"value": "<number>",
+									"description": "page through results  <br> Default: `1`"
+								}
+							]
+						},
+						"description": "This endpoint allows you to **query all the supported NFT collections with floor price, market cap, volume and market related data on CoinGecko**"
+					},
+					"response": [
+						{
+							"name": "List all NFTs markets",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/nfts/markets?asset_platform_id=<string>&order=h24_volume_usd_asc&per_page=<number>&page=<number>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"nfts",
+										"markets"
+									],
+									"query": [
+										{
+											"key": "asset_platform_id",
+											"value": "<string>",
+											"description": "filter result by asset platform (blockchain network)  <br> *refers to [`/asset_platforms`](/reference/asset-platforms-list) filter=`nft` "
+										},
+										{
+											"key": "order",
+											"value": "h24_volume_usd_asc",
+											"description": "sort results by field  <br> Default: `market_cap_usd_desc`"
+										},
+										{
+											"key": "per_page",
+											"value": "<number>",
+											"description": "total results per page  <br> Valid values: any integer between 1 and 250  <br> Default: `100`"
+										},
+										{
+											"key": "page",
+											"value": "<number>",
+											"description": "page through results  <br> Default: `1`"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "[\n  {\n    \"id\": \"<string>\",\n    \"contract_address\": \"<string>\",\n    \"asset_platform_id\": \"<string>\",\n    \"name\": \"<string>\",\n    \"symbol\": \"<string>\",\n    \"image\": {\n      \"small\": \"<string>\"\n    },\n    \"description\": \"<string>\",\n    \"native_currency\": \"<string>\",\n    \"native_currency_symbol\": \"<string>\",\n    \"floor_price\": {\n      \"native_currency\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"market_cap\": {\n      \"native_currency\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"volume_24h\": {\n      \"native_currency\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"floor_price_in_usd_24h_percentage_change\": \"<number>\",\n    \"floor_price_24h_percentage_change\": {\n      \"usd\": \"<number>\",\n      \"native_currency\": \"<number>\"\n    },\n    \"market_cap_24h_percentage_change\": {\n      \"usd\": \"<number>\",\n      \"native_currency\": \"<number>\"\n    },\n    \"volume_24h_percentage_change\": {\n      \"usd\": \"<number>\",\n      \"native_currency\": \"<number>\"\n    },\n    \"number_of_unique_addresses\": \"<number>\",\n    \"number_of_unique_addresses_24h_percentage_change\": \"<number>\",\n    \"volume_in_usd_24h_percentage_change\": \"<number>\",\n    \"total_supply\": \"<number>\",\n    \"one_day_sales\": \"<number>\",\n    \"one_day_sales_24h_percentage_change\": \"<number>\",\n    \"one_day_average_sale_price\": \"<number>\",\n    \"one_day_average_sale_price_24h_percentage_change\": \"<number>\"\n  },\n  {\n    \"id\": \"<string>\",\n    \"contract_address\": \"<string>\",\n    \"asset_platform_id\": \"<string>\",\n    \"name\": \"<string>\",\n    \"symbol\": \"<string>\",\n    \"image\": {\n      \"small\": \"<string>\"\n    },\n    \"description\": \"<string>\",\n    \"native_currency\": \"<string>\",\n    \"native_currency_symbol\": \"<string>\",\n    \"floor_price\": {\n      \"native_currency\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"market_cap\": {\n      \"native_currency\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"volume_24h\": {\n      \"native_currency\": \"<number>\",\n      \"usd\": \"<number>\"\n    },\n    \"floor_price_in_usd_24h_percentage_change\": \"<number>\",\n    \"floor_price_24h_percentage_change\": {\n      \"usd\": \"<number>\",\n      \"native_currency\": \"<number>\"\n    },\n    \"market_cap_24h_percentage_change\": {\n      \"usd\": \"<number>\",\n      \"native_currency\": \"<number>\"\n    },\n    \"volume_24h_percentage_change\": {\n      \"usd\": \"<number>\",\n      \"native_currency\": \"<number>\"\n    },\n    \"number_of_unique_addresses\": \"<number>\",\n    \"number_of_unique_addresses_24h_percentage_change\": \"<number>\",\n    \"volume_in_usd_24h_percentage_change\": \"<number>\",\n    \"total_supply\": \"<number>\",\n    \"one_day_sales\": \"<number>\",\n    \"one_day_sales_24h_percentage_change\": \"<number>\",\n    \"one_day_average_sale_price\": \"<number>\",\n    \"one_day_average_sale_price_24h_percentage_change\": \"<number>\"\n  }\n]"
+						}
+					]
+				},
+				{
+					"name": "💼 NFTs Collection Historical Chart Data by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/nfts/:id/market_chart?days=<string>",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"nfts",
+								":id",
+								"market_chart"
+							],
+							"query": [
+								{
+									"key": "days",
+									"value": "<string>",
+									"description": "(Required) data up to number of days  <br> Valid values: any integer or max "
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "<string>",
+									"description": "(Required) NFTs id <br> *refers to [`/nfts/list`](/reference/nfts-list)."
+								}
+							]
+						},
+						"description": "This endpoint allows you **query historical market data of a NFT collection, including floor price, market cap, and 24h volume, by number of days away from now**"
+					},
+					"response": [
+						{
+							"name": "Get historical market data include price, market cap, and 24h volume (granularity auto)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/nfts/:id/market_chart?days=<string>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"nfts",
+										":id",
+										"market_chart"
+									],
+									"query": [
+										{
+											"key": "days",
+											"value": "<string>",
+											"description": "(Required) data up to number of days  <br> Valid values: any integer or max "
+										}
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"floor_price_usd\": [\n    [\n      \"<number>\",\n      \"<number>\"\n    ],\n    [\n      \"<number>\",\n      \"<number>\"\n    ]\n  ],\n  \"floor_price_native\": [\n    [\n      \"<number>\",\n      \"<number>\"\n    ],\n    [\n      \"<number>\",\n      \"<number>\"\n    ]\n  ],\n  \"h24_volume_usd\": [\n    [\n      \"<number>\",\n      \"<number>\"\n    ],\n    [\n      \"<number>\",\n      \"<number>\"\n    ]\n  ],\n  \"h24_volume_native\": [\n    [\n      \"<number>\",\n      \"<number>\"\n    ],\n    [\n      \"<number>\",\n      \"<number>\"\n    ]\n  ],\n  \"market_cap_usd\": [\n    [\n      \"<number>\",\n      \"<number>\"\n    ],\n    [\n      \"<number>\",\n      \"<number>\"\n    ]\n  ],\n  \"market_cap_native\": [\n    [\n      \"<number>\",\n      \"<number>\"\n    ],\n    [\n      \"<number>\",\n      \"<number>\"\n    ]\n  ]\n}"
+						}
+					]
+				},
+				{
+					"name": "💼 NFTs Collection Historical Chart Data by Contract Address",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/nfts/:asset_platform_id/contract/:contract_address/market_chart?days=<string>",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"nfts",
+								":asset_platform_id",
+								"contract",
+								":contract_address",
+								"market_chart"
+							],
+							"query": [
+								{
+									"key": "days",
+									"value": "<string>",
+									"description": "(Required) data up to number of days ago <br> Valid values: any integer or max "
+								}
+							],
+							"variable": [
+								{
+									"key": "asset_platform_id",
+									"value": "<string>",
+									"description": "(Required) asset platform id <br> *refers to [`/asset_platforms`](/reference/asset-platforms-list)"
+								},
+								{
+									"key": "contract_address",
+									"value": "<string>",
+									"description": "(Required) contract address of the nft collection"
+								}
+							]
+						},
+						"description": "This endpoint allows you **query historical market data of a NFT collection, including floor price, market cap, and 24h volume, by number of days away from now based on the provided contract address**"
+					},
+					"response": [
+						{
+							"name": "Get historical market data include price, market cap, and 24h volume (granularity auto)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/nfts/:asset_platform_id/contract/:contract_address/market_chart?days=<string>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"nfts",
+										":asset_platform_id",
+										"contract",
+										":contract_address",
+										"market_chart"
+									],
+									"query": [
+										{
+											"key": "days",
+											"value": "<string>",
+											"description": "(Required) data up to number of days ago <br> Valid values: any integer or max "
+										}
+									],
+									"variable": [
+										{
+											"key": "asset_platform_id"
+										},
+										{
+											"key": "contract_address"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"floor_price_usd\": [\n    [\n      \"<number>\",\n      \"<number>\"\n    ],\n    [\n      \"<number>\",\n      \"<number>\"\n    ]\n  ],\n  \"floor_price_native\": [\n    [\n      \"<number>\",\n      \"<number>\"\n    ],\n    [\n      \"<number>\",\n      \"<number>\"\n    ]\n  ],\n  \"h24_volume_usd\": [\n    [\n      \"<number>\",\n      \"<number>\"\n    ],\n    [\n      \"<number>\",\n      \"<number>\"\n    ]\n  ],\n  \"h24_volume_native\": [\n    [\n      \"<number>\",\n      \"<number>\"\n    ],\n    [\n      \"<number>\",\n      \"<number>\"\n    ]\n  ],\n  \"market_cap_usd\": [\n    [\n      \"<number>\",\n      \"<number>\"\n    ],\n    [\n      \"<number>\",\n      \"<number>\"\n    ]\n  ],\n  \"market_cap_native\": [\n    [\n      \"<number>\",\n      \"<number>\"\n    ],\n    [\n      \"<number>\",\n      \"<number>\"\n    ]\n  ]\n}"
+						}
+					]
+				},
+				{
+					"name": "💼 NFTs Collection Tickers by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/nfts/:id/tickers",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"nfts",
+								":id",
+								"tickers"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "<string>",
+									"description": "(Required) NFTs id <br> *refers to [`/nfts/list`](/reference/nfts-list)."
+								}
+							]
+						},
+						"description": "This endpoint allows you to **query the latest floor price and 24h volume of a NFT collection, on each NFT marketplace, e.g. OpenSea and LooksRare**"
+					},
+					"response": [
+						{
+							"name": "Get NFTs tickers",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/nfts/:id/tickers",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"nfts",
+										":id",
+										"tickers"
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"tickers\": [\n    {\n      \"floor_price_in_native_currency\": \"<number>\",\n      \"h24_volume_in_native_currency\": \"<number>\",\n      \"native_currency\": \"<string>\",\n      \"native_currency_symbol\": \"<string>\",\n      \"updated_at\": \"<string>\",\n      \"nft_marketplace_id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"image\": \"<string>\",\n      \"nft_collection_url\": \"<string>\"\n    },\n    {\n      \"floor_price_in_native_currency\": \"<number>\",\n      \"h24_volume_in_native_currency\": \"<number>\",\n      \"native_currency\": \"<string>\",\n      \"native_currency_symbol\": \"<string>\",\n      \"updated_at\": \"<string>\",\n      \"nft_marketplace_id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"image\": \"<string>\",\n      \"nft_collection_url\": \"<string>\"\n    }\n  ]\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Exchange Rates",
+			"item": [
+				{
+					"name": "BTC-to-Currency Exchange Rates",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/exchange_rates",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"exchange_rates"
+							]
+						},
+						"description": "This endpoint allows you to **query BTC exchange rates with other currencies**."
+					},
+					"response": [
+						{
+							"name": "List rates",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/exchange_rates",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"exchange_rates"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"rates\": {\n    \"in_c\": {\n      \"name\": \"<string>\",\n      \"unit\": \"<string>\",\n      \"value\": \"<number>\",\n      \"type\": \"<string>\"\n    }\n  }\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Search",
+			"item": [
+				{
+					"name": "Search Queries",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/search?query=<string>",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "<string>",
+									"description": "(Required) search query"
+								}
+							]
+						},
+						"description": "This endpoint allows you to **search for coins, categories and markets listed on CoinGecko**."
+					},
+					"response": [
+						{
+							"name": "List of coins, categories and markets matching search term ordered by market cap",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/search?query=<string>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"search"
+									],
+									"query": [
+										{
+											"key": "query",
+											"value": "<string>",
+											"description": "(Required) search query"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"coins\": [\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"api_symbol\": \"<string>\",\n      \"symbol\": \"<string>\",\n      \"market_cap_rank\": \"<number>\",\n      \"thumb\": \"<string>\",\n      \"large\": \"<string>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"api_symbol\": \"<string>\",\n      \"symbol\": \"<string>\",\n      \"market_cap_rank\": \"<number>\",\n      \"thumb\": \"<string>\",\n      \"large\": \"<string>\"\n    }\n  ],\n  \"exchanges\": [\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"market_type\": \"<string>\",\n      \"thumb\": \"<string>\",\n      \"large\": \"<string>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"market_type\": \"<string>\",\n      \"thumb\": \"<string>\",\n      \"large\": \"<string>\"\n    }\n  ],\n  \"icos\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"categories\": [\n    {\n      \"id\": \"<number>\",\n      \"name\": \"<string>\"\n    },\n    {\n      \"id\": \"<number>\",\n      \"name\": \"<string>\"\n    }\n  ],\n  \"nfts\": [\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"symbol\": \"<string>\",\n      \"thumb\": \"<string>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"symbol\": \"<string>\",\n      \"thumb\": \"<string>\"\n    }\n  ]\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Trending",
+			"item": [
+				{
+					"name": "Trending Search List",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/search/trending",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"search",
+								"trending"
+							]
+						},
+						"description": "This endpoint allows you **query trending search coins, nfts and categories on CoinGecko in the last 24 hours**."
+					},
+					"response": [
+						{
+							"name": "List trending coins by most popular first",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/search/trending",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"search",
+										"trending"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"coins\": [\n    {\n      \"id\": \"<string>\",\n      \"coin_id\": \"<number>\",\n      \"name\": \"<string>\",\n      \"symbol\": \"<string>\",\n      \"market_cap_rank\": \"<number>\",\n      \"thumb\": \"<string>\",\n      \"small\": \"<string>\",\n      \"large\": \"<string>\",\n      \"slug\": \"<string>\",\n      \"price_btc\": \"<number>\",\n      \"score\": \"<number>\",\n      \"data\": {\n        \"price\": \"<number>\",\n        \"price_btc\": \"<string>\",\n        \"price_change_percentage_24h\": {\n          \"btc\": \"<number>\",\n          \"usd\": \"<number>\"\n        },\n        \"market_cap\": \"<string>\",\n        \"market_cap_btc\": \"<string>\",\n        \"total_volume\": \"<string>\",\n        \"total_volume_btc\": \"<string>\",\n        \"sparkline\": \"<string>\",\n        \"content\": \"<string>\"\n      }\n    },\n    {\n      \"id\": \"<string>\",\n      \"coin_id\": \"<number>\",\n      \"name\": \"<string>\",\n      \"symbol\": \"<string>\",\n      \"market_cap_rank\": \"<number>\",\n      \"thumb\": \"<string>\",\n      \"small\": \"<string>\",\n      \"large\": \"<string>\",\n      \"slug\": \"<string>\",\n      \"price_btc\": \"<number>\",\n      \"score\": \"<number>\",\n      \"data\": {\n        \"price\": \"<number>\",\n        \"price_btc\": \"<string>\",\n        \"price_change_percentage_24h\": {\n          \"btc\": \"<number>\",\n          \"usd\": \"<number>\"\n        },\n        \"market_cap\": \"<string>\",\n        \"market_cap_btc\": \"<string>\",\n        \"total_volume\": \"<string>\",\n        \"total_volume_btc\": \"<string>\",\n        \"sparkline\": \"<string>\",\n        \"content\": \"<string>\"\n      }\n    }\n  ],\n  \"nfts\": [\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"symbol\": \"<string>\",\n      \"thumb\": \"<string>\",\n      \"nft_contract_id\": \"<number>\",\n      \"native_currency_symbol\": \"<string>\",\n      \"floor_price_in_native_currency\": \"<number>\",\n      \"floor_price_24h_percentage_change\": \"<number>\",\n      \"data\": {\n        \"floor_price\": \"<string>\",\n        \"floor_price_in_usd_24h_percentage_change\": \"<string>\",\n        \"h24_volume\": \"<string>\",\n        \"h24_average_sale_price\": \"<string>\",\n        \"sparkline\": \"<string>\",\n        \"content\": \"<string>\"\n      }\n    },\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"symbol\": \"<string>\",\n      \"thumb\": \"<string>\",\n      \"nft_contract_id\": \"<number>\",\n      \"native_currency_symbol\": \"<string>\",\n      \"floor_price_in_native_currency\": \"<number>\",\n      \"floor_price_24h_percentage_change\": \"<number>\",\n      \"data\": {\n        \"floor_price\": \"<string>\",\n        \"floor_price_in_usd_24h_percentage_change\": \"<string>\",\n        \"h24_volume\": \"<string>\",\n        \"h24_average_sale_price\": \"<string>\",\n        \"sparkline\": \"<string>\",\n        \"content\": \"<string>\"\n      }\n    }\n  ],\n  \"categories\": [\n    {\n      \"id\": \"<number>\",\n      \"name\": \"<string>\",\n      \"market_cap_1h_change\": \"<number>\",\n      \"slug\": \"<string>\",\n      \"coins_count\": \"<number>\",\n      \"data\": {\n        \"market_cap\": \"<number>\",\n        \"market_cap_btc\": \"<number>\",\n        \"total_volume\": \"<number>\",\n        \"total_volume_btc\": \"<number>\",\n        \"market_cap_change_percentage_24h\": {\n          \"btc\": \"<number>\",\n          \"usd\": \"<number>\"\n        },\n        \"sparkline\": \"<string>\"\n      }\n    },\n    {\n      \"id\": \"<number>\",\n      \"name\": \"<string>\",\n      \"market_cap_1h_change\": \"<number>\",\n      \"slug\": \"<string>\",\n      \"coins_count\": \"<number>\",\n      \"data\": {\n        \"market_cap\": \"<number>\",\n        \"market_cap_btc\": \"<number>\",\n        \"total_volume\": \"<number>\",\n        \"total_volume_btc\": \"<number>\",\n        \"market_cap_change_percentage_24h\": {\n          \"btc\": \"<number>\",\n          \"usd\": \"<number>\"\n        },\n        \"sparkline\": \"<string>\"\n      }\n    }\n  ]\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Global",
+			"item": [
+				{
+					"name": "Crypto Global Market Data",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/global",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"global"
+							]
+						},
+						"description": "This endpoint allows you **query cryptocurrency global data including active cryptocurrencies, markets, total crypto market cap and etc**."
+					},
+					"response": [
+						{
+							"name": "Get cryptocurrency global data",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/global",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"global"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"data\": {\n    \"active_cryptocurrencies\": \"<number>\",\n    \"upcoming_icos\": \"<number>\",\n    \"ongoing_icos\": \"<number>\",\n    \"ended_icos\": \"<number>\",\n    \"markets\": \"<number>\",\n    \"total_market_cap\": {\n      \"btc\": \"<number>\",\n      \"eth\": \"<number>\"\n    },\n    \"total_volume\": {\n      \"btc\": \"<number>\",\n      \"eth\": \"<number>\"\n    },\n    \"market_cap_percentage\": {\n      \"btc\": \"<number>\",\n      \"eth\": \"<number>\"\n    }\n  },\n  \"market_cap_change_percentage_24h_usd\": \"<number>\",\n  \"updated_at\": \"<number>\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Global De-Fi Market Data",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/global/decentralized_finance_defi",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"global",
+								"decentralized_finance_defi"
+							]
+						},
+						"description": "This endpoint allows you **query top 100 cryptocurrency global decentralized finance (defi) data including defi market cap, trading volume**."
+					},
+					"response": [
+						{
+							"name": "Get cryptocurrency global decentralized finance (defi) data",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/global/decentralized_finance_defi",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"global",
+										"decentralized_finance_defi"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"data\": {\n    \"defi_market_cap\": \"<string>\",\n    \"eth_market_cap\": \"<string>\",\n    \"defi_to_eth_ratio\": \"<string>\",\n    \"trading_volume_24h\": \"<string>\",\n    \"defi_dominance\": \"<string>\",\n    \"top_coin_name\": \"<string>\",\n    \"top_coin_defi_dominance\": \"<number>\"\n  }\n}"
+						}
+					]
+				},
+				{
+					"name": "💼 Global Market Cap Chart Data",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/global/market_cap_chart?days=14&vs_currency=<string>",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"global",
+								"market_cap_chart"
+							],
+							"query": [
+								{
+									"key": "days",
+									"value": "14",
+									"description": "(Required) data up to number of days ago  <br>Valid values: any integer "
+								},
+								{
+									"key": "vs_currency",
+									"value": "<string>",
+									"description": "target currency of market cap, default: usd <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies) "
+								}
+							]
+						},
+						"description": "This endpoint allows you to **query historical global market cap and volume data by number of days away from now**"
+					},
+					"response": [
+						{
+							"name": "Get cryptocurrency global market cap chart data",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/global/market_cap_chart?days=14&vs_currency=<string>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"global",
+										"market_cap_chart"
+									],
+									"query": [
+										{
+											"key": "days",
+											"value": "14",
+											"description": "(Required) data up to number of days ago  <br>Valid values: any integer "
+										},
+										{
+											"key": "vs_currency",
+											"value": "<string>",
+											"description": "target currency of market cap, default: usd <br> *refers to [`/simple/supported_vs_currencies`](/reference/simple-supported-currencies) "
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"market_cap_chart\": {\n    \"market_cap\": [\n      [\n        \"<number>\",\n        \"<number>\"\n      ],\n      [\n        \"<number>\",\n        \"<number>\"\n      ]\n    ]\n  }\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Companies (Beta)",
+			"item": [
+				{
+					"name": "Public Companies Holdings",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/companies/public_treasury/:coin_id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"companies",
+								"public_treasury",
+								":coin_id"
+							],
+							"variable": [
+								{
+									"key": "coin_id",
+									"value": "bitcoin",
+									"description": "(Required) coin id"
+								}
+							]
+						},
+						"description": "This endpoint allows you **query public companies’ bitcoin or ethereum holdings**."
+					},
+					"response": [
+						{
+							"name": "Get public companies treasury data",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "x-cg-pro-api-key",
+										"value": "<API Key>",
+										"description": "Added as a part of security scheme: apikey"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/companies/public_treasury/:coin_id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"companies",
+										"public_treasury",
+										":coin_id"
+									],
+									"variable": [
+										{
+											"key": "coin_id"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"total_holdings\": \"<number>\",\n  \"total_value_usd\": \"<number>\",\n  \"market_cap_dominance\": \"<number>\",\n  \"companies\": [\n    {\n      \"name\": \"<string>\",\n      \"symbol\": \"<string>\",\n      \"country\": \"<string>\",\n      \"total_holdings\": \"<number>\",\n      \"total_entry_value_usd\": \"<number>\",\n      \"total_current_value_usd\": \"<number>\",\n      \"percentage_of_total_supply\": \"<number>\"\n    },\n    {\n      \"name\": \"<string>\",\n      \"symbol\": \"<string>\",\n      \"country\": \"<string>\",\n      \"total_holdings\": \"<number>\",\n      \"total_entry_value_usd\": \"<number>\",\n      \"total_current_value_usd\": \"<number>\",\n      \"percentage_of_total_supply\": \"<number>\"\n    }\n  ]\n}"
+						}
+					]
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "value",
+				"value": "{{API_KEY}}",
+				"type": "string"
+			},
+			{
+				"key": "key",
+				"value": "x-cg-pro-api-key",
+				"type": "string"
+			},
+			{
+				"key": "in",
+				"value": "header",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://pro-api.coingecko.com/api/v3"
+		}
+	]
+}
