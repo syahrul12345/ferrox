@@ -53,7 +53,6 @@ where
         history_id: &str,
     ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>> {
         // Clone what we need for the async block
-        println!("Sending prompt: {}", prompt);
         let conversation_history = self.conversation_history.clone();
         let system_prompt = self.system_prompt.clone();
         let state = self.state.clone();
@@ -65,16 +64,18 @@ where
         Box::pin(async move {
             // Get or create conversation history
             let mut conversation = {
-                let history_map = conversation_history.lock().map_err(|e| e.to_string())?;
+                let mut history_map = conversation_history.lock().map_err(|e| e.to_string())?;
                 if let Some(existing_history) = history_map.get(&history_id) {
                     existing_history.clone()
                 } else {
-                    vec![Message {
+                    let new_history = vec![Message {
                         role: "system".to_string(),
                         content: Some(system_prompt),
                         tool_calls: None,
                         tool_call_id: None,
-                    }]
+                    }];
+                    history_map.insert(history_id.to_string(), new_history.clone());
+                    new_history
                 }
             };
 
@@ -187,15 +188,15 @@ where
             // Update conversation history
             {
                 let mut history_map = conversation_history.lock().map_err(|e| e.to_string())?;
-                if let Some(conv) = history_map.get_mut(&history_id) {
-                    conversation.push(Message {
-                        role: "assistant".to_string(),
-                        content: Some(final_result.clone()),
-                        tool_calls: None,
-                        tool_call_id: None,
-                    });
-                    *conv = conversation;
-                }
+                // Add final assistant message
+                conversation.push(Message {
+                    role: "assistant".to_string(),
+                    content: Some(final_result.clone()),
+                    tool_calls: None,
+                    tool_call_id: None,
+                });
+                // Update the history
+                history_map.insert(history_id.to_string(), conversation);
             }
 
             if count == 5 {
