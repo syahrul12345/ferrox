@@ -4,7 +4,10 @@ use ferrox::{
     agent::{text_agent::TextAgent, Agent, NullAgent},
     Ferrox,
 };
-use ferrox_actions::{ActionBuilder, AgentState, CoinGeckoActionGroup, DexScreenerActionGroup, EmptyParams};
+use ferrox_actions::{
+    ActionBuilder, AgentState, BirdeyeActionGroup, CoinGeckoActionGroup, DexScreenerActionGroup,
+    EmptyParams,
+};
 use openai_api::models::{Model, OpenAIModel};
 use serde::Deserialize;
 
@@ -86,6 +89,9 @@ async fn main() {
 
     let dexscreener_group = DexScreenerActionGroup::new();
     decision_agent.add_action_group(&dexscreener_group);
+
+    let birdeye_group = BirdeyeActionGroup::new();
+    decision_agent.add_action_group(&birdeye_group);
 
     let ferrox = Ferrox::<_, TestState>::new(decision_agent);
     ferrox.start().await;
