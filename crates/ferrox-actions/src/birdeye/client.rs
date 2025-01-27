@@ -45,6 +45,15 @@ impl BirdeyeClient {
         }
     }
 
+    fn format_resolution(resolution: String) -> String {
+        // If resolution is just a number, append "M"
+        if resolution.chars().all(|c| c.is_numeric()) {
+            format!("{}m", resolution)
+        } else {
+            resolution
+        }
+    }
+
     pub async fn get_token_price(&self, address: String) -> Result<String, String> {
         self.make_request(&format!("/defi/price?address={}", address))
             .await
@@ -58,9 +67,10 @@ impl BirdeyeClient {
         time_to: Option<i64>,
         limit: Option<i32>,
     ) -> Result<String, String> {
+        let formatted_resolution = Self::format_resolution(resolution);
         let mut endpoint = format!(
             "/defi/history_price?address={}&address_type=token&type={}",
-            address, resolution
+            address, formatted_resolution
         );
 
         if let Some(from) = time_from {
@@ -95,9 +105,10 @@ impl BirdeyeClient {
         time_from: i64,
         time_to: i64,
     ) -> Result<String, String> {
+        let formatted_resolution = Self::format_resolution(resolution);
         self.make_request(&format!(
             "/defi/ohlcv?address={}&type={}&time_from={}&time_to={}",
-            address, resolution, time_from, time_to
+            address, formatted_resolution, time_from, time_to
         ))
         .await
     }
@@ -109,9 +120,10 @@ impl BirdeyeClient {
         time_from: i64,
         time_to: i64,
     ) -> Result<String, String> {
+        let formatted_resolution = Self::format_resolution(resolution);
         self.make_request(&format!(
             "/defi/ohlcv/pair?address={}&type={}&time_from={}&time_to={}",
-            pair_address, resolution, time_from, time_to
+            pair_address, formatted_resolution, time_from, time_to
         ))
         .await
     }
@@ -592,5 +604,13 @@ mod tests {
         let client = BirdeyeClient::new("invalid-api-key".to_string());
         let result = client.get_token_price(SOL_ADDRESS.to_string()).await;
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_format_resolution() {
+        assert_eq!(BirdeyeClient::format_resolution("1".to_string()), "1M");
+        assert_eq!(BirdeyeClient::format_resolution("15".to_string()), "15M");
+        assert_eq!(BirdeyeClient::format_resolution("1D".to_string()), "1D");
+        assert_eq!(BirdeyeClient::format_resolution("1W".to_string()), "1W");
     }
 }
