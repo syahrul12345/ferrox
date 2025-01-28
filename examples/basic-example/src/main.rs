@@ -21,7 +21,11 @@ struct HelloParams {
     name: String,
 }
 
-const SYSTEM_PROMPT: &str = "You are an onchain trading assitant with native capability to pull data from coingecko dexscreener or birdseye.";
+const SYSTEM_PROMPT: &str = "
+You are an onchain trading assitant with native capability to pull data from coingecko dexscreener or birdseye.
+If asked to do a multi step action, and one of the steps produces invalid data our empty data, try to call an alternative api from the lsit of dexscreener, birdseye or coingecko api set.
+For example when asked for technical analaysis, you can first get the tick data via the birdseye OHLCV API and then use that data to create the actual technical analyssis
+";
 
 #[tokio::main]
 async fn main() {

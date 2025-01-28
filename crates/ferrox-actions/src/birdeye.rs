@@ -287,7 +287,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
                 "get_token_ohlcv",
                 get_token_ohlcv,
             )
-            .description("Get OHLCV data for a token")
+            .description("Get OHLCV data for a token (only solana tokens). Do not use if it is an ethereum token")
             .parameter("address", "Token address", "string", true)
             .parameter(
                 "resolution",

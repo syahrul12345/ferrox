@@ -173,7 +173,10 @@ where
                             .map_err(|e| {
                                 format!("Failed to execute {}: {}", tool_call.function.name, e)
                             })?;
-
+                        println!(
+                            "Executed function {} Result {}",
+                            tool_call.function.name, result
+                        );
                         conversation.push(Message {
                             role: "tool".to_string(),
                             content: Some(result),

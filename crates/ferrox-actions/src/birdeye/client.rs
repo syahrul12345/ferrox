@@ -2,6 +2,7 @@ use reqwest::{
     header::{HeaderMap, HeaderValue, ACCEPT, CONTENT_TYPE},
     Client,
 };
+use solana_sdk::pubkey::Pubkey;
 
 const BASE_URL: &str = "https://public-api.birdeye.so";
 
@@ -54,8 +55,15 @@ impl BirdeyeClient {
         }
     }
 
+    fn validate_solana_address(address: &str) -> Result<Pubkey, String> {
+        address
+            .parse::<Pubkey>()
+            .map_err(|e| format!("Invalid Solana address: {}", e))
+    }
+
     pub async fn get_token_price(&self, address: String) -> Result<String, String> {
-        self.make_request(&format!("/defi/price?address={}", address))
+        let pubkey = Self::validate_solana_address(&address)?;
+        self.make_request(&format!("/defi/price?address={}", pubkey.to_string()))
             .await
     }
 
@@ -67,10 +75,12 @@ impl BirdeyeClient {
         time_to: Option<i64>,
         limit: Option<i32>,
     ) -> Result<String, String> {
+        let pubkey = Self::validate_solana_address(&address)?;
         let formatted_resolution = Self::format_resolution(resolution);
         let mut endpoint = format!(
             "/defi/history_price?address={}&address_type=token&type={}",
-            address, formatted_resolution
+            pubkey.to_string(),
+            formatted_resolution
         );
 
         if let Some(from) = time_from {
@@ -86,8 +96,23 @@ impl BirdeyeClient {
     }
 
     pub async fn get_multi_token_price(&self, addresses: String) -> Result<String, String> {
-        self.make_request(&format!("/defi/multi_price?list_address={}", addresses))
-            .await
+        let pubkeys: Result<Vec<Pubkey>, String> = addresses
+            .split(',')
+            .map(|addr| Self::validate_solana_address(addr.trim()))
+            .collect();
+        let pubkeys = pubkeys?;
+
+        let formatted_addresses = pubkeys
+            .iter()
+            .map(|pubkey| pubkey.to_string())
+            .collect::<Vec<String>>()
+            .join(",");
+
+        self.make_request(&format!(
+            "/defi/multi_price?list_address={}",
+            formatted_addresses
+        ))
+        .await
     }
 
     pub async fn get_token_trending(&self, limit: Option<i32>) -> Result<String, String> {
@@ -105,10 +130,14 @@ impl BirdeyeClient {
         time_from: i64,
         time_to: i64,
     ) -> Result<String, String> {
+        let pubkey = Self::validate_solana_address(&address)?;
         let formatted_resolution = Self::format_resolution(resolution);
         self.make_request(&format!(
             "/defi/ohlcv?address={}&type={}&time_from={}&time_to={}",
-            address, formatted_resolution, time_from, time_to
+            pubkey.to_string(),
+            formatted_resolution,
+            time_from,
+            time_to
         ))
         .await
     }
@@ -120,10 +149,14 @@ impl BirdeyeClient {
         time_from: i64,
         time_to: i64,
     ) -> Result<String, String> {
+        let pubkey = Self::validate_solana_address(&pair_address)?;
         let formatted_resolution = Self::format_resolution(resolution);
         self.make_request(&format!(
             "/defi/ohlcv/pair?address={}&type={}&time_from={}&time_to={}",
-            pair_address, formatted_resolution, time_from, time_to
+            pubkey.to_string(),
+            formatted_resolution,
+            time_from,
+            time_to
         ))
         .await
     }
@@ -134,7 +167,12 @@ impl BirdeyeClient {
         limit: Option<i32>,
         offset: Option<i32>,
     ) -> Result<String, String> {
-        let mut endpoint = format!("/defi/txs/token?address={}&sort_type=asc", address);
+        let pubkey = Self::validate_solana_address(&address)?;
+        println!("Pubkey: {:?}", pubkey);
+        let mut endpoint = format!(
+            "/defi/txs/token?address={}&sort_type=desc",
+            pubkey.to_string()
+        );
         if let Some(limit) = limit {
             endpoint.push_str(&format!("&limit={}", limit));
         }
@@ -150,9 +188,18 @@ impl BirdeyeClient {
         limit: Option<i32>,
         offset: Option<i32>,
     ) -> Result<String, String> {
-        let mut endpoint = format!("/dex/trades?address={}", pair_address);
+        let pubkey = Self::validate_solana_address(&pair_address)?;
+        println!("Pubkey: {:?}", pubkey);
+        let mut endpoint = format!(
+            "/defi/txs/pair?address={}&tx_type=swap&sort_type=desc",
+            pubkey.to_string()
+        );
         if let Some(limit) = limit {
-            endpoint.push_str(&format!("&limit={}", limit));
+            if limit >= 50 {
+                endpoint.push_str("&limit=50");
+            } else {
+                endpoint.push_str(&format!("&limit={}", limit));
+            }
         }
         if let Some(offset) = offset {
             endpoint.push_str(&format!("&offset={}", offset));
@@ -161,8 +208,12 @@ impl BirdeyeClient {
     }
 
     pub async fn get_token_overview(&self, address: String) -> Result<String, String> {
-        self.make_request(&format!("/defi/token_overview?address={}", address))
-            .await
+        let pubkey = Self::validate_solana_address(&address)?;
+        self.make_request(&format!(
+            "/defi/token_overview?address={}",
+            pubkey.to_string()
+        ))
+        .await
     }
 
     pub async fn get_token_list(
@@ -187,12 +238,17 @@ impl BirdeyeClient {
     }
 
     pub async fn get_token_security(&self, address: String) -> Result<String, String> {
-        self.make_request(&format!("/defi/token_security?address={}", address))
-            .await
+        let pubkey = Self::validate_solana_address(&address)?;
+        self.make_request(&format!(
+            "/defi/token_security?address={}",
+            pubkey.to_string()
+        ))
+        .await
     }
 
     pub async fn get_token_market_list(&self, address: String) -> Result<String, String> {
-        self.make_request(&format!("/defi/v2/markets?address={}", address))
+        let pubkey = Self::validate_solana_address(&address)?;
+        self.make_request(&format!("/defi/v2/markets?address={}", pubkey.to_string()))
             .await
     }
 
@@ -222,7 +278,8 @@ impl BirdeyeClient {
         address: String,
         limit: Option<i32>,
     ) -> Result<String, String> {
-        let mut endpoint = format!("/defi/v2/tokens/top_traders?address={}", address);
+        let pubkey = Self::validate_solana_address(&address)?;
+        let mut endpoint = format!("/defi/v2/tokens/top_traders?address={}", pubkey.to_string());
         if let Some(limit) = limit {
             endpoint.push_str(&format!("&limit={}", limit));
         }
@@ -241,9 +298,12 @@ impl BirdeyeClient {
         time_to: i64,
         limit: Option<i32>,
     ) -> Result<String, String> {
+        let pubkey = Self::validate_solana_address(&address)?;
         let mut endpoint = format!(
             "/trader/txs/seek_by_time?address={}&from={}&to={}",
-            address, time_from, time_to
+            pubkey.to_string(),
+            time_from,
+            time_to
         );
         if let Some(limit) = limit {
             endpoint.push_str(&format!("&limit={}", limit));
@@ -286,7 +346,7 @@ impl BirdeyeClient {
     //     chain_id: String,
     // ) -> Result<String, String> {
     //     self.make_request(&format!(
-    //         "/v1/wallet/token_balance?wallet={}&token_address={}&chain_id={}",
+    //         "/v1/wallet/token_balance?wallet={}&token_address={:?}&chain_id={}",
     //         wallet_address, token_address, chain_id
     //     ))
     //     .await
