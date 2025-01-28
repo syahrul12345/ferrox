@@ -6,7 +6,7 @@ use ferrox::{
 };
 use ferrox_actions::{
     ActionBuilder, AgentState, BirdeyeActionGroup, CoinGeckoActionGroup, DexScreenerActionGroup,
-    EmptyParams,
+    EmptyParams, GmgnActionGroup,
 };
 use openai_api::models::{Model, OpenAIModel};
 use serde::Deserialize;
@@ -96,6 +96,9 @@ async fn main() {
 
     let birdeye_group = BirdeyeActionGroup::new();
     decision_agent.add_action_group(&birdeye_group);
+
+    let gmgn_group = GmgnActionGroup::new();
+    decision_agent.add_action_group(&gmgn_group);
 
     let ferrox = Ferrox::<_, TestState>::new(decision_agent);
     ferrox.start().await;
