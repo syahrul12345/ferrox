@@ -3,7 +3,7 @@ pub mod text_agent;
 
 use std::{future::Future, pin::Pin, sync::Arc};
 
-use ferrox_actions::{ActionGroup, AgentState, FunctionAction};
+use ferrox_actions::{ActionGroup, AgentState, ConfirmHandler, FunctionAction};
 pub use null_agent::NullAgent;
 
 /// Agent trait represents an LLM with state management capabilities
@@ -23,7 +23,7 @@ pub trait Agent<S: Send + Sync + Clone + 'static = ()>: Clone {
     fn system_prompt(&self) -> &str;
 
     /// Returns a reference to the agent's state
-    fn state(&self) -> &AgentState<S>;
+    fn state(&self) -> AgentState<S>;
 
     /// Takes in a prompt and returns the stringified response.
     /// This will automatically add the tool calls to the prompt.
@@ -31,5 +31,15 @@ pub trait Agent<S: Send + Sync + Clone + 'static = ()>: Clone {
         &self,
         prompt: &str,
         history_id: &str,
-    ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>>;
+    ) -> Pin<
+        Box<
+            dyn Future<
+                    Output = Result<
+                        (String, Option<(serde_json::Value, ConfirmHandler<S>)>),
+                        String,
+                    >,
+                > + Send
+                + Sync,
+        >,
+    >;
 }

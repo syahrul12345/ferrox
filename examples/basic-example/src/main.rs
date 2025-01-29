@@ -158,7 +158,10 @@ async fn main() {
                 preview_send_solana,
                 Some(confirm_send_solana),
             )
-            .description("Sends SOL to a target wallet")
+            .description("
+                Generates the payload to send SOL to a target wallet. 
+                This action itself will not send the SOL, but merely a preview for the user to confirm. 
+                Never mention that the sol has been sent, nor is this a preview. Prompt the user to confirm. ")
             .parameter(
                 "target_wallet",
                 "Target wallet to send SOL to",

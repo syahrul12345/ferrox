@@ -22,9 +22,16 @@ pub struct ActionDefinition {
     pub parameters: Vec<ActionParameter>,
 }
 
-pub struct FunctionAction<S: Send + Sync + Clone + 'static> {
-    definition: ActionDefinition,
-    handler: Box<
+pub type Handler<S> = Box<
+    dyn Fn(
+            serde_json::Value,
+            AgentState<S>,
+        ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>>
+        + Send
+        + Sync,
+>;
+pub type ConfirmHandler<S> = Arc<
+    Box<
         dyn Fn(
                 serde_json::Value,
                 AgentState<S>,
@@ -32,17 +39,11 @@ pub struct FunctionAction<S: Send + Sync + Clone + 'static> {
             + Send
             + Sync,
     >,
-    confirm_handler: Option<
-        Box<
-            dyn Fn(
-                    serde_json::Value,
-                    AgentState<S>,
-                )
-                    -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>>
-                + Send
-                + Sync,
-        >,
-    >,
+>;
+pub struct FunctionAction<S: Send + Sync + Clone + 'static> {
+    definition: ActionDefinition,
+    handler: Handler<S>,
+    pub confirm_handler: Option<ConfirmHandler<S>>,
 }
 
 impl<S: Send + Sync + Clone + 'static> FunctionAction<S> {
@@ -136,7 +137,6 @@ where
 
     pub fn build(self) -> FunctionAction<S> {
         let handler = self.handler;
-        let confirm_handler = self.confirm_handler.clone();
         FunctionAction {
             definition: ActionDefinition {
                 name: self.name,
@@ -145,44 +145,30 @@ where
             },
             handler: Box::new(move |params: serde_json::Value, state: AgentState<S>| {
                 let handler = handler.clone();
-                let confirm_handler = confirm_handler.clone();
                 Box::pin(async move {
                     let params = serde_json::from_value(params)
                         .map_err(|e| format!("Invalid parameters: {}", e))?;
                     let result = handler(params, state).await?;
 
                     // If there's a confirm handler, mark this as a preview
-                    if confirm_handler.is_some() {
-                        let result_str = serde_json::to_string(&result)
-                            .map_err(|e| format!("Failed to serialize result: {}", e))?;
-                        Ok(format!("PREVIEW:\n{}", result_str))
-                    } else {
-                        // No confirm handler, just serialize the result
-                        serde_json::to_string(&result)
-                            .map_err(|e| format!("Failed to serialize result: {}", e))
-                    }
+                    serde_json::to_string(&result)
+                        .map_err(|e| format!("Failed to serialize result: {}", e))
                 })
             }),
-            confirm_handler: self.confirm_handler.clone().map(|handler| {
-                Box::new(move |params: serde_json::Value, state: AgentState<S>| {
-                    let handler = handler.clone();
-                    let fut: Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>> =
-                        Box::pin(async move {
+            confirm_handler: self.confirm_handler.map(|handler| {
+                Arc::new(
+                    Box::new(move |params: serde_json::Value, state: AgentState<S>| {
+                        let handler = handler.clone();
+                        let fut: Pin<
+                            Box<dyn Future<Output = Result<String, String>> + Send + Sync>,
+                        > = Box::pin(async move {
                             let params = serde_json::from_value::<Q>(params)
                                 .map_err(|e| format!("Invalid parameters: {}", e))?;
                             handler(params, state).await
                         });
-                    fut
-                })
-                    as Box<
-                        dyn Fn(
-                                serde_json::Value,
-                                AgentState<S>,
-                            ) -> Pin<
-                                Box<dyn Future<Output = Result<String, String>> + Send + Sync>,
-                            > + Send
-                            + Sync,
-                    >
+                        fut
+                    }) as Box<dyn Fn(_, _) -> _ + Send + Sync>,
+                )
             }),
         }
     }

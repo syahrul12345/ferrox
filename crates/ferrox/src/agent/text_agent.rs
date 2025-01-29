@@ -1,4 +1,4 @@
-use super::Agent;
+use super::{Agent, ConfirmHandler};
 use ferrox_actions::{AgentState, FunctionAction};
 use openai_api::{
     completions::Client as OpenAIClient,
@@ -51,7 +51,17 @@ where
         &self,
         prompt: &str,
         history_id: &str,
-    ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>> {
+    ) -> Pin<
+        Box<
+            dyn Future<
+                    Output = Result<
+                        (String, Option<(serde_json::Value, ConfirmHandler<S>)>),
+                        String,
+                    >,
+                > + Send
+                + Sync,
+        >,
+    > {
         // Clone what we need for the async block
         let conversation_history = self.conversation_history.clone();
         let system_prompt = self.system_prompt.clone();
@@ -120,6 +130,8 @@ where
             };
 
             let mut final_result = String::new();
+            let mut prev_result: String = String::new();
+            let mut confirm_handler: Option<ConfirmHandler<S>> = None;
             let mut count = 0;
             while count <= 5 {
                 let response = open_ai_client
@@ -173,10 +185,9 @@ where
                             .map_err(|e| {
                                 format!("Failed to execute {}: {}", tool_call.function.name, e)
                             })?;
-                        println!(
-                            "Executed function {} Result {}",
-                            tool_call.function.name, result
-                        );
+                        println!("Executed function {}", tool_call.function.name);
+                        prev_result = result.clone();
+                        confirm_handler = action.confirm_handler.clone();
                         conversation.push(Message {
                             role: "tool".to_string(),
                             content: Some(result),
@@ -207,7 +218,11 @@ where
                     "Failed to get a final response from the AI agent within 5 rounds".to_string(),
                 );
             }
-            Ok(final_result)
+            Ok((
+                final_result,
+                confirm_handler
+                    .map(|handler| (serde_json::from_str(&prev_result).unwrap(), handler)),
+            ))
         })
     }
 }
@@ -226,24 +241,34 @@ where
         &self.system_prompt
     }
 
-    fn state(&self) -> &AgentState<S> {
-        &self.state
+    fn state(&self) -> AgentState<S> {
+        self.state.clone()
     }
 
     fn process_prompt(
         &self,
         prompt: &str,
         history_id: &str,
-    ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>> {
+    ) -> Pin<
+        Box<
+            dyn Future<
+                    Output = Result<
+                        (String, Option<(serde_json::Value, ConfirmHandler<S>)>),
+                        String,
+                    >,
+                > + Send
+                + Sync,
+        >,
+    > {
         let history_id = history_id.to_string();
         let text_future = self.send_prompt(prompt, &history_id);
         let inner_agent = self.inner_agent.clone();
         Box::pin(async move {
-            let text_result = text_future.await?;
-            let text_result = inner_agent
+            let (text_result, confirm_option) = text_future.await?;
+            let (text_result, _) = inner_agent
                 .process_prompt(&text_result, &history_id)
                 .await?;
-            Ok(text_result)
+            Ok((text_result, confirm_option))
         })
     }
 }
@@ -378,21 +403,21 @@ mod tests {
         println!("--------------------------------");
         let calc_prompt = "Calculate 5 plus 3";
         println!("Testing calculator with prompt: {}", calc_prompt);
-        let calc_response = agent.process_prompt(calc_prompt, "test1").await.unwrap();
+        let (calc_response, _) = agent.process_prompt(calc_prompt, "test1").await.unwrap();
         println!("Calculator response: {}", calc_response);
         assert_eq!(agent.state().lock().await.counter, 1);
 
         println!("--------------------------------");
         let greet_prompt = "Say hello to Alice in Spanish";
         println!("Testing greeter with prompt: {}", greet_prompt);
-        let greet_response = agent.process_prompt(greet_prompt, "test2").await.unwrap();
+        let (greet_response, _) = agent.process_prompt(greet_prompt, "test2").await.unwrap();
         println!("Greeter response: {}", greet_response);
         assert_eq!(agent.state().lock().await.counter, 2);
 
         println!("--------------------------------");
         let reverse_prompt = "Reverse the text 'hello world'";
         println!("Testing reverser with prompt: {}", reverse_prompt);
-        let reverse_response = agent.process_prompt(reverse_prompt, "test3").await.unwrap();
+        let (reverse_response, _) = agent.process_prompt(reverse_prompt, "test3").await.unwrap();
         println!("Reverser response: {}", reverse_response);
         assert_eq!(agent.state().lock().await.counter, 3);
 
@@ -400,7 +425,7 @@ mod tests {
         println!("--------------------------------");
         let chained_prompt = "Calculate 10 plus 5, then greet the result in Spanish, and finally reverse that greeting";
         println!("Testing chained actions with prompt: {}", chained_prompt);
-        let chained_response = agent.process_prompt(chained_prompt, "test4").await.unwrap();
+        let (chained_response, _) = agent.process_prompt(chained_prompt, "test4").await.unwrap();
         println!("Chained actions response: {}", chained_response);
         assert_eq!(agent.state().lock().await.counter, 6); // Should have used all 3 actions
     }
@@ -419,7 +444,7 @@ mod tests {
         );
 
         // Test first message
-        let response = agent
+        let (response, _) = agent
             .process_prompt("What is Rust programming language?", "default")
             .await
             .expect("Failed to get response");
@@ -428,7 +453,7 @@ mod tests {
         assert!(!response.is_empty());
 
         // Test follow-up question (should maintain context)
-        let response = agent
+        let (response, _) = agent
             .process_prompt("What are its main features?", "default")
             .await
             .expect("Failed to get response");
@@ -474,7 +499,7 @@ mod tests {
             }
         };
 
-        let (response1, response2) = tokio::join!(
+        let ((response1, _), (response2, _)) = tokio::join!(
             send_prompt("conv1", "Tell me about Python"),
             send_prompt("conv2", "Tell me about JavaScript")
         );
@@ -533,7 +558,7 @@ mod tests {
         );
 
         // Test the chain
-        let response = agent
+        let (response, _) = agent
             .process_prompt("What is Rust's ownership system?", "test_chain")
             .await
             .expect("Failed to get response");
@@ -578,7 +603,7 @@ mod tests {
         agent.add_action(Arc::new(time_action));
 
         // Test the action
-        let response = agent
+        let (response, _) = agent
             .process_prompt("What time is it?", "test_empty")
             .await
             .unwrap();

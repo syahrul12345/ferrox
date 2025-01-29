@@ -3,7 +3,7 @@ use tokio::sync::Mutex;
 use ferrox_actions::{AgentState, FunctionAction};
 use std::{future::Future, pin::Pin, sync::Arc};
 
-use super::Agent;
+use super::{Agent, ConfirmHandler};
 
 /// A no-op agent implementation used primarily for testing
 #[derive(Clone)]
@@ -24,17 +24,27 @@ impl Agent for NullAgent {
         ""
     }
 
-    fn state(&self) -> &AgentState<()> {
-        &self.state
+    fn state(&self) -> AgentState<()> {
+        self.state.clone()
     }
 
     fn process_prompt(
         &self,
         _prompt: &str,
         _history_id: &str,
-    ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>> {
+    ) -> Pin<
+        Box<
+            dyn Future<
+                    Output = Result<
+                        (String, Option<(serde_json::Value, ConfirmHandler<()>)>),
+                        String,
+                    >,
+                > + Send
+                + Sync,
+        >,
+    > {
         let prompt = _prompt.to_string();
-        Box::pin(async move { Ok(prompt.to_string()) })
+        Box::pin(async move { Ok((prompt.to_string(), None)) })
     }
 
     fn add_action(&mut self, _action: Arc<FunctionAction<()>>) {
@@ -55,7 +65,7 @@ mod tests {
     #[tokio::test]
     async fn test_process_prompt() {
         let agent = NullAgent::default();
-        let response = agent
+        let (response, _) = agent
             .process_prompt("test prompt", "test_history")
             .await
             .expect("Failed to process prompt");
@@ -83,7 +93,7 @@ mod tests {
     #[tokio::test]
     async fn test_process_prompt_with_empty_input() {
         let agent = NullAgent::default();
-        let response = agent
+        let (response, _) = agent
             .process_prompt("", "test_history")
             .await
             .expect("Failed to process prompt");
