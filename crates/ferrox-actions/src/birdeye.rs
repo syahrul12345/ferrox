@@ -169,11 +169,14 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
                 client.get_token_price(params.address).await
             }
 
-            let action =
-                ActionBuilder::<_, TokenPriceParams, S>::new("get_token_price", get_token_price)
-                    .description("Get real-time price data for a token")
-                    .parameter("address", "Token address", "string", true)
-                    .build();
+            let action = ActionBuilder::<_, TokenPriceParams, S>::new(
+                "get_token_price",
+                get_token_price,
+                None,
+            )
+            .description("Get real-time price data for a token")
+            .parameter("address", "Token address", "string", true)
+            .build();
 
             actions.push(Arc::new(action));
         }
@@ -201,6 +204,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
             let action = ActionBuilder::<_, TokenPriceHistoryParams, S>::new(
                 "get_token_price_history",
                 get_token_price_history,
+                None,
             )
             .description("Get historical price data for a token")
             .parameter("address", "Token address", "string", true)
@@ -228,6 +232,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
             let action = ActionBuilder::<_, MultiTokenPriceParams, S>::new(
                 "get_multi_token_price",
                 get_multi_token_price,
+                None,
             )
             .description("Get price data for multiple tokens")
             .parameter(
@@ -256,6 +261,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
             let action = ActionBuilder::<_, TokenTrendingParams, S>::new(
                 "get_token_trending",
                 get_token_trending,
+                None,
             )
             .description("Get trending tokens")
             .parameter("limit", "Number of tokens to return", "integer", false)
@@ -286,6 +292,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
             let action = ActionBuilder::<_, TokenOhlcvParams, S>::new(
                 "get_token_ohlcv",
                 get_token_ohlcv,
+                None,
             )
             .description("Get OHLCV data for a token (only solana tokens). Do not use if it is an ethereum token")
             .parameter("address", "Token address", "string", true)
@@ -324,6 +331,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
             let action = ActionBuilder::<_, PairOhlcvParams, S>::new(
                 "get_pair_ohlcv",
                 get_pair_ohlcv,
+                None,
             )
             .description("Get OHLCV data for a trading pair")
             .parameter("pair_address", "Pair address", "string", true)
@@ -354,13 +362,16 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
                     .await
             }
 
-            let action =
-                ActionBuilder::<_, TokenTradesParams, S>::new("get_token_trades", get_token_trades)
-                    .description("Get recent trades for a token")
-                    .parameter("address", "Token address", "string", true)
-                    .parameter("limit", "Number of trades to return", "integer", false)
-                    .parameter("offset", "Number of trades to skip", "integer", false)
-                    .build();
+            let action = ActionBuilder::<_, TokenTradesParams, S>::new(
+                "get_token_trades",
+                get_token_trades,
+                None,
+            )
+            .description("Get recent trades for a token")
+            .parameter("address", "Token address", "string", true)
+            .parameter("limit", "Number of trades to return", "integer", false)
+            .parameter("offset", "Number of trades to skip", "integer", false)
+            .build();
 
             actions.push(Arc::new(action));
         }
@@ -379,13 +390,16 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
                     .await
             }
 
-            let action =
-                ActionBuilder::<_, PairTradesParams, S>::new("get_pair_trades", get_pair_trades)
-                    .description("Get recent trades for a trading pair")
-                    .parameter("pair_address", "Pair address", "string", true)
-                    .parameter("limit", "Number of trades to return", "integer", false)
-                    .parameter("offset", "Number of trades to skip", "integer", false)
-                    .build();
+            let action = ActionBuilder::<_, PairTradesParams, S>::new(
+                "get_pair_trades",
+                get_pair_trades,
+                None,
+            )
+            .description("Get recent trades for a trading pair")
+            .parameter("pair_address", "Pair address", "string", true)
+            .parameter("limit", "Number of trades to return", "integer", false)
+            .parameter("offset", "Number of trades to skip", "integer", false)
+            .build();
 
             actions.push(Arc::new(action));
         }
@@ -405,6 +419,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
             let action = ActionBuilder::<_, TokenOverviewParams, S>::new(
                 "get_token_overview",
                 get_token_overview,
+                None,
             )
             .description("Get comprehensive overview data for a token")
             .parameter("address", "Token address", "string", true)
@@ -426,7 +441,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
             }
 
             let action =
-                ActionBuilder::<_, TokenListParams, S>::new("get_token_list", get_token_list)
+                ActionBuilder::<_, TokenListParams, S>::new("get_token_list", get_token_list, None)
                     .description("Get list of tokens with market data")
                     .parameter("limit", "Number of tokens to return", "integer", false)
                     .parameter("offset", "Number of tokens to skip", "integer", false)
@@ -450,6 +465,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
             let action = ActionBuilder::<_, TokenSecurityParams, S>::new(
                 "get_token_security",
                 get_token_security,
+                None,
             )
             .description("Get security information for a token")
             .parameter("address", "Token address", "string", true)
@@ -473,6 +489,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
             let action = ActionBuilder::<_, TokenMarketListParams, S>::new(
                 "get_token_market_list",
                 get_token_market_list,
+                None,
             )
             .description("Get list of markets where a token is traded")
             .parameter("address", "Token address", "string", true)
@@ -498,6 +515,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
             let action = ActionBuilder::<_, TokenNewListingParams, S>::new(
                 "get_token_new_listing",
                 get_token_new_listing,
+                None,
             )
             .description("Get list of newly listed tokens")
             .parameter("limit", "Number of tokens to return", "integer", false)
@@ -524,6 +542,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
             let action = ActionBuilder::<_, TokenTopTradersParams, S>::new(
                 "get_token_top_traders",
                 get_token_top_traders,
+                None,
             )
             .description("Get top traders for a token")
             .parameter("address", "Token address", "string", true)
@@ -548,6 +567,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
             let action = ActionBuilder::<_, GainersLosersParams, S>::new(
                 "get_gainers_losers",
                 get_gainers_losers,
+                None,
             )
             .description("Get gainers and losers data")
             .build();
@@ -577,6 +597,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
             let action = ActionBuilder::<_, TraderTxsByTimeParams, S>::new(
                 "get_trader_txs_by_time",
                 get_trader_txs_by_time,
+                None,
             )
             .description("Get trader transactions within a time range")
             .parameter("address", "Token address", "string", true)
@@ -608,6 +629,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
             let action = ActionBuilder::<_, SupportedChainsParams, S>::new(
                 "list_supported_chains",
                 list_supported_chains,
+                None,
             )
             .description("List supported blockchain networks")
             .build();
@@ -632,6 +654,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
             let action = ActionBuilder::<_, WalletPortfolioParams, S>::new(
                 "get_wallet_portfolio",
                 get_wallet_portfolio,
+                None,
             )
             .description("Get wallet portfolio for a specific chain")
             .parameter("wallet_address", "Wallet address", "string", true)
@@ -658,6 +681,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
             let action = ActionBuilder::<_, WalletPortfolioMultichainParams, S>::new(
                 "get_wallet_portfolio_multichain",
                 get_wallet_portfolio_multichain,
+                None,
             )
             .description("Get wallet portfolio across all chains")
             .parameter("wallet_address", "Wallet address", "string", true)
@@ -688,6 +712,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
             let action = ActionBuilder::<_, WalletTransactionHistoryParams, S>::new(
                 "get_wallet_transaction_history",
                 get_wallet_transaction_history,
+                None,
             )
             .description("Get wallet transaction history for a specific chain")
             .parameter("wallet_address", "Wallet address", "string", true)
@@ -725,6 +750,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
             let action = ActionBuilder::<_, WalletTransactionHistoryMultichainParams, S>::new(
                 "get_wallet_transaction_history_multichain",
                 get_wallet_transaction_history_multichain,
+                None,
             )
             .description("Get wallet transaction history across all chains")
             .parameter("wallet_address", "Wallet address", "string", true)
@@ -757,6 +783,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
             let action = ActionBuilder::<_, SimulateTransactionParams, S>::new(
                 "simulate_transaction",
                 simulate_transaction,
+                None,
             )
             .description("Simulate a transaction")
             .parameter("chain_id", "Chain ID", "string", true)

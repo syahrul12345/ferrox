@@ -90,6 +90,7 @@ impl<S: Send + Sync + Clone + 'static> GmgnActionGroup<S> {
             let action = ActionBuilder::<_, KlineDataParams, S>::new(
                 "get_gmgn_kline_data",
                 get_kline_data,
+                None,
             )
             .description(
                 "Get OHLCV kline data for a Solana token from GMGN (alternative to Birdeye). Use this if the birdeye response is empty or errored",

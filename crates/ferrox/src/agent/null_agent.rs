@@ -45,7 +45,7 @@ impl Agent for NullAgent {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use ferrox_actions::ActionBuilder;
+    use ferrox_actions::{ActionBuilder, EmptyParams};
     #[tokio::test]
     async fn test_system_prompt() {
         let agent = NullAgent::default();
@@ -68,11 +68,11 @@ mod tests {
         let mut agent = NullAgent::default();
 
         // Create a test action using ActionBuilder
-        async fn mock_handler(_: serde_json::Value, _: AgentState<()>) -> Result<String, String> {
+        async fn mock_handler(_: EmptyParams, _: AgentState<()>) -> Result<String, String> {
             Ok("mock result".to_string())
         }
 
-        let action = ActionBuilder::new("mock_action", mock_handler)
+        let action = ActionBuilder::<_, EmptyParams, ()>::new("mock_action", mock_handler, None)
             .description("A mock action for testing")
             .build();
 

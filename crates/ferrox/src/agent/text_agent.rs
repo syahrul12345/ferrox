@@ -307,7 +307,7 @@ mod tests {
                 Ok(result.to_string())
             }
             let calc_action =
-                ActionBuilder::<_, CalcParams, TestState>::new("calculator", calculator)
+                ActionBuilder::<_, CalcParams, TestState>::new("calculator", calculator, None)
                     .description("Perform basic arithmetic operations")
                     .parameter("a", "First number", "number", true)
                     .parameter("b", "Second number", "number", true)
@@ -341,11 +341,12 @@ mod tests {
                 state.lock().await.counter += 1;
                 Ok(format!("{} {}!", greeting, params.name))
             }
-            let greet_action = ActionBuilder::<_, GreetParams, TestState>::new("greeter", greeter)
-                .description("Generate a greeting message")
-                .parameter("name", "Name to greet", "string", true)
-                .parameter("language", "Language code (en/es/fr)", "string", false)
-                .build();
+            let greet_action =
+                ActionBuilder::<_, GreetParams, TestState>::new("greeter", greeter, None)
+                    .description("Generate a greeting message")
+                    .parameter("name", "Name to greet", "string", true)
+                    .parameter("language", "Language code (en/es/fr)", "string", false)
+                    .build();
             agent.add_action(Arc::new(greet_action));
             println!("Added greeter action");
         }
@@ -365,7 +366,7 @@ mod tests {
                 Ok(params.text.chars().rev().collect())
             }
             let reverse_action =
-                ActionBuilder::<_, ReverseParams, TestState>::new("reverser", reverser)
+                ActionBuilder::<_, ReverseParams, TestState>::new("reverser", reverser, None)
                     .description("Reverse input text")
                     .parameter("text", "Text to reverse", "string", true)
                     .build();
@@ -569,9 +570,10 @@ mod tests {
             Ok("12:00 PM".to_string())
         }
 
-        let time_action = ActionBuilder::<_, EmptyParams, TestState>::new("get_time", get_time)
-            .description("Get the current time")
-            .build();
+        let time_action =
+            ActionBuilder::<_, EmptyParams, TestState>::new("get_time", get_time, None)
+                .description("Get the current time")
+                .build();
 
         agent.add_action(Arc::new(time_action));
 

@@ -49,10 +49,11 @@ async fn main() {
             println!("say hello called. Params: {:?}", params);
             Ok(format!("Hello, {}!", params.name))
         }
-        let hello_action = ActionBuilder::<_, HelloParams, TestState>::new("say_hello", say_hello)
-            .description("Greets the user with their name")
-            .parameter("name", "Name of the person to greet", "string", true)
-            .build();
+        let hello_action =
+            ActionBuilder::<_, HelloParams, TestState>::new("say_hello", say_hello, None)
+                .description("Greets the user with their name")
+                .parameter("name", "Name of the person to greet", "string", true)
+                .build();
         decision_agent.add_action(Arc::new(hello_action));
 
         /// Increments the counter in the state and returns the new value
@@ -66,10 +67,13 @@ async fn main() {
             Ok(format!("Counter incremented to: {}", state.counter))
         }
         let var_name = "Increments the internal counter and returns the new value";
-        let increment_action =
-            ActionBuilder::<_, EmptyParams, TestState>::new("increment_counter", increment_counter)
-                .description(var_name)
-                .build();
+        let increment_action = ActionBuilder::<_, EmptyParams, TestState>::new(
+            "increment_counter",
+            increment_counter,
+            None,
+        )
+        .description(var_name)
+        .build();
         decision_agent.add_action(Arc::new(increment_action));
 
         /// Returns the current counter value
@@ -82,21 +86,25 @@ async fn main() {
             Ok(format!("Current counter value: {}", state.counter))
         }
         let get_counter_action =
-            ActionBuilder::<_, EmptyParams, TestState>::new("get_counter", get_counter)
+            ActionBuilder::<_, EmptyParams, TestState>::new("get_counter", get_counter, None)
                 .description("Returns the current counter value")
                 .build();
         decision_agent.add_action(Arc::new(get_counter_action));
     }
 
+    //Coingecko actions
     let coingecko_group = CoinGeckoActionGroup::new();
     decision_agent.add_action_group(&coingecko_group);
 
+    //Dexscreener actions
     let dexscreener_group = DexScreenerActionGroup::new();
     decision_agent.add_action_group(&dexscreener_group);
 
+    //Birdeye actions
     let birdeye_group = BirdeyeActionGroup::new();
     decision_agent.add_action_group(&birdeye_group);
 
+    //GMGN actions
     let gmgn_group = GmgnActionGroup::new();
     decision_agent.add_action_group(&gmgn_group);
 

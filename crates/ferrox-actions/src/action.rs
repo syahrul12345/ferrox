@@ -15,7 +15,7 @@ pub struct ActionParameter {
     pub required: bool,
 }
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ActionDefinition {
     pub name: String,
     pub description: String,
@@ -31,6 +31,17 @@ pub struct FunctionAction<S: Send + Sync + Clone + 'static> {
             ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>>
             + Send
             + Sync,
+    >,
+    confirm_handler: Option<
+        Box<
+            dyn Fn(
+                    serde_json::Value,
+                    AgentState<S>,
+                )
+                    -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>>
+                + Send
+                + Sync,
+        >,
     >,
 }
 
@@ -48,30 +59,39 @@ impl<S: Send + Sync + Clone + 'static> FunctionAction<S> {
     }
 }
 
+pub type EmptyConfirmHandler<T, S> =
+    fn(T, AgentState<S>) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>>;
 /// A builder to create actions from async functions with typed parameters
-pub struct ActionBuilder<F, P, S> {
+pub struct ActionBuilder<F, P, S, CF = EmptyConfirmHandler<(), S>, Q = ()> {
     name: String,
     description: String,
     parameters: Vec<ActionParameter>,
     handler: F,
-    _phantom: std::marker::PhantomData<P>,
+    confirm_handler: Option<CF>,
+    _phantom_handler_input: std::marker::PhantomData<P>,
+    _phantom_confirm_handler_input: std::marker::PhantomData<Q>,
     _phantom_state: std::marker::PhantomData<S>,
 }
 
-impl<F, Fut, P, S> ActionBuilder<F, P, S>
+impl<F, CF, P, Q, S, Fut, CFut> ActionBuilder<F, P, S, CF, Q>
 where
     F: Fn(P, AgentState<S>) -> Fut + Send + Sync + Clone + 'static,
     Fut: Future<Output = Result<String, String>> + Send + Sync + 'static,
     P: DeserializeOwned + Send + 'static,
+    CF: Fn(Q, AgentState<S>) -> CFut + Send + Sync + Clone + 'static,
+    CFut: Future<Output = Result<String, String>> + Send + Sync + 'static,
+    Q: DeserializeOwned + Send + 'static,
     S: Send + Sync + Clone + 'static,
 {
-    pub fn new(name: impl Into<String>, handler: F) -> Self {
+    pub fn new(name: impl Into<String>, handler: F, confirm_handler: Option<CF>) -> Self {
         Self {
             name: name.into(),
             description: String::new(),
             parameters: Vec::new(),
             handler,
-            _phantom: std::marker::PhantomData,
+            confirm_handler,
+            _phantom_handler_input: std::marker::PhantomData,
+            _phantom_confirm_handler_input: std::marker::PhantomData,
             _phantom_state: std::marker::PhantomData,
         }
     }
@@ -99,6 +119,7 @@ where
 
     pub fn build(self) -> FunctionAction<S> {
         let handler = self.handler;
+        let confirm_handler = self.confirm_handler;
         FunctionAction {
             definition: ActionDefinition {
                 name: self.name,
@@ -112,6 +133,27 @@ where
                         .map_err(|e| format!("Invalid parameters: {}", e))?;
                     handler(params, state).await
                 })
+            }),
+            confirm_handler: confirm_handler.map(|handler| {
+                Box::new(move |params: serde_json::Value, state: AgentState<S>| {
+                    let handler = handler.clone();
+                    let fut: Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>> =
+                        Box::pin(async move {
+                            let params = serde_json::from_value::<Q>(params)
+                                .map_err(|e| format!("Invalid parameters: {}", e))?;
+                            handler(params, state).await
+                        });
+                    fut
+                })
+                    as Box<
+                        dyn Fn(
+                                serde_json::Value,
+                                AgentState<S>,
+                            ) -> Pin<
+                                Box<dyn Future<Output = Result<String, String>> + Send + Sync>,
+                            > + Send
+                            + Sync,
+                    >
             }),
         }
     }
@@ -145,7 +187,7 @@ mod tests {
             Ok(format!("Weather in {} ({}): Sunny", params.location, units))
         }
 
-        let action = ActionBuilder::<_, WeatherParams, ()>::new("get_weather", weather)
+        let action = ActionBuilder::<_, WeatherParams, ()>::new("get_weather", weather, None)
             .description("Get the weather for a location")
             .parameter("location", "The city to get weather for", "string", true)
             .parameter(

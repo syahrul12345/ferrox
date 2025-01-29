@@ -75,6 +75,7 @@ impl<S: Send + Sync + Clone + 'static> DexScreenerActionGroup<S> {
             let action = ActionBuilder::<_, TokenProfilesParams, S>::new(
                 "get_token_profiles",
                 get_token_profiles,
+                None,
             )
             .description("Get the latest token profiles")
             .build();
@@ -94,12 +95,15 @@ impl<S: Send + Sync + Clone + 'static> DexScreenerActionGroup<S> {
                     .await
             }
 
-            let action =
-                ActionBuilder::<_, TokenOrdersParams, S>::new("get_token_orders", get_token_orders)
-                    .description("Check orders paid for of token")
-                    .parameter("chain_id", "The chain ID (e.g. solana)", "string", true)
-                    .parameter("token_address", "Token's address", "string", true)
-                    .build();
+            let action = ActionBuilder::<_, TokenOrdersParams, S>::new(
+                "get_token_orders",
+                get_token_orders,
+                None,
+            )
+            .description("Check orders paid for of token")
+            .parameter("chain_id", "The chain ID (e.g. solana)", "string", true)
+            .parameter("token_address", "Token's address", "string", true)
+            .build();
 
             actions.push(Arc::new(action));
         }
@@ -114,10 +118,13 @@ impl<S: Send + Sync + Clone + 'static> DexScreenerActionGroup<S> {
                 client.get_token_boosts().await
             }
 
-            let action =
-                ActionBuilder::<_, TokenBoostsParams, S>::new("get_token_boosts", get_token_boosts)
-                    .description("Get the latest boosted tokens")
-                    .build();
+            let action = ActionBuilder::<_, TokenBoostsParams, S>::new(
+                "get_token_boosts",
+                get_token_boosts,
+                None,
+            )
+            .description("Get the latest boosted tokens")
+            .build();
 
             actions.push(Arc::new(action));
         }
@@ -135,6 +142,7 @@ impl<S: Send + Sync + Clone + 'static> DexScreenerActionGroup<S> {
             let action = ActionBuilder::<_, TokenBoostsTopParams, S>::new(
                 "get_token_boosts_top",
                 get_token_boosts_top,
+                None,
             )
             .description("Get the tokens with most active boosts")
             .build();
@@ -154,12 +162,15 @@ impl<S: Send + Sync + Clone + 'static> DexScreenerActionGroup<S> {
                     .await
             }
 
-            let action =
-                ActionBuilder::<_, TokenPairsParams, S>::new("get_token_pairs", get_token_pairs)
-                    .description("Get the pools of a given token address")
-                    .parameter("chain_id", "The chain ID (e.g. solana)", "string", true)
-                    .parameter("token_address", "Token's address", "string", true)
-                    .build();
+            let action = ActionBuilder::<_, TokenPairsParams, S>::new(
+                "get_token_pairs",
+                get_token_pairs,
+                None,
+            )
+            .description("Get the pools of a given token address")
+            .parameter("chain_id", "The chain ID (e.g. solana)", "string", true)
+            .parameter("token_address", "Token's address", "string", true)
+            .build();
 
             actions.push(Arc::new(action));
         }
@@ -176,7 +187,7 @@ impl<S: Send + Sync + Clone + 'static> DexScreenerActionGroup<S> {
                     .await
             }
 
-            let action = ActionBuilder::<_, TokensParams, S>::new("get_tokens", get_tokens)
+            let action = ActionBuilder::<_, TokensParams, S>::new("get_tokens", get_tokens, None)
                 .description("Get one or multiple pairs by token address")
                 .parameter("chain_id", "The chain ID (e.g. solana)", "string", true)
                 .parameter(
@@ -201,7 +212,7 @@ impl<S: Send + Sync + Clone + 'static> DexScreenerActionGroup<S> {
             }
 
             let action =
-                ActionBuilder::<_, SearchPairsParams, S>::new("search_pairs", search_pairs)
+                ActionBuilder::<_, SearchPairsParams, S>::new("search_pairs", search_pairs, None)
                     .description("Search for pairs or tokens matching query")
                     .parameter("query", "Search query", "string", true)
                     .build();
@@ -219,7 +230,7 @@ impl<S: Send + Sync + Clone + 'static> DexScreenerActionGroup<S> {
                 client.get_pairs(params.chain_id, params.pair_id).await
             }
 
-            let action = ActionBuilder::<_, PairsParams, S>::new("get_pairs", get_pairs)
+            let action = ActionBuilder::<_, PairsParams, S>::new("get_pairs", get_pairs, None)
                 .description("Get one or multiple pairs by chain and pair address")
                 .parameter("chain_id", "The chain ID (e.g. solana)", "string", true)
                 .parameter("pair_id", "Pair ID", "string", true)

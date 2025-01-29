@@ -196,6 +196,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
             let action = ActionBuilder::<_, CoinContractMarketChartRangeParams, S>::new(
                 "get_coin_contract_market_chart_range",
                 get_coin_contract_market_chart_range,
+                None,
             )
             .description("Get historical market data for a token contract address")
             .parameter("id", "The coin id (e.g. ethereum)", "string", true)
@@ -242,6 +243,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
             let action = ActionBuilder::<_, CoinMarketChartParams, S>::new(
                 "get_coin_market_chart",
                 get_coin_market_chart,
+                None,
             )
             .description("Get historical market data include price, market cap, and 24h volume")
             .parameter("id", "The coin id (e.g. bitcoin)", "string", true)
@@ -275,6 +277,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
             let action = ActionBuilder::<_, NetworkStatusParams, S>::new(
                 "get_network_status",
                 get_network_status,
+                None,
             )
             .description("Check API server status")
             .build();
@@ -296,10 +299,13 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                 client.get_global_data().await
             }
 
-            let action =
-                ActionBuilder::<_, GlobalDataParams, S>::new("get_global_data", get_global_data)
-                    .description("Get cryptocurrency global data")
-                    .build();
+            let action = ActionBuilder::<_, GlobalDataParams, S>::new(
+                "get_global_data",
+                get_global_data,
+                None,
+            )
+            .description("Get cryptocurrency global data")
+            .build();
 
             actions.push(Arc::new(action));
         }
@@ -321,6 +327,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
             let action = ActionBuilder::<_, GlobalDefiDataParams, S>::new(
                 "get_global_defi_data",
                 get_global_defi_data,
+                None,
             )
             .description("Get cryptocurrency global decentralized finance (defi) data")
             .build();
@@ -343,7 +350,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
             }
 
             let action =
-                ActionBuilder::<_, ExchangesParams, S>::new("get_exchanges", get_exchanges)
+                ActionBuilder::<_, ExchangesParams, S>::new("get_exchanges", get_exchanges, None)
                     .description("List all exchanges")
                     .parameter("per_page", "Total results per page", "integer", false)
                     .parameter("page", "Page number", "integer", false)
@@ -366,10 +373,11 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                 client.get_exchange(params.id).await
             }
 
-            let action = ActionBuilder::<_, ExchangeParams, S>::new("get_exchange", get_exchange)
-                .description("Get exchange volume in BTC and top 100 tickers only")
-                .parameter("id", "Exchange id", "string", true)
-                .build();
+            let action =
+                ActionBuilder::<_, ExchangeParams, S>::new("get_exchange", get_exchange, None)
+                    .description("Get exchange volume in BTC and top 100 tickers only")
+                    .parameter("id", "Exchange id", "string", true)
+                    .build();
 
             actions.push(Arc::new(action));
         }
@@ -400,6 +408,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
             let action = ActionBuilder::<_, ExchangeTickersParams, S>::new(
                 "get_exchange_tickers",
                 get_exchange_tickers,
+                None,
             )
             .description("Get exchange tickers (paginated)")
             .parameter("id", "Exchange id", "string", true)
@@ -437,6 +446,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
             let action = ActionBuilder::<_, ExchangeVolumeChartParams, S>::new(
                 "get_exchange_volume_chart",
                 get_exchange_volume_chart,
+                None,
             )
             .description("Get volume chart data for a given exchange")
             .parameter("id", "Exchange id", "string", true)
@@ -461,7 +471,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
             }
 
             let action =
-                ActionBuilder::<_, CoinsListParams, S>::new("get_coins_list", get_coins_list)
+                ActionBuilder::<_, CoinsListParams, S>::new("get_coins_list", get_coins_list, None)
                     .description("List all supported coins with id and name")
                     .parameter(
                         "include_platform",
@@ -497,26 +507,29 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                     .await
             }
 
-            let action =
-                ActionBuilder::<_, CoinTickersParams, S>::new("get_coin_tickers", get_coin_tickers)
-                    .description("Get coin tickers (paginated to 100 items)")
-                    .parameter("id", "The coin id", "string", true)
-                    .parameter(
-                        "exchange_ids",
-                        "Filter results by exchange ids",
-                        "array",
-                        false,
-                    )
-                    .parameter(
-                        "include_exchange_logo",
-                        "Include exchange logo",
-                        "boolean",
-                        false,
-                    )
-                    .parameter("page", "Page through results", "integer", false)
-                    .parameter("order", "Sort results by order", "string", false)
-                    .parameter("depth", "Include 2% orderbook depth", "boolean", false)
-                    .build();
+            let action = ActionBuilder::<_, CoinTickersParams, S>::new(
+                "get_coin_tickers",
+                get_coin_tickers,
+                None,
+            )
+            .description("Get coin tickers (paginated to 100 items)")
+            .parameter("id", "The coin id", "string", true)
+            .parameter(
+                "exchange_ids",
+                "Filter results by exchange ids",
+                "array",
+                false,
+            )
+            .parameter(
+                "include_exchange_logo",
+                "Include exchange logo",
+                "boolean",
+                false,
+            )
+            .parameter("page", "Page through results", "integer", false)
+            .parameter("order", "Sort results by order", "string", false)
+            .parameter("depth", "Include 2% orderbook depth", "boolean", false)
+            .build();
 
             actions.push(Arc::new(action));
         }
@@ -540,6 +553,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
             let action = ActionBuilder::<_, CoinHistoryParams, S>::new(
                 "get_coin_history",
                 get_coin_history,
+                None,
             )
             .description(
                 "Get historical data (name, price, market, stats) at a given date for a coin",
@@ -578,17 +592,18 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                     .await
             }
 
-            let action = ActionBuilder::<_, CoinOhlcParams, S>::new("get_coin_ohlc", get_coin_ohlc)
-                .description("Get coin's OHLC (Open, High, Low, Close) data")
-                .parameter("id", "The coin id", "string", true)
-                .parameter(
-                    "vs_currency",
-                    "The target currency of market data (usd, eur, jpy, etc.)",
-                    "string",
-                    true,
-                )
-                .parameter("days", "Data up to number of days ago", "string", true)
-                .build();
+            let action =
+                ActionBuilder::<_, CoinOhlcParams, S>::new("get_coin_ohlc", get_coin_ohlc, None)
+                    .description("Get coin's OHLC (Open, High, Low, Close) data")
+                    .parameter("id", "The coin id", "string", true)
+                    .parameter(
+                        "vs_currency",
+                        "The target currency of market data (usd, eur, jpy, etc.)",
+                        "string",
+                        true,
+                    )
+                    .parameter("days", "Data up to number of days ago", "string", true)
+                    .build();
 
             actions.push(Arc::new(action));
         }
@@ -612,6 +627,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
             let action = ActionBuilder::<_, CoinContractParams, S>::new(
                 "get_coin_contract",
                 get_coin_contract,
+                None,
             )
             .description("Get coin info from contract address")
             .parameter("id", "Asset platform (e.g. ethereum)", "string", true)
@@ -650,6 +666,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
             let action = ActionBuilder::<_, CoinContractMarketChartParams, S>::new(
                 "get_coin_contract_market_chart",
                 get_coin_contract_market_chart,
+                None,
             )
             .description("Get historical market data for a contract address")
             .parameter("id", "The platform id (e.g. ethereum)", "string", true)
@@ -688,6 +705,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
             let action = ActionBuilder::<_, AssetPlatformsParams, S>::new(
                 "get_asset_platforms",
                 get_asset_platforms,
+                None,
             )
             .description("List all asset platforms (blockchain networks)")
             .build();
@@ -712,6 +730,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
             let action = ActionBuilder::<_, CoinsCategoriesListParams, S>::new(
                 "get_coins_categories_list",
                 get_coins_categories_list,
+                None,
             )
             .description("List all categories")
             .build();
@@ -736,6 +755,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
             let action = ActionBuilder::<_, CoinsCategoriesParams, S>::new(
                 "get_coins_categories",
                 get_coins_categories,
+                None,
             )
             .description("List all categories with market data")
             .parameter("order", "Sort by market_cap or name", "string", false)
@@ -758,9 +778,10 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                 client.get_indexes().await
             }
 
-            let action = ActionBuilder::<_, IndexesParams, S>::new("get_indexes", get_indexes)
-                .description("List all market indexes")
-                .build();
+            let action =
+                ActionBuilder::<_, IndexesParams, S>::new("get_indexes", get_indexes, None)
+                    .description("List all market indexes")
+                    .build();
 
             actions.push(Arc::new(action));
         }
@@ -779,10 +800,13 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                 client.get_indexes_list().await
             }
 
-            let action =
-                ActionBuilder::<_, IndexesListParams, S>::new("get_indexes_list", get_indexes_list)
-                    .description("List market indexes id and name")
-                    .build();
+            let action = ActionBuilder::<_, IndexesListParams, S>::new(
+                "get_indexes_list",
+                get_indexes_list,
+                None,
+            )
+            .description("List market indexes id and name")
+            .build();
 
             actions.push(Arc::new(action));
         }
@@ -801,10 +825,13 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                 client.get_derivatives().await
             }
 
-            let action =
-                ActionBuilder::<_, DerivativesParams, S>::new("get_derivatives", get_derivatives)
-                    .description("List all derivative tickers")
-                    .build();
+            let action = ActionBuilder::<_, DerivativesParams, S>::new(
+                "get_derivatives",
+                get_derivatives,
+                None,
+            )
+            .description("List all derivative tickers")
+            .build();
 
             actions.push(Arc::new(action));
         }
@@ -828,6 +855,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
             let action = ActionBuilder::<_, DerivativesExchangesParams, S>::new(
                 "get_derivatives_exchanges",
                 get_derivatives_exchanges,
+                None,
             )
             .description("List all derivative exchanges")
             .parameter("order", "Order results by specified field", "string", false)
@@ -857,6 +885,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
             let action = ActionBuilder::<_, DerivativesExchangeParams, S>::new(
                 "get_derivatives_exchange",
                 get_derivatives_exchange,
+                None,
             )
             .description("Show derivative exchange data")
             .parameter("id", "The exchange id", "string", true)
@@ -888,6 +917,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
             let action = ActionBuilder::<_, ExchangeRatesParams, S>::new(
                 "get_exchange_rates",
                 get_exchange_rates,
+                None,
             )
             .description("Get BTC-to-Currency exchange rates")
             .build();
@@ -909,7 +939,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                 client.search(params.query).await
             }
 
-            let action = ActionBuilder::<_, SearchParams, S>::new("search", search)
+            let action = ActionBuilder::<_, SearchParams, S>::new("search", search, None)
                 .description("Search for coins, categories and markets")
                 .parameter("query", "Search string", "string", true)
                 .build();
@@ -931,9 +961,10 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                 client.get_trending().await
             }
 
-            let action = ActionBuilder::<_, TrendingParams, S>::new("get_trending", get_trending)
-                .description("Get trending search coins (Top-7) on CoinGecko")
-                .build();
+            let action =
+                ActionBuilder::<_, TrendingParams, S>::new("get_trending", get_trending, None)
+                    .description("Get trending search coins (Top-7) on CoinGecko")
+                    .build();
 
             actions.push(Arc::new(action));
         }
@@ -955,6 +986,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
             let action = ActionBuilder::<_, CompaniesPublicTreasuryParams, S>::new(
                 "get_companies_public_treasury",
                 get_companies_public_treasury,
+                None,
             )
             .description("Get public companies bitcoin or ethereum holdings")
             .parameter(
