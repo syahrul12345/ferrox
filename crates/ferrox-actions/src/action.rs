@@ -57,12 +57,27 @@ impl<S: Send + Sync + Clone + 'static> FunctionAction<S> {
     ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>> {
         (self.handler)(params, state)
     }
+
+    pub fn confirm(
+        &self,
+        params: serde_json::Value,
+        state: AgentState<S>,
+    ) -> Option<Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>>> {
+        self.confirm_handler
+            .as_ref()
+            .map(|handler| handler(params, state))
+    }
 }
 
 pub type EmptyConfirmHandler<T, S> =
     fn(T, AgentState<S>) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>>;
 /// A builder to create actions from async functions with typed parameters
-pub struct ActionBuilder<F, P, S, CF = EmptyConfirmHandler<(), S>, Q = ()> {
+/// F: The handler function type
+/// P: Input parameters for the handler
+/// S: State type
+/// Q: Output type from handler and input type for confirm handler
+/// CF: Confirm handler function type (defaults to EmptyConfirmHandler)
+pub struct ActionBuilder<F, P, S, Q = String, CF = EmptyConfirmHandler<Q, S>> {
     name: String,
     description: String,
     parameters: Vec<ActionParameter>,
@@ -73,14 +88,16 @@ pub struct ActionBuilder<F, P, S, CF = EmptyConfirmHandler<(), S>, Q = ()> {
     _phantom_state: std::marker::PhantomData<S>,
 }
 
-impl<F, CF, P, Q, S, Fut, CFut> ActionBuilder<F, P, S, CF, Q>
+impl<F, CF, P, Q, S, Fut, CFut> ActionBuilder<F, P, S, Q, CF>
 where
+    // Handler F takes P and returns Q
     F: Fn(P, AgentState<S>) -> Fut + Send + Sync + Clone + 'static,
-    Fut: Future<Output = Result<String, String>> + Send + Sync + 'static,
+    Fut: Future<Output = Result<Q, String>> + Send + Sync + 'static,
     P: DeserializeOwned + Send + 'static,
+    // Confirm handler CF takes Q and returns String
     CF: Fn(Q, AgentState<S>) -> CFut + Send + Sync + Clone + 'static,
     CFut: Future<Output = Result<String, String>> + Send + Sync + 'static,
-    Q: DeserializeOwned + Send + 'static,
+    Q: Serialize + DeserializeOwned + Send + 'static,
     S: Send + Sync + Clone + 'static,
 {
     pub fn new(name: impl Into<String>, handler: F, confirm_handler: Option<CF>) -> Self {
@@ -119,7 +136,7 @@ where
 
     pub fn build(self) -> FunctionAction<S> {
         let handler = self.handler;
-        let confirm_handler = self.confirm_handler;
+        let confirm_handler = self.confirm_handler.clone();
         FunctionAction {
             definition: ActionDefinition {
                 name: self.name,
@@ -128,13 +145,25 @@ where
             },
             handler: Box::new(move |params: serde_json::Value, state: AgentState<S>| {
                 let handler = handler.clone();
+                let confirm_handler = confirm_handler.clone();
                 Box::pin(async move {
                     let params = serde_json::from_value(params)
                         .map_err(|e| format!("Invalid parameters: {}", e))?;
-                    handler(params, state).await
+                    let result = handler(params, state).await?;
+
+                    // If there's a confirm handler, mark this as a preview
+                    if confirm_handler.is_some() {
+                        let result_str = serde_json::to_string(&result)
+                            .map_err(|e| format!("Failed to serialize result: {}", e))?;
+                        Ok(format!("PREVIEW:\n{}", result_str))
+                    } else {
+                        // No confirm handler, just serialize the result
+                        serde_json::to_string(&result)
+                            .map_err(|e| format!("Failed to serialize result: {}", e))
+                    }
                 })
             }),
-            confirm_handler: confirm_handler.map(|handler| {
+            confirm_handler: self.confirm_handler.clone().map(|handler| {
                 Box::new(move |params: serde_json::Value, state: AgentState<S>| {
                     let handler = handler.clone();
                     let fut: Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>> =

@@ -10,3 +10,4 @@ ferrox-actions = { path = "../../crates/ferrox-actions" }
 openai-api = { path = "../../crates/openai-api" }
 serde = "1.0.217"
 tokio = { version = "1.43.0", features = ["full"] }
+solana-sdk = "1.16"

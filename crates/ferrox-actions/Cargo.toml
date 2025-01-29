@@ -8,4 +8,4 @@ reqwest = { version = "0.11", features = ["json"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 tokio = { version = "1.43.0", features = ["full"] }
-solana-sdk = "1.16"  # or whatever version is compatible with your project
+solana-sdk = "1.16"

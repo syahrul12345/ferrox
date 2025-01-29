@@ -1,4 +1,4 @@
-use std::{env, sync::Arc};
+use std::{env, str::FromStr, sync::Arc};
 
 use ferrox::{
     agent::{text_agent::TextAgent, Agent, NullAgent},
@@ -9,11 +9,17 @@ use ferrox_actions::{
     EmptyParams, GmgnActionGroup,
 };
 use openai_api::models::{Model, OpenAIModel};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
+use solana_sdk::{
+    pubkey::Pubkey,
+    signature::{Keypair, Signature},
+    signer::Signer,
+};
 
 #[derive(Clone)]
 struct TestState {
     counter: u32,
+    wallet: Arc<Keypair>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -31,12 +37,21 @@ For example when asked for technical analaysis, you can first get the tick data 
 async fn main() {
     dotenv::dotenv().ok();
     let api_key = env::var("OPENAI_API_KEY").expect("OPENAI_API_KEY must be set");
+    let private_key = [
+        103, 17, 11, 163, 113, 182, 255, 6, 9, 212, 145, 104, 9, 54, 192, 214, 170, 91, 36, 255,
+        10, 225, 26, 73, 183, 136, 250, 134, 171, 24, 250, 184, 9, 247, 185, 29, 89, 143, 75, 110,
+        195, 235, 251, 190, 182, 47, 42, 83, 2, 95, 187, 132, 253, 38, 244, 162, 168, 81, 252, 6,
+        133, 28, 79, 228,
+    ];
     let mut decision_agent = TextAgent::<TestState, NullAgent>::new(
         NullAgent::default(),
         SYSTEM_PROMPT.to_string(),
         api_key,
         Model::OpenAI(OpenAIModel::GPT40),
-        TestState { counter: 0 },
+        TestState {
+            counter: 0,
+            wallet: Arc::new(Keypair::from_bytes(&private_key).unwrap()),
+        },
     );
 
     //Now let's add some actions to the decision agent.
@@ -90,6 +105,69 @@ async fn main() {
                 .description("Returns the current counter value")
                 .build();
         decision_agent.add_action(Arc::new(get_counter_action));
+    }
+
+    {
+        //The data the agent will call the preview_send_solana with
+        #[derive(Deserialize, Debug)]
+        struct SendSolanaParams {
+            target_wallet: String,
+            amount_to_send: String,
+        }
+        //The data the user will see in the preview
+        #[derive(Serialize, Deserialize, Debug)]
+        struct SendSolanaPreview {
+            sender: Pubkey,
+            target_wallet: Pubkey,
+            amount_to_send: u64,
+        }
+
+        //This function will cause a preview to be shown to the user
+        //It acceps one parameter which is the target wallet to send to. So the user can prompt the agent to send to a specific wallet.
+        async fn preview_send_solana(
+            params: SendSolanaParams,
+            state: AgentState<TestState>,
+        ) -> Result<SendSolanaPreview, String> {
+            println!("LLM called preview send solana");
+            let amount_to_send =
+                (params.amount_to_send.parse::<f64>().unwrap() * 10.0f64.powi(9)).round() as u64;
+            let sender = state.lock().await.wallet.pubkey();
+            let target_wallet = Pubkey::from_str(&params.target_wallet).unwrap();
+            Ok(SendSolanaPreview {
+                sender,
+                target_wallet,
+                amount_to_send,
+            })
+        }
+
+        //NOTE: The params value in the confirm MUST match the output type of the preview
+        async fn confirm_send_solana(
+            _params: SendSolanaPreview,
+            _state: AgentState<TestState>,
+        ) -> Result<String, String> {
+            println!("User clicked confirm send solana");
+            // For now we just return a dummy signature
+            // In reality, we can use the input parameters to hit some backend service to send the transaction or do some processing
+            Ok(Signature::new_unique().to_string())
+        }
+
+        //Create the action
+        let get_send_solana_action =
+            ActionBuilder::<_, SendSolanaParams, TestState, SendSolanaPreview, _>::new(
+                "send_solana",
+                preview_send_solana,
+                Some(confirm_send_solana),
+            )
+            .description("Sends SOL to a target wallet")
+            .parameter(
+                "target_wallet",
+                "Target wallet to send SOL to",
+                "string",
+                true,
+            )
+            .parameter("amount_to_send", "Amount of SOL to send", "string", true)
+            .build();
+        decision_agent.add_action(Arc::new(get_send_solana_action));
     }
 
     //Coingecko actions
