@@ -51,6 +51,7 @@ where
         &self,
         prompt: &str,
         history_id: &str,
+        send_state: serde_json::Value,
     ) -> Pin<
         Box<
             dyn Future<
@@ -179,6 +180,7 @@ where
                             .execute(
                                 serde_json::from_str(&tool_call.function.arguments)
                                     .map_err(|e| e.to_string())?,
+                                send_state.clone(),
                                 state.clone(),
                             )
                             .await
@@ -249,6 +251,7 @@ where
         &self,
         prompt: &str,
         history_id: &str,
+        send_state: serde_json::Value,
     ) -> Pin<
         Box<
             dyn Future<
@@ -261,12 +264,12 @@ where
         >,
     > {
         let history_id = history_id.to_string();
-        let text_future = self.send_prompt(prompt, &history_id);
+        let text_future = self.send_prompt(prompt, &history_id, send_state.clone());
         let inner_agent = self.inner_agent.clone();
         Box::pin(async move {
             let (text_result, confirm_option) = text_future.await?;
             let (text_result, _) = inner_agent
-                .process_prompt(&text_result, &history_id)
+                .process_prompt(&text_result, &history_id, send_state)
                 .await?;
             Ok((text_result, confirm_option))
         })
@@ -313,6 +316,7 @@ mod tests {
             }
             async fn calculator(
                 params: CalcParams,
+                send_state: serde_json::Value,
                 state: AgentState<TestState>,
             ) -> Result<String, String> {
                 println!("Calculator called with params: {:?}", params);
@@ -331,18 +335,17 @@ mod tests {
                 state.lock().await.counter += 1;
                 Ok(result.to_string())
             }
-            let calc_action =
-                ActionBuilder::<_, CalcParams, TestState>::new("calculator", calculator, None)
-                    .description("Perform basic arithmetic operations")
-                    .parameter("a", "First number", "number", true)
-                    .parameter("b", "Second number", "number", true)
-                    .parameter(
-                        "operation",
-                        "Operation to perform (add/subtract/multiply/divide)",
-                        "string",
-                        true,
-                    )
-                    .build();
+            let calc_action = ActionBuilder::<_, _, _, _>::new("calculator", calculator, None)
+                .description("Perform basic arithmetic operations")
+                .parameter("a", "First number", "number", true)
+                .parameter("b", "Second number", "number", true)
+                .parameter(
+                    "operation",
+                    "Operation to perform (add/subtract/multiply/divide)",
+                    "string",
+                    true,
+                )
+                .build();
             agent.add_action(Arc::new(calc_action));
             println!("Added calculator action");
         }
@@ -355,6 +358,7 @@ mod tests {
             }
             async fn greeter(
                 params: GreetParams,
+                send_state: serde_json::Value,
                 state: AgentState<TestState>,
             ) -> Result<String, String> {
                 println!("Greeter called with params: {:?}", params);
@@ -366,12 +370,11 @@ mod tests {
                 state.lock().await.counter += 1;
                 Ok(format!("{} {}!", greeting, params.name))
             }
-            let greet_action =
-                ActionBuilder::<_, GreetParams, TestState>::new("greeter", greeter, None)
-                    .description("Generate a greeting message")
-                    .parameter("name", "Name to greet", "string", true)
-                    .parameter("language", "Language code (en/es/fr)", "string", false)
-                    .build();
+            let greet_action = ActionBuilder::<_, _, _, _>::new("greeter", greeter, None)
+                .description("Generate a greeting message")
+                .parameter("name", "Name to greet", "string", true)
+                .parameter("language", "Language code (en/es/fr)", "string", false)
+                .build();
             agent.add_action(Arc::new(greet_action));
             println!("Added greeter action");
         }
@@ -384,17 +387,17 @@ mod tests {
 
             async fn reverser(
                 params: ReverseParams,
+                send_state: serde_json::Value,
                 state: AgentState<TestState>,
             ) -> Result<String, String> {
                 println!("Reverser called with params: {:?}", params);
                 state.lock().await.counter += 1;
                 Ok(params.text.chars().rev().collect())
             }
-            let reverse_action =
-                ActionBuilder::<_, ReverseParams, TestState>::new("reverser", reverser, None)
-                    .description("Reverse input text")
-                    .parameter("text", "Text to reverse", "string", true)
-                    .build();
+            let reverse_action = ActionBuilder::<_, _, _, _>::new("reverser", reverser, None)
+                .description("Reverse input text")
+                .parameter("text", "Text to reverse", "string", true)
+                .build();
             agent.add_action(Arc::new(reverse_action));
             println!("Added reverser action");
         }
@@ -403,21 +406,30 @@ mod tests {
         println!("--------------------------------");
         let calc_prompt = "Calculate 5 plus 3";
         println!("Testing calculator with prompt: {}", calc_prompt);
-        let (calc_response, _) = agent.process_prompt(calc_prompt, "test1").await.unwrap();
+        let (calc_response, _) = agent
+            .process_prompt(calc_prompt, "test1", serde_json::Value::Null)
+            .await
+            .unwrap();
         println!("Calculator response: {}", calc_response);
         assert_eq!(agent.state().lock().await.counter, 1);
 
         println!("--------------------------------");
         let greet_prompt = "Say hello to Alice in Spanish";
         println!("Testing greeter with prompt: {}", greet_prompt);
-        let (greet_response, _) = agent.process_prompt(greet_prompt, "test2").await.unwrap();
+        let (greet_response, _) = agent
+            .process_prompt(greet_prompt, "test2", serde_json::Value::Null)
+            .await
+            .unwrap();
         println!("Greeter response: {}", greet_response);
         assert_eq!(agent.state().lock().await.counter, 2);
 
         println!("--------------------------------");
         let reverse_prompt = "Reverse the text 'hello world'";
         println!("Testing reverser with prompt: {}", reverse_prompt);
-        let (reverse_response, _) = agent.process_prompt(reverse_prompt, "test3").await.unwrap();
+        let (reverse_response, _) = agent
+            .process_prompt(reverse_prompt, "test3", serde_json::Value::Null)
+            .await
+            .unwrap();
         println!("Reverser response: {}", reverse_response);
         assert_eq!(agent.state().lock().await.counter, 3);
 
@@ -425,7 +437,10 @@ mod tests {
         println!("--------------------------------");
         let chained_prompt = "Calculate 10 plus 5, then greet the result in Spanish, and finally reverse that greeting";
         println!("Testing chained actions with prompt: {}", chained_prompt);
-        let (chained_response, _) = agent.process_prompt(chained_prompt, "test4").await.unwrap();
+        let (chained_response, _) = agent
+            .process_prompt(chained_prompt, "test4", serde_json::Value::Null)
+            .await
+            .unwrap();
         println!("Chained actions response: {}", chained_response);
         assert_eq!(agent.state().lock().await.counter, 6); // Should have used all 3 actions
     }
@@ -445,7 +460,11 @@ mod tests {
 
         // Test first message
         let (response, _) = agent
-            .process_prompt("What is Rust programming language?", "default")
+            .process_prompt(
+                "What is Rust programming language?",
+                "default",
+                serde_json::Value::Null,
+            )
             .await
             .expect("Failed to get response");
 
@@ -454,7 +473,11 @@ mod tests {
 
         // Test follow-up question (should maintain context)
         let (response, _) = agent
-            .process_prompt("What are its main features?", "default")
+            .process_prompt(
+                "What are its main features?",
+                "default",
+                serde_json::Value::Null,
+            )
             .await
             .expect("Failed to get response");
 
@@ -493,7 +516,7 @@ mod tests {
             let prompt = prompt.to_string();
             async move {
                 agent
-                    .process_prompt(&prompt, &id)
+                    .process_prompt(&prompt, &id, serde_json::Value::Null)
                     .await
                     .expect("Failed to get response")
             }
@@ -559,7 +582,11 @@ mod tests {
 
         // Test the chain
         let (response, _) = agent
-            .process_prompt("What is Rust's ownership system?", "test_chain")
+            .process_prompt(
+                "What is Rust's ownership system?",
+                "test_chain",
+                serde_json::Value::Null,
+            )
             .await
             .expect("Failed to get response");
 
@@ -588,6 +615,7 @@ mod tests {
         // Create action that takes EmptyParams
         async fn get_time(
             _params: EmptyParams,
+            _send_state: serde_json::Value,
             state: AgentState<TestState>,
         ) -> Result<String, String> {
             println!("get_time called. Params: {:?}", _params);
@@ -595,16 +623,15 @@ mod tests {
             Ok("12:00 PM".to_string())
         }
 
-        let time_action =
-            ActionBuilder::<_, EmptyParams, TestState>::new("get_time", get_time, None)
-                .description("Get the current time")
-                .build();
+        let time_action = ActionBuilder::<_, _, _, _>::new("get_time", get_time, None)
+            .description("Get the current time")
+            .build();
 
         agent.add_action(Arc::new(time_action));
 
         // Test the action
         let (response, _) = agent
-            .process_prompt("What time is it?", "test_empty")
+            .process_prompt("What time is it?", "test_empty", serde_json::Value::Null)
             .await
             .unwrap();
 

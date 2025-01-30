@@ -31,6 +31,7 @@ pub trait Agent<S: Send + Sync + Clone + 'static = ()>: Clone {
         &self,
         prompt: &str,
         history_id: &str,
+        send_state: serde_json::Value,
     ) -> Pin<
         Box<
             dyn Future<

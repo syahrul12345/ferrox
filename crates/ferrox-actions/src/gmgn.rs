@@ -74,6 +74,7 @@ impl<S: Send + Sync + Clone + 'static> GmgnActionGroup<S> {
         {
             async fn get_kline_data<S: Send + Sync + Clone + 'static>(
                 params: KlineDataParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let kline_data = fetch_k_line_data_from_gmgn(
@@ -87,7 +88,7 @@ impl<S: Send + Sync + Clone + 'static> GmgnActionGroup<S> {
                     .map_err(|e| format!("Failed to serialize GMGN response: {}", e))
             }
 
-            let action = ActionBuilder::<_, KlineDataParams, S>::new(
+            let action = ActionBuilder::<_, _, _, _>::new(
                 "get_gmgn_kline_data",
                 get_kline_data,
                 None,

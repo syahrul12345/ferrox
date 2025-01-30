@@ -161,6 +161,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
         {
             async fn get_token_price<S: Send + Sync + Clone + 'static>(
                 params: TokenPriceParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("BIRDEYE_API_KEY")
@@ -169,14 +170,10 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
                 client.get_token_price(params.address).await
             }
 
-            let action = ActionBuilder::<_, TokenPriceParams, S>::new(
-                "get_token_price",
-                get_token_price,
-                None,
-            )
-            .description("Get real-time price data for a token")
-            .parameter("address", "Token address", "string", true)
-            .build();
+            let action = ActionBuilder::<_, _, _, _>::new("get_token_price", get_token_price, None)
+                .description("Get real-time price data for a token")
+                .parameter("address", "Token address", "string", true)
+                .build();
 
             actions.push(Arc::new(action));
         }
@@ -185,6 +182,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
         {
             async fn get_token_price_history<S: Send + Sync + Clone + 'static>(
                 params: TokenPriceHistoryParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("BIRDEYE_API_KEY")
@@ -201,7 +199,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
                     .await
             }
 
-            let action = ActionBuilder::<_, TokenPriceHistoryParams, S>::new(
+            let action = ActionBuilder::<_, _, _, _>::new(
                 "get_token_price_history",
                 get_token_price_history,
                 None,
@@ -221,6 +219,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
         {
             async fn get_multi_token_price<S: Send + Sync + Clone + 'static>(
                 params: MultiTokenPriceParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("BIRDEYE_API_KEY")
@@ -229,7 +228,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
                 client.get_multi_token_price(params.addresses).await
             }
 
-            let action = ActionBuilder::<_, MultiTokenPriceParams, S>::new(
+            let action = ActionBuilder::<_, _, _, _>::new(
                 "get_multi_token_price",
                 get_multi_token_price,
                 None,
@@ -250,6 +249,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
         {
             async fn get_token_trending<S: Send + Sync + Clone + 'static>(
                 params: TokenTrendingParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("BIRDEYE_API_KEY")
@@ -258,14 +258,11 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
                 client.get_token_trending(params.limit).await
             }
 
-            let action = ActionBuilder::<_, TokenTrendingParams, S>::new(
-                "get_token_trending",
-                get_token_trending,
-                None,
-            )
-            .description("Get trending tokens")
-            .parameter("limit", "Number of tokens to return", "integer", false)
-            .build();
+            let action =
+                ActionBuilder::<_, _, _, _>::new("get_token_trending", get_token_trending, None)
+                    .description("Get trending tokens")
+                    .parameter("limit", "Number of tokens to return", "integer", false)
+                    .build();
 
             actions.push(Arc::new(action));
         }
@@ -274,6 +271,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
         {
             async fn get_token_ohlcv<S: Send + Sync + Clone + 'static>(
                 params: TokenOhlcvParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("BIRDEYE_API_KEY")
@@ -289,7 +287,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
                     .await
             }
 
-            let action = ActionBuilder::<_, TokenOhlcvParams, S>::new(
+            let action = ActionBuilder::<_, _, _, _>::new(
                 "get_token_ohlcv",
                 get_token_ohlcv,
                 None,
@@ -313,6 +311,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
         {
             async fn get_pair_ohlcv<S: Send + Sync + Clone + 'static>(
                 params: PairOhlcvParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("BIRDEYE_API_KEY")
@@ -328,7 +327,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
                     .await
             }
 
-            let action = ActionBuilder::<_, PairOhlcvParams, S>::new(
+            let action = ActionBuilder::<_, _, _, _>::new(
                 "get_pair_ohlcv",
                 get_pair_ohlcv,
                 None,
@@ -352,6 +351,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
         {
             async fn get_token_trades<S: Send + Sync + Clone + 'static>(
                 params: TokenTradesParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("BIRDEYE_API_KEY")
@@ -362,16 +362,13 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
                     .await
             }
 
-            let action = ActionBuilder::<_, TokenTradesParams, S>::new(
-                "get_token_trades",
-                get_token_trades,
-                None,
-            )
-            .description("Get recent trades for a token")
-            .parameter("address", "Token address", "string", true)
-            .parameter("limit", "Number of trades to return", "integer", false)
-            .parameter("offset", "Number of trades to skip", "integer", false)
-            .build();
+            let action =
+                ActionBuilder::<_, _, _, _>::new("get_token_trades", get_token_trades, None)
+                    .description("Get recent trades for a token")
+                    .parameter("address", "Token address", "string", true)
+                    .parameter("limit", "Number of trades to return", "integer", false)
+                    .parameter("offset", "Number of trades to skip", "integer", false)
+                    .build();
 
             actions.push(Arc::new(action));
         }
@@ -380,6 +377,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
         {
             async fn get_pair_trades<S: Send + Sync + Clone + 'static>(
                 params: PairTradesParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("BIRDEYE_API_KEY")
@@ -390,16 +388,12 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
                     .await
             }
 
-            let action = ActionBuilder::<_, PairTradesParams, S>::new(
-                "get_pair_trades",
-                get_pair_trades,
-                None,
-            )
-            .description("Get recent trades for a trading pair")
-            .parameter("pair_address", "Pair address", "string", true)
-            .parameter("limit", "Number of trades to return", "integer", false)
-            .parameter("offset", "Number of trades to skip", "integer", false)
-            .build();
+            let action = ActionBuilder::<_, _, _, _>::new("get_pair_trades", get_pair_trades, None)
+                .description("Get recent trades for a trading pair")
+                .parameter("pair_address", "Pair address", "string", true)
+                .parameter("limit", "Number of trades to return", "integer", false)
+                .parameter("offset", "Number of trades to skip", "integer", false)
+                .build();
 
             actions.push(Arc::new(action));
         }
@@ -408,6 +402,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
         {
             async fn get_token_overview<S: Send + Sync + Clone + 'static>(
                 params: TokenOverviewParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("BIRDEYE_API_KEY")
@@ -416,14 +411,11 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
                 client.get_token_overview(params.address).await
             }
 
-            let action = ActionBuilder::<_, TokenOverviewParams, S>::new(
-                "get_token_overview",
-                get_token_overview,
-                None,
-            )
-            .description("Get comprehensive overview data for a token")
-            .parameter("address", "Token address", "string", true)
-            .build();
+            let action =
+                ActionBuilder::<_, _, _, _>::new("get_token_overview", get_token_overview, None)
+                    .description("Get comprehensive overview data for a token")
+                    .parameter("address", "Token address", "string", true)
+                    .build();
 
             actions.push(Arc::new(action));
         }
@@ -432,6 +424,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
         {
             async fn get_token_list<S: Send + Sync + Clone + 'static>(
                 params: TokenListParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("BIRDEYE_API_KEY")
@@ -440,12 +433,11 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
                 client.get_token_list(params.limit, params.offset).await
             }
 
-            let action =
-                ActionBuilder::<_, TokenListParams, S>::new("get_token_list", get_token_list, None)
-                    .description("Get list of tokens with market data")
-                    .parameter("limit", "Number of tokens to return", "integer", false)
-                    .parameter("offset", "Number of tokens to skip", "integer", false)
-                    .build();
+            let action = ActionBuilder::<_, _, _, _>::new("get_token_list", get_token_list, None)
+                .description("Get list of tokens with market data")
+                .parameter("limit", "Number of tokens to return", "integer", false)
+                .parameter("offset", "Number of tokens to skip", "integer", false)
+                .build();
 
             actions.push(Arc::new(action));
         }
@@ -454,6 +446,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
         {
             async fn get_token_security<S: Send + Sync + Clone + 'static>(
                 params: TokenSecurityParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("BIRDEYE_API_KEY")
@@ -462,14 +455,11 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
                 client.get_token_security(params.address).await
             }
 
-            let action = ActionBuilder::<_, TokenSecurityParams, S>::new(
-                "get_token_security",
-                get_token_security,
-                None,
-            )
-            .description("Get security information for a token")
-            .parameter("address", "Token address", "string", true)
-            .build();
+            let action =
+                ActionBuilder::<_, _, _, _>::new("get_token_security", get_token_security, None)
+                    .description("Get security information for a token")
+                    .parameter("address", "Token address", "string", true)
+                    .build();
 
             actions.push(Arc::new(action));
         }
@@ -478,6 +468,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
         {
             async fn get_token_market_list<S: Send + Sync + Clone + 'static>(
                 params: TokenMarketListParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("BIRDEYE_API_KEY")
@@ -486,7 +477,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
                 client.get_token_market_list(params.address).await
             }
 
-            let action = ActionBuilder::<_, TokenMarketListParams, S>::new(
+            let action = ActionBuilder::<_, _, _, _>::new(
                 "get_token_market_list",
                 get_token_market_list,
                 None,
@@ -502,6 +493,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
         {
             async fn get_token_new_listing<S: Send + Sync + Clone + 'static>(
                 params: TokenNewListingParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("BIRDEYE_API_KEY")
@@ -512,7 +504,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
                     .await
             }
 
-            let action = ActionBuilder::<_, TokenNewListingParams, S>::new(
+            let action = ActionBuilder::<_, _, _, _>::new(
                 "get_token_new_listing",
                 get_token_new_listing,
                 None,
@@ -529,6 +521,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
         {
             async fn get_token_top_traders<S: Send + Sync + Clone + 'static>(
                 params: TokenTopTradersParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("BIRDEYE_API_KEY")
@@ -539,7 +532,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
                     .await
             }
 
-            let action = ActionBuilder::<_, TokenTopTradersParams, S>::new(
+            let action = ActionBuilder::<_, _, _, _>::new(
                 "get_token_top_traders",
                 get_token_top_traders,
                 None,
@@ -556,6 +549,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
         {
             async fn get_gainers_losers<S: Send + Sync + Clone + 'static>(
                 _params: GainersLosersParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("BIRDEYE_API_KEY")
@@ -564,13 +558,10 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
                 client.get_gainers_losers().await
             }
 
-            let action = ActionBuilder::<_, GainersLosersParams, S>::new(
-                "get_gainers_losers",
-                get_gainers_losers,
-                None,
-            )
-            .description("Get gainers and losers data")
-            .build();
+            let action =
+                ActionBuilder::<_, _, _, _>::new("get_gainers_losers", get_gainers_losers, None)
+                    .description("Get gainers and losers data")
+                    .build();
 
             actions.push(Arc::new(action));
         }
@@ -579,6 +570,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
         {
             async fn get_trader_txs_by_time<S: Send + Sync + Clone + 'static>(
                 params: TraderTxsByTimeParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("BIRDEYE_API_KEY")
@@ -594,7 +586,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
                     .await
             }
 
-            let action = ActionBuilder::<_, TraderTxsByTimeParams, S>::new(
+            let action = ActionBuilder::<_, _, _, _>::new(
                 "get_trader_txs_by_time",
                 get_trader_txs_by_time,
                 None,
@@ -618,6 +610,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
         {
             async fn list_supported_chains<S: Send + Sync + Clone + 'static>(
                 _params: SupportedChainsParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("BIRDEYE_API_KEY")
@@ -626,7 +619,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
                 client.list_supported_chains().await
             }
 
-            let action = ActionBuilder::<_, SupportedChainsParams, S>::new(
+            let action = ActionBuilder::<_, _, _, _>::new(
                 "list_supported_chains",
                 list_supported_chains,
                 None,
@@ -641,6 +634,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
         {
             async fn get_wallet_portfolio<S: Send + Sync + Clone + 'static>(
                 params: WalletPortfolioParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("BIRDEYE_API_KEY")
@@ -651,7 +645,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
                     .await
             }
 
-            let action = ActionBuilder::<_, WalletPortfolioParams, S>::new(
+            let action = ActionBuilder::<_, _, _, _>::new(
                 "get_wallet_portfolio",
                 get_wallet_portfolio,
                 None,
@@ -668,6 +662,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
         {
             async fn get_wallet_portfolio_multichain<S: Send + Sync + Clone + 'static>(
                 params: WalletPortfolioMultichainParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("BIRDEYE_API_KEY")
@@ -678,7 +673,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
                     .await
             }
 
-            let action = ActionBuilder::<_, WalletPortfolioMultichainParams, S>::new(
+            let action = ActionBuilder::<_, _, _, _>::new(
                 "get_wallet_portfolio_multichain",
                 get_wallet_portfolio_multichain,
                 None,
@@ -694,6 +689,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
         {
             async fn get_wallet_transaction_history<S: Send + Sync + Clone + 'static>(
                 params: WalletTransactionHistoryParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("BIRDEYE_API_KEY")
@@ -709,7 +705,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
                     .await
             }
 
-            let action = ActionBuilder::<_, WalletTransactionHistoryParams, S>::new(
+            let action = ActionBuilder::<_, _, _, _>::new(
                 "get_wallet_transaction_history",
                 get_wallet_transaction_history,
                 None,
@@ -733,6 +729,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
         {
             async fn get_wallet_transaction_history_multichain<S: Send + Sync + Clone + 'static>(
                 params: WalletTransactionHistoryMultichainParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("BIRDEYE_API_KEY")
@@ -747,7 +744,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
                     .await
             }
 
-            let action = ActionBuilder::<_, WalletTransactionHistoryMultichainParams, S>::new(
+            let action = ActionBuilder::<_, _, _, _>::new(
                 "get_wallet_transaction_history_multichain",
                 get_wallet_transaction_history_multichain,
                 None,
@@ -770,6 +767,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
         {
             async fn simulate_transaction<S: Send + Sync + Clone + 'static>(
                 params: SimulateTransactionParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("BIRDEYE_API_KEY")
@@ -780,7 +778,7 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
                     .await
             }
 
-            let action = ActionBuilder::<_, SimulateTransactionParams, S>::new(
+            let action = ActionBuilder::<_, _, _, _>::new(
                 "simulate_transaction",
                 simulate_transaction,
                 None,

@@ -175,6 +175,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
         {
             async fn get_coin_contract_market_chart_range<S: Send + Sync + Clone + 'static>(
                 params: CoinContractMarketChartRangeParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("COINGECKO_PRO_API_KEY").map_err(|_| {
@@ -193,7 +194,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                     .await
             }
 
-            let action = ActionBuilder::<_, CoinContractMarketChartRangeParams, S>::new(
+            let action = ActionBuilder::<_, _, _, _>::new(
                 "get_coin_contract_market_chart_range",
                 get_coin_contract_market_chart_range,
                 None,
@@ -223,6 +224,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
         {
             async fn get_coin_market_chart<S: Send + Sync + Clone + 'static>(
                 params: CoinMarketChartParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("COINGECKO_PRO_API_KEY").map_err(|_| {
@@ -240,7 +242,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                     .await
             }
 
-            let action = ActionBuilder::<_, CoinMarketChartParams, S>::new(
+            let action = ActionBuilder::<_, _, _, _>::new(
                 "get_coin_market_chart",
                 get_coin_market_chart,
                 None,
@@ -264,6 +266,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
         {
             async fn get_network_status<S: Send + Sync + Clone + 'static>(
                 _params: NetworkStatusParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("COINGECKO_PRO_API_KEY").map_err(|_| {
@@ -274,13 +277,10 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                 client.get_network_status().await
             }
 
-            let action = ActionBuilder::<_, NetworkStatusParams, S>::new(
-                "get_network_status",
-                get_network_status,
-                None,
-            )
-            .description("Check API server status")
-            .build();
+            let action =
+                ActionBuilder::<_, _, _, _>::new("get_network_status", get_network_status, None)
+                    .description("Check API server status")
+                    .build();
 
             actions.push(Arc::new(action));
         }
@@ -289,6 +289,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
         {
             async fn get_global_data<S: Send + Sync + Clone + 'static>(
                 _params: GlobalDataParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("COINGECKO_PRO_API_KEY").map_err(|_| {
@@ -299,13 +300,9 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                 client.get_global_data().await
             }
 
-            let action = ActionBuilder::<_, GlobalDataParams, S>::new(
-                "get_global_data",
-                get_global_data,
-                None,
-            )
-            .description("Get cryptocurrency global data")
-            .build();
+            let action = ActionBuilder::<_, _, _, _>::new("get_global_data", get_global_data, None)
+                .description("Get cryptocurrency global data")
+                .build();
 
             actions.push(Arc::new(action));
         }
@@ -314,6 +311,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
         {
             async fn get_global_defi_data<S: Send + Sync + Clone + 'static>(
                 _params: GlobalDefiDataParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("COINGECKO_PRO_API_KEY").map_err(|_| {
@@ -324,7 +322,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                 client.get_global_defi_data().await
             }
 
-            let action = ActionBuilder::<_, GlobalDefiDataParams, S>::new(
+            let action = ActionBuilder::<_, _, _, _>::new(
                 "get_global_defi_data",
                 get_global_defi_data,
                 None,
@@ -339,6 +337,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
         {
             async fn get_exchanges<S: Send + Sync + Clone + 'static>(
                 params: ExchangesParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("COINGECKO_PRO_API_KEY").map_err(|_| {
@@ -349,12 +348,11 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                 client.get_exchanges(params.per_page, params.page).await
             }
 
-            let action =
-                ActionBuilder::<_, ExchangesParams, S>::new("get_exchanges", get_exchanges, None)
-                    .description("List all exchanges")
-                    .parameter("per_page", "Total results per page", "integer", false)
-                    .parameter("page", "Page number", "integer", false)
-                    .build();
+            let action = ActionBuilder::<_, _, _, _>::new("get_exchanges", get_exchanges, None)
+                .description("List all exchanges")
+                .parameter("per_page", "Total results per page", "integer", false)
+                .parameter("page", "Page number", "integer", false)
+                .build();
 
             actions.push(Arc::new(action));
         }
@@ -363,6 +361,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
         {
             async fn get_exchange<S: Send + Sync + Clone + 'static>(
                 params: ExchangeParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("COINGECKO_PRO_API_KEY").map_err(|_| {
@@ -373,11 +372,10 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                 client.get_exchange(params.id).await
             }
 
-            let action =
-                ActionBuilder::<_, ExchangeParams, S>::new("get_exchange", get_exchange, None)
-                    .description("Get exchange volume in BTC and top 100 tickers only")
-                    .parameter("id", "Exchange id", "string", true)
-                    .build();
+            let action = ActionBuilder::<_, _, _, _>::new("get_exchange", get_exchange, None)
+                .description("Get exchange volume in BTC and top 100 tickers only")
+                .parameter("id", "Exchange id", "string", true)
+                .build();
 
             actions.push(Arc::new(action));
         }
@@ -386,6 +384,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
         {
             async fn get_exchange_tickers<S: Send + Sync + Clone + 'static>(
                 params: ExchangeTickersParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("COINGECKO_PRO_API_KEY").map_err(|_| {
@@ -405,7 +404,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                     .await
             }
 
-            let action = ActionBuilder::<_, ExchangeTickersParams, S>::new(
+            let action = ActionBuilder::<_, _, _, _>::new(
                 "get_exchange_tickers",
                 get_exchange_tickers,
                 None,
@@ -431,6 +430,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
         {
             async fn get_exchange_volume_chart<S: Send + Sync + Clone + 'static>(
                 params: ExchangeVolumeChartParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("COINGECKO_PRO_API_KEY").map_err(|_| {
@@ -443,7 +443,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                     .await
             }
 
-            let action = ActionBuilder::<_, ExchangeVolumeChartParams, S>::new(
+            let action = ActionBuilder::<_, _, _, _>::new(
                 "get_exchange_volume_chart",
                 get_exchange_volume_chart,
                 None,
@@ -460,6 +460,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
         {
             async fn get_coins_list<S: Send + Sync + Clone + 'static>(
                 params: CoinsListParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("COINGECKO_PRO_API_KEY").map_err(|_| {
@@ -470,16 +471,15 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                 client.get_coins_list(params.include_platform).await
             }
 
-            let action =
-                ActionBuilder::<_, CoinsListParams, S>::new("get_coins_list", get_coins_list, None)
-                    .description("List all supported coins with id and name")
-                    .parameter(
-                        "include_platform",
-                        "Include platform contract addresses",
-                        "boolean",
-                        false,
-                    )
-                    .build();
+            let action = ActionBuilder::<_, _, _, _>::new("get_coins_list", get_coins_list, None)
+                .description("List all supported coins with id and name")
+                .parameter(
+                    "include_platform",
+                    "Include platform contract addresses",
+                    "boolean",
+                    false,
+                )
+                .build();
 
             actions.push(Arc::new(action));
         }
@@ -488,6 +488,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
         {
             async fn get_coin_tickers<S: Send + Sync + Clone + 'static>(
                 params: CoinTickersParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("COINGECKO_PRO_API_KEY").map_err(|_| {
@@ -507,29 +508,26 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                     .await
             }
 
-            let action = ActionBuilder::<_, CoinTickersParams, S>::new(
-                "get_coin_tickers",
-                get_coin_tickers,
-                None,
-            )
-            .description("Get coin tickers (paginated to 100 items)")
-            .parameter("id", "The coin id", "string", true)
-            .parameter(
-                "exchange_ids",
-                "Filter results by exchange ids",
-                "array",
-                false,
-            )
-            .parameter(
-                "include_exchange_logo",
-                "Include exchange logo",
-                "boolean",
-                false,
-            )
-            .parameter("page", "Page through results", "integer", false)
-            .parameter("order", "Sort results by order", "string", false)
-            .parameter("depth", "Include 2% orderbook depth", "boolean", false)
-            .build();
+            let action =
+                ActionBuilder::<_, _, _, _>::new("get_coin_tickers", get_coin_tickers, None)
+                    .description("Get coin tickers (paginated to 100 items)")
+                    .parameter("id", "The coin id", "string", true)
+                    .parameter(
+                        "exchange_ids",
+                        "Filter results by exchange ids",
+                        "array",
+                        false,
+                    )
+                    .parameter(
+                        "include_exchange_logo",
+                        "Include exchange logo",
+                        "boolean",
+                        false,
+                    )
+                    .parameter("page", "Page through results", "integer", false)
+                    .parameter("order", "Sort results by order", "string", false)
+                    .parameter("depth", "Include 2% orderbook depth", "boolean", false)
+                    .build();
 
             actions.push(Arc::new(action));
         }
@@ -538,6 +536,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
         {
             async fn get_coin_history<S: Send + Sync + Clone + 'static>(
                 params: CoinHistoryParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("COINGECKO_PRO_API_KEY").map_err(|_| {
@@ -550,7 +549,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                     .await
             }
 
-            let action = ActionBuilder::<_, CoinHistoryParams, S>::new(
+            let action = ActionBuilder::<_, _, _, _>::new(
                 "get_coin_history",
                 get_coin_history,
                 None,
@@ -580,6 +579,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
         {
             async fn get_coin_ohlc<S: Send + Sync + Clone + 'static>(
                 params: CoinOhlcParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("COINGECKO_PRO_API_KEY").map_err(|_| {
@@ -592,18 +592,17 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                     .await
             }
 
-            let action =
-                ActionBuilder::<_, CoinOhlcParams, S>::new("get_coin_ohlc", get_coin_ohlc, None)
-                    .description("Get coin's OHLC (Open, High, Low, Close) data")
-                    .parameter("id", "The coin id", "string", true)
-                    .parameter(
-                        "vs_currency",
-                        "The target currency of market data (usd, eur, jpy, etc.)",
-                        "string",
-                        true,
-                    )
-                    .parameter("days", "Data up to number of days ago", "string", true)
-                    .build();
+            let action = ActionBuilder::<_, _, _, _>::new("get_coin_ohlc", get_coin_ohlc, None)
+                .description("Get coin's OHLC (Open, High, Low, Close) data")
+                .parameter("id", "The coin id", "string", true)
+                .parameter(
+                    "vs_currency",
+                    "The target currency of market data (usd, eur, jpy, etc.)",
+                    "string",
+                    true,
+                )
+                .parameter("days", "Data up to number of days ago", "string", true)
+                .build();
 
             actions.push(Arc::new(action));
         }
@@ -612,6 +611,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
         {
             async fn get_coin_contract<S: Send + Sync + Clone + 'static>(
                 params: CoinContractParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("COINGECKO_PRO_API_KEY").map_err(|_| {
@@ -624,20 +624,17 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                     .await
             }
 
-            let action = ActionBuilder::<_, CoinContractParams, S>::new(
-                "get_coin_contract",
-                get_coin_contract,
-                None,
-            )
-            .description("Get coin info from contract address")
-            .parameter("id", "Asset platform (e.g. ethereum)", "string", true)
-            .parameter(
-                "contract_address",
-                "Token's contract address",
-                "string",
-                true,
-            )
-            .build();
+            let action =
+                ActionBuilder::<_, _, _, _>::new("get_coin_contract", get_coin_contract, None)
+                    .description("Get coin info from contract address")
+                    .parameter("id", "Asset platform (e.g. ethereum)", "string", true)
+                    .parameter(
+                        "contract_address",
+                        "Token's contract address",
+                        "string",
+                        true,
+                    )
+                    .build();
 
             actions.push(Arc::new(action));
         }
@@ -646,6 +643,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
         {
             async fn get_coin_contract_market_chart<S: Send + Sync + Clone + 'static>(
                 params: CoinContractMarketChartParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("COINGECKO_PRO_API_KEY").map_err(|_| {
@@ -663,7 +661,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                     .await
             }
 
-            let action = ActionBuilder::<_, CoinContractMarketChartParams, S>::new(
+            let action = ActionBuilder::<_, _, _, _>::new(
                 "get_coin_contract_market_chart",
                 get_coin_contract_market_chart,
                 None,
@@ -692,6 +690,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
         {
             async fn get_asset_platforms<S: Send + Sync + Clone + 'static>(
                 _params: AssetPlatformsParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("COINGECKO_PRO_API_KEY").map_err(|_| {
@@ -702,13 +701,10 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                 client.get_asset_platforms().await
             }
 
-            let action = ActionBuilder::<_, AssetPlatformsParams, S>::new(
-                "get_asset_platforms",
-                get_asset_platforms,
-                None,
-            )
-            .description("List all asset platforms (blockchain networks)")
-            .build();
+            let action =
+                ActionBuilder::<_, _, _, _>::new("get_asset_platforms", get_asset_platforms, None)
+                    .description("List all asset platforms (blockchain networks)")
+                    .build();
 
             actions.push(Arc::new(action));
         }
@@ -717,6 +713,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
         {
             async fn get_coins_categories_list<S: Send + Sync + Clone + 'static>(
                 _params: CoinsCategoriesListParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("COINGECKO_PRO_API_KEY").map_err(|_| {
@@ -727,7 +724,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                 client.get_coins_categories_list().await
             }
 
-            let action = ActionBuilder::<_, CoinsCategoriesListParams, S>::new(
+            let action = ActionBuilder::<_, _, _, _>::new(
                 "get_coins_categories_list",
                 get_coins_categories_list,
                 None,
@@ -742,6 +739,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
         {
             async fn get_coins_categories<S: Send + Sync + Clone + 'static>(
                 params: CoinsCategoriesParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("COINGECKO_PRO_API_KEY").map_err(|_| {
@@ -752,7 +750,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                 client.get_coins_categories(params.order).await
             }
 
-            let action = ActionBuilder::<_, CoinsCategoriesParams, S>::new(
+            let action = ActionBuilder::<_, _, _, _>::new(
                 "get_coins_categories",
                 get_coins_categories,
                 None,
@@ -768,6 +766,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
         {
             async fn get_indexes<S: Send + Sync + Clone + 'static>(
                 _params: IndexesParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("COINGECKO_PRO_API_KEY").map_err(|_| {
@@ -778,10 +777,9 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                 client.get_indexes().await
             }
 
-            let action =
-                ActionBuilder::<_, IndexesParams, S>::new("get_indexes", get_indexes, None)
-                    .description("List all market indexes")
-                    .build();
+            let action = ActionBuilder::<_, _, _, _>::new("get_indexes", get_indexes, None)
+                .description("List all market indexes")
+                .build();
 
             actions.push(Arc::new(action));
         }
@@ -790,6 +788,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
         {
             async fn get_indexes_list<S: Send + Sync + Clone + 'static>(
                 _params: IndexesListParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("COINGECKO_PRO_API_KEY").map_err(|_| {
@@ -800,13 +799,10 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                 client.get_indexes_list().await
             }
 
-            let action = ActionBuilder::<_, IndexesListParams, S>::new(
-                "get_indexes_list",
-                get_indexes_list,
-                None,
-            )
-            .description("List market indexes id and name")
-            .build();
+            let action =
+                ActionBuilder::<_, _, _, _>::new("get_indexes_list", get_indexes_list, None)
+                    .description("List market indexes id and name")
+                    .build();
 
             actions.push(Arc::new(action));
         }
@@ -815,6 +811,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
         {
             async fn get_derivatives<S: Send + Sync + Clone + 'static>(
                 _params: DerivativesParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("COINGECKO_PRO_API_KEY").map_err(|_| {
@@ -825,13 +822,9 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                 client.get_derivatives().await
             }
 
-            let action = ActionBuilder::<_, DerivativesParams, S>::new(
-                "get_derivatives",
-                get_derivatives,
-                None,
-            )
-            .description("List all derivative tickers")
-            .build();
+            let action = ActionBuilder::<_, _, _, _>::new("get_derivatives", get_derivatives, None)
+                .description("List all derivative tickers")
+                .build();
 
             actions.push(Arc::new(action));
         }
@@ -840,6 +833,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
         {
             async fn get_derivatives_exchanges<S: Send + Sync + Clone + 'static>(
                 params: DerivativesExchangesParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("COINGECKO_PRO_API_KEY").map_err(|_| {
@@ -852,7 +846,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                     .await
             }
 
-            let action = ActionBuilder::<_, DerivativesExchangesParams, S>::new(
+            let action = ActionBuilder::<_, _, _, _>::new(
                 "get_derivatives_exchanges",
                 get_derivatives_exchanges,
                 None,
@@ -870,6 +864,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
         {
             async fn get_derivatives_exchange<S: Send + Sync + Clone + 'static>(
                 params: DerivativesExchangeParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("COINGECKO_PRO_API_KEY").map_err(|_| {
@@ -882,7 +877,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                     .await
             }
 
-            let action = ActionBuilder::<_, DerivativesExchangeParams, S>::new(
+            let action = ActionBuilder::<_, _, _, _>::new(
                 "get_derivatives_exchange",
                 get_derivatives_exchange,
                 None,
@@ -904,6 +899,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
         {
             async fn get_exchange_rates<S: Send + Sync + Clone + 'static>(
                 _params: ExchangeRatesParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("COINGECKO_PRO_API_KEY").map_err(|_| {
@@ -914,13 +910,10 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                 client.get_exchange_rates().await
             }
 
-            let action = ActionBuilder::<_, ExchangeRatesParams, S>::new(
-                "get_exchange_rates",
-                get_exchange_rates,
-                None,
-            )
-            .description("Get BTC-to-Currency exchange rates")
-            .build();
+            let action =
+                ActionBuilder::<_, _, _, _>::new("get_exchange_rates", get_exchange_rates, None)
+                    .description("Get BTC-to-Currency exchange rates")
+                    .build();
 
             actions.push(Arc::new(action));
         }
@@ -929,6 +922,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
         {
             async fn search<S: Send + Sync + Clone + 'static>(
                 params: SearchParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("COINGECKO_PRO_API_KEY").map_err(|_| {
@@ -939,7 +933,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                 client.search(params.query).await
             }
 
-            let action = ActionBuilder::<_, SearchParams, S>::new("search", search, None)
+            let action = ActionBuilder::<_, _, _, _>::new("search", search, None)
                 .description("Search for coins, categories and markets")
                 .parameter("query", "Search string", "string", true)
                 .build();
@@ -951,6 +945,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
         {
             async fn get_trending<S: Send + Sync + Clone + 'static>(
                 _params: TrendingParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("COINGECKO_PRO_API_KEY").map_err(|_| {
@@ -961,10 +956,9 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                 client.get_trending().await
             }
 
-            let action =
-                ActionBuilder::<_, TrendingParams, S>::new("get_trending", get_trending, None)
-                    .description("Get trending search coins (Top-7) on CoinGecko")
-                    .build();
+            let action = ActionBuilder::<_, _, _, _>::new("get_trending", get_trending, None)
+                .description("Get trending search coins (Top-7) on CoinGecko")
+                .build();
 
             actions.push(Arc::new(action));
         }
@@ -973,6 +967,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
         {
             async fn get_companies_public_treasury<S: Send + Sync + Clone + 'static>(
                 params: CompaniesPublicTreasuryParams,
+                _send_state: serde_json::Value,
                 _state: AgentState<S>,
             ) -> Result<String, String> {
                 let api_key = std::env::var("COINGECKO_PRO_API_KEY").map_err(|_| {
@@ -983,7 +978,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                 client.get_companies_public_treasury(params.coin_id).await
             }
 
-            let action = ActionBuilder::<_, CompaniesPublicTreasuryParams, S>::new(
+            let action = ActionBuilder::<_, _, _, _>::new(
                 "get_companies_public_treasury",
                 get_companies_public_treasury,
                 None,

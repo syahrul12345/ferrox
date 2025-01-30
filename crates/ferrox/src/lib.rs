@@ -1,13 +1,12 @@
 pub mod agent;
-
 use std::{collections::HashMap, sync::Arc};
 
 use agent::Agent;
 use ferrox_actions::ConfirmHandler;
+pub use teloxide::types::Message;
 use teloxide::{
-    dispatching::UpdateHandler,
     prelude::*,
-    types::{CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, Message},
+    types::{CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup},
     RequestError,
 };
 use tokio::sync::Mutex;
@@ -50,7 +49,10 @@ where
                     let history_id = msg.chat.id.to_string();
                     let sent_message = bot.send_message(msg.chat.id, "Thinking...").await?;
                     println!("event=PROCESSING_PROMPT");
-                    match agent.process_prompt(text, &history_id).await {
+                    match agent
+                        .process_prompt(text, &history_id, serde_json::to_value(&msg).unwrap())
+                        .await
+                    {
                         Ok((response, confirm_handler)) => {
                             println!("event=RECEIVE_RESPONSE_FROM_AGENT: {:?}", response);
                             // Check if this is a preview response that needs confirmation
@@ -106,7 +108,12 @@ where
                     // Get the stored data and handler
                     if let Some((value, handler)) = callback_data.lock().await.remove(&data) {
                         // Execute the confirmation handler
-                        let result = handler(value, agent.state()).await;
+                        let result = handler(
+                            value,
+                            serde_json::to_value(&q.message).unwrap(),
+                            agent.state(),
+                        )
+                        .await;
                         match result {
                             Ok(response) => {
                                 // Update the message with the confirmation result

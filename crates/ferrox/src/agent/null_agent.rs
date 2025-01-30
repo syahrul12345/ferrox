@@ -32,6 +32,7 @@ impl Agent for NullAgent {
         &self,
         _prompt: &str,
         _history_id: &str,
+        _send_state: serde_json::Value,
     ) -> Pin<
         Box<
             dyn Future<
@@ -66,7 +67,7 @@ mod tests {
     async fn test_process_prompt() {
         let agent = NullAgent::default();
         let (response, _) = agent
-            .process_prompt("test prompt", "test_history")
+            .process_prompt("test prompt", "test_history", serde_json::Value::Null)
             .await
             .expect("Failed to process prompt");
 
@@ -78,11 +79,15 @@ mod tests {
         let mut agent = NullAgent::default();
 
         // Create a test action using ActionBuilder
-        async fn mock_handler(_: EmptyParams, _: AgentState<()>) -> Result<String, String> {
+        async fn mock_handler(
+            _: EmptyParams,
+            _: serde_json::Value,
+            _: AgentState<()>,
+        ) -> Result<String, String> {
             Ok("mock result".to_string())
         }
 
-        let action = ActionBuilder::<_, EmptyParams, ()>::new("mock_action", mock_handler, None)
+        let action = ActionBuilder::<_, _, _, _>::new("mock_action", mock_handler, None)
             .description("A mock action for testing")
             .build();
 
@@ -94,7 +99,7 @@ mod tests {
     async fn test_process_prompt_with_empty_input() {
         let agent = NullAgent::default();
         let (response, _) = agent
-            .process_prompt("", "test_history")
+            .process_prompt("", "test_history", serde_json::Value::Null)
             .await
             .expect("Failed to process prompt");
 

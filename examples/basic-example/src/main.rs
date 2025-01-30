@@ -2,7 +2,7 @@ use std::{env, str::FromStr, sync::Arc};
 
 use ferrox::{
     agent::{text_agent::TextAgent, Agent, NullAgent},
-    Ferrox,
+    Ferrox, Message,
 };
 use ferrox_actions::{
     ActionBuilder, AgentState, BirdeyeActionGroup, CoinGeckoActionGroup, DexScreenerActionGroup,
@@ -55,13 +55,14 @@ async fn main() {
         //Greets the user with their name
         async fn say_hello(
             params: HelloParams,
+            _send_state: (),
             _state: AgentState<TestState>,
         ) -> Result<String, String> {
             println!("say hello called. Params: {:?}", params);
             Ok(format!("Hello, {}!", params.name))
         }
         let hello_action =
-            ActionBuilder::<_, HelloParams, TestState>::new("say_hello", say_hello, None)
+            ActionBuilder::<_, HelloParams, (), TestState>::new("say_hello", say_hello, None)
                 .description("Greets the user with their name")
                 .parameter("name", "Name of the person to greet", "string", true)
                 .build();
@@ -70,6 +71,7 @@ async fn main() {
         /// Increments the counter in the state and returns the new value
         async fn increment_counter(
             _params: EmptyParams,
+            _send_state: (),
             state: AgentState<TestState>,
         ) -> Result<String, String> {
             println!("increment counter called. Params: {:?}", _params);
@@ -78,7 +80,7 @@ async fn main() {
             Ok(format!("Counter incremented to: {}", state.counter))
         }
         let var_name = "Increments the internal counter and returns the new value";
-        let increment_action = ActionBuilder::<_, EmptyParams, TestState>::new(
+        let increment_action = ActionBuilder::<_, EmptyParams, (), TestState>::new(
             "increment_counter",
             increment_counter,
             None,
@@ -90,6 +92,7 @@ async fn main() {
         /// Returns the current counter value
         async fn get_counter(
             _params: EmptyParams,
+            _send_state: (),
             state: AgentState<TestState>,
         ) -> Result<String, String> {
             println!("get counter called. Params: {:?}", _params);
@@ -97,7 +100,7 @@ async fn main() {
             Ok(format!("Current counter value: {}", state.counter))
         }
         let get_counter_action =
-            ActionBuilder::<_, EmptyParams, TestState>::new("get_counter", get_counter, None)
+            ActionBuilder::<_, EmptyParams, (), TestState>::new("get_counter", get_counter, None)
                 .description("Returns the current counter value")
                 .build();
         decision_agent.add_action(Arc::new(get_counter_action));
@@ -119,19 +122,23 @@ async fn main() {
         }
 
         //This function will cause a preview to be shown to the user
+        //The second arugment is the message from telegram.
         //It acceps one parameter which is the target wallet to send to. So the user can prompt the agent to send to a specific wallet.
         async fn preview_send_solana(
             params: SendSolanaParams,
+            message: Message,
             state: AgentState<TestState>,
         ) -> Result<SendSolanaPreview, String> {
             println!("LLM called preview send solana");
+            let user_id = message.from().unwrap().id.0;
+            println!("User ID: {:?}", user_id);
             let amount_to_send =
                 (params.amount_to_send.parse::<f64>().unwrap() * 10.0f64.powi(9)).round() as u64;
             let wallet = state
                 .lock()
                 .await
                 .wallet_manager
-                .get_wallet("123")
+                .get_wallet(&format!("{:?}", user_id))
                 .await
                 .unwrap();
             let wallet = match wallet {
@@ -149,6 +156,7 @@ async fn main() {
         //NOTE: The params value in the confirm MUST match the output type of the preview
         async fn confirm_send_solana(
             _params: SendSolanaPreview,
+            _message: Message,
             _state: AgentState<TestState>,
         ) -> Result<String, String> {
             println!("User clicked confirm send solana");
@@ -159,7 +167,7 @@ async fn main() {
 
         //Create the action
         let get_send_solana_action =
-            ActionBuilder::<_, SendSolanaParams, TestState, SendSolanaPreview, _>::new(
+            ActionBuilder::<_, SendSolanaParams, Message, TestState, SendSolanaPreview, _>::new(
                 "send_solana",
                 preview_send_solana,
                 Some(confirm_send_solana),

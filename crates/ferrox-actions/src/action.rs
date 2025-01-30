@@ -25,6 +25,7 @@ pub struct ActionDefinition {
 pub type Handler<S> = Box<
     dyn Fn(
             serde_json::Value,
+            serde_json::Value,
             AgentState<S>,
         ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>>
         + Send
@@ -33,6 +34,7 @@ pub type Handler<S> = Box<
 pub type ConfirmHandler<S> = Arc<
     Box<
         dyn Fn(
+                serde_json::Value,
                 serde_json::Value,
                 AgentState<S>,
             ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>>
@@ -54,31 +56,33 @@ impl<S: Send + Sync + Clone + 'static> FunctionAction<S> {
     pub fn execute(
         &self,
         params: serde_json::Value,
+        send_state: serde_json::Value,
         state: AgentState<S>,
     ) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>> {
-        (self.handler)(params, state)
+        (self.handler)(params, send_state, state)
     }
 
     pub fn confirm(
         &self,
         params: serde_json::Value,
+        send_state: serde_json::Value,
         state: AgentState<S>,
     ) -> Option<Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>>> {
         self.confirm_handler
             .as_ref()
-            .map(|handler| handler(params, state))
+            .map(|handler| handler(params, send_state, state))
     }
 }
 
-pub type EmptyConfirmHandler<T, S> =
-    fn(T, AgentState<S>) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>>;
+pub type EmptyConfirmHandler<T, V, S> =
+    fn(T, V, AgentState<S>) -> Pin<Box<dyn Future<Output = Result<String, String>> + Send + Sync>>;
 /// A builder to create actions from async functions with typed parameters
 /// F: The handler function type
 /// P: Input parameters for the handler
 /// S: State type
 /// Q: Output type from handler and input type for confirm handler
 /// CF: Confirm handler function type (defaults to EmptyConfirmHandler)
-pub struct ActionBuilder<F, P, S, Q = String, CF = EmptyConfirmHandler<Q, S>> {
+pub struct ActionBuilder<F, P, V, S, Q = String, CF = EmptyConfirmHandler<Q, V, S>> {
     name: String,
     description: String,
     parameters: Vec<ActionParameter>,
@@ -87,19 +91,21 @@ pub struct ActionBuilder<F, P, S, Q = String, CF = EmptyConfirmHandler<Q, S>> {
     _phantom_handler_input: std::marker::PhantomData<P>,
     _phantom_confirm_handler_input: std::marker::PhantomData<Q>,
     _phantom_state: std::marker::PhantomData<S>,
+    _phantom_send_state: std::marker::PhantomData<V>,
 }
 
-impl<F, CF, P, Q, S, Fut, CFut> ActionBuilder<F, P, S, Q, CF>
+impl<F, CF, P, Q, S, V, Fut, CFut> ActionBuilder<F, P, V, S, Q, CF>
 where
     // Handler F takes P and returns Q
-    F: Fn(P, AgentState<S>) -> Fut + Send + Sync + Clone + 'static,
+    F: Fn(P, V, AgentState<S>) -> Fut + Send + Sync + Clone + 'static,
     Fut: Future<Output = Result<Q, String>> + Send + Sync + 'static,
     P: DeserializeOwned + Send + 'static,
     // Confirm handler CF takes Q and returns String
-    CF: Fn(Q, AgentState<S>) -> CFut + Send + Sync + Clone + 'static,
+    CF: Fn(Q, V, AgentState<S>) -> CFut + Send + Sync + Clone + 'static,
     CFut: Future<Output = Result<String, String>> + Send + Sync + 'static,
     Q: Serialize + DeserializeOwned + Send + 'static,
     S: Send + Sync + Clone + 'static,
+    V: Serialize + DeserializeOwned + Send + 'static,
 {
     pub fn new(name: impl Into<String>, handler: F, confirm_handler: Option<CF>) -> Self {
         Self {
@@ -111,6 +117,7 @@ where
             _phantom_handler_input: std::marker::PhantomData,
             _phantom_confirm_handler_input: std::marker::PhantomData,
             _phantom_state: std::marker::PhantomData,
+            _phantom_send_state: std::marker::PhantomData,
         }
     }
 
@@ -143,32 +150,42 @@ where
                 description: self.description,
                 parameters: self.parameters,
             },
-            handler: Box::new(move |params: serde_json::Value, state: AgentState<S>| {
-                let handler = handler.clone();
-                Box::pin(async move {
-                    let params = serde_json::from_value(params)
-                        .map_err(|e| format!("Invalid parameters: {}", e))?;
-                    let result = handler(params, state).await?;
+            handler: Box::new(
+                move |params: serde_json::Value,
+                      send_state: serde_json::Value,
+                      state: AgentState<S>| {
+                    let handler = handler.clone();
+                    Box::pin(async move {
+                        let params = serde_json::from_value(params)
+                            .map_err(|e| format!("Invalid parameters: {}", e))?;
+                        let send_state = serde_json::from_value(send_state)
+                            .map_err(|e| format!("Invalid send_state: {}", e))?;
+                        let result = handler(params, send_state, state).await?;
 
-                    // If there's a confirm handler, mark this as a preview
-                    serde_json::to_string(&result)
-                        .map_err(|e| format!("Failed to serialize result: {}", e))
-                })
-            }),
+                        // If there's a confirm handler, mark this as a preview
+                        serde_json::to_string(&result)
+                            .map_err(|e| format!("Failed to serialize result: {}", e))
+                    })
+                },
+            ),
             confirm_handler: self.confirm_handler.map(|handler| {
-                Arc::new(
-                    Box::new(move |params: serde_json::Value, state: AgentState<S>| {
+                Arc::new(Box::new(
+                    move |params: serde_json::Value,
+                          send_state: serde_json::Value,
+                          state: AgentState<S>| {
                         let handler = handler.clone();
                         let fut: Pin<
                             Box<dyn Future<Output = Result<String, String>> + Send + Sync>,
                         > = Box::pin(async move {
                             let params = serde_json::from_value::<Q>(params)
                                 .map_err(|e| format!("Invalid parameters: {}", e))?;
-                            handler(params, state).await
+                            let send_state = serde_json::from_value(send_state)
+                                .map_err(|e| format!("Invalid send_state: {}", e))?;
+                            handler(params, send_state, state).await
                         });
                         fut
-                    }) as Box<dyn Fn(_, _) -> _ + Send + Sync>,
-                )
+                    },
+                ) as Box<dyn Fn(_, _, _) -> _ + Send + Sync>)
             }),
         }
     }
@@ -197,12 +214,16 @@ mod tests {
 
     #[tokio::test]
     async fn test_typed_function_action() {
-        async fn weather(params: WeatherParams, _state: AgentState<()>) -> Result<String, String> {
+        async fn weather(
+            params: WeatherParams,
+            _send_state: String,
+            _state: AgentState<()>,
+        ) -> Result<String, String> {
             let units = params.units.unwrap_or_else(|| "celsius".to_string());
             Ok(format!("Weather in {} ({}): Sunny", params.location, units))
         }
 
-        let action = ActionBuilder::<_, WeatherParams, ()>::new("get_weather", weather, None)
+        let action = ActionBuilder::<_, _, _, _>::new("get_weather", weather, None)
             .description("Get the weather for a location")
             .parameter("location", "The city to get weather for", "string", true)
             .parameter(
@@ -220,25 +241,32 @@ mod tests {
 
         // Test execution with all parameters
         let state = Arc::new(Mutex::new(()));
+        let send_state = serde_json::json!({});
         let params = serde_json::json!({
             "location": "London",
             "units": "fahrenheit"
         });
-        let result = action.execute(params, state.clone()).await.unwrap();
+        let result = action
+            .execute(params, send_state.clone(), state.clone())
+            .await
+            .unwrap();
         assert_eq!(result, "Weather in London (fahrenheit): Sunny");
 
         // Test execution with only required parameters
         let params = serde_json::json!({
             "location": "Paris"
         });
-        let result = action.execute(params, state.clone()).await.unwrap();
+        let result = action
+            .execute(params, send_state.clone(), state.clone())
+            .await
+            .unwrap();
         assert_eq!(result, "Weather in Paris (celsius): Sunny");
 
         // Test execution with invalid parameters
         let params = serde_json::json!({
             "wrong_field": "London"
         });
-        let result = action.execute(params, state.clone()).await;
+        let result = action.execute(params, send_state, state.clone()).await;
         assert!(result.is_err());
     }
 }
