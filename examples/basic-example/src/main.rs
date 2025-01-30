@@ -8,6 +8,7 @@ use ferrox_actions::{
     ActionBuilder, AgentState, BirdeyeActionGroup, CoinGeckoActionGroup, DexScreenerActionGroup,
     EmptyParams, GmgnActionGroup,
 };
+use ferrox_wallet::{simple_wallet_manager::SimpleWalletManager, Wallet, WalletManager};
 use openai_api::models::{Model, OpenAIModel};
 use serde::{Deserialize, Serialize};
 use solana_sdk::{
@@ -19,7 +20,7 @@ use solana_sdk::{
 #[derive(Clone)]
 struct TestState {
     counter: u32,
-    wallet: Arc<Keypair>,
+    wallet_manager: SimpleWalletManager,
 }
 
 #[derive(Deserialize, Debug)]
@@ -37,12 +38,7 @@ For example when asked for technical analaysis, you can first get the tick data 
 async fn main() {
     dotenv::dotenv().ok();
     let api_key = env::var("OPENAI_API_KEY").expect("OPENAI_API_KEY must be set");
-    let private_key = [
-        103, 17, 11, 163, 113, 182, 255, 6, 9, 212, 145, 104, 9, 54, 192, 214, 170, 91, 36, 255,
-        10, 225, 26, 73, 183, 136, 250, 134, 171, 24, 250, 184, 9, 247, 185, 29, 89, 143, 75, 110,
-        195, 235, 251, 190, 182, 47, 42, 83, 2, 95, 187, 132, 253, 38, 244, 162, 168, 81, 252, 6,
-        133, 28, 79, 228,
-    ];
+    let wallet_manager = SimpleWalletManager::new();
     let mut decision_agent = TextAgent::<TestState, NullAgent>::new(
         NullAgent::default(),
         SYSTEM_PROMPT.to_string(),
@@ -50,7 +46,7 @@ async fn main() {
         Model::OpenAI(OpenAIModel::GPT40),
         TestState {
             counter: 0,
-            wallet: Arc::new(Keypair::from_bytes(&private_key).unwrap()),
+            wallet_manager,
         },
     );
 
@@ -131,10 +127,20 @@ async fn main() {
             println!("LLM called preview send solana");
             let amount_to_send =
                 (params.amount_to_send.parse::<f64>().unwrap() * 10.0f64.powi(9)).round() as u64;
-            let sender = state.lock().await.wallet.pubkey();
+            let wallet = state
+                .lock()
+                .await
+                .wallet_manager
+                .get_wallet("123")
+                .await
+                .unwrap();
+            let wallet = match wallet {
+                Wallet::Solana(wallet) => wallet.pubkey(),
+            };
+            println!("Wallet: {:?}", wallet);
             let target_wallet = Pubkey::from_str(&params.target_wallet).unwrap();
             Ok(SendSolanaPreview {
-                sender,
+                sender: wallet,
                 target_wallet,
                 amount_to_send,
             })
@@ -161,7 +167,7 @@ async fn main() {
             .description("
                 Generates the payload to send SOL to a target wallet. 
                 This action itself will not send the SOL, but merely a preview for the user to confirm. 
-                Never mention that the sol has been sent, nor is this a preview. Prompt the user to confirm. ")
+                Never mention that the sol has been sent, nor is this a preview. Prompt the user to confirm.")
             .parameter(
                 "target_wallet",
                 "Target wallet to send SOL to",

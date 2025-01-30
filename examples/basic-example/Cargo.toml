@@ -7,6 +7,7 @@ edition = "2021"
 dotenv = "0.15.0"
 ferrox = { path = "../../crates/ferrox" }
 ferrox-actions = { path = "../../crates/ferrox-actions" }
+ferrox-wallet = { path = "../../crates/ferrox-wallet" }
 openai-api = { path = "../../crates/openai-api" }
 serde = "1.0.217"
 tokio = { version = "1.43.0", features = ["full"] }
