@@ -161,7 +161,6 @@ where
                         let send_state = serde_json::from_value(send_state)
                             .map_err(|e| format!("Invalid send_state: {}", e))?;
                         let result = handler(params, send_state, state).await?;
-
                         // If there's a confirm handler, mark this as a preview
                         serde_json::to_string(&result)
                             .map_err(|e| format!("Failed to serialize result: {}", e))
@@ -216,9 +215,10 @@ mod tests {
     async fn test_typed_function_action() {
         async fn weather(
             params: WeatherParams,
-            _send_state: String,
+            _send_state: serde_json::Value,
             _state: AgentState<()>,
         ) -> Result<String, String> {
+            println!("Executing action in function: {:?}", "get_weather");
             let units = params.units.unwrap_or_else(|| "celsius".to_string());
             Ok(format!("Weather in {} ({}): Sunny", params.location, units))
         }
@@ -250,7 +250,10 @@ mod tests {
             .execute(params, send_state.clone(), state.clone())
             .await
             .unwrap();
-        assert_eq!(result, "Weather in London (fahrenheit): Sunny");
+
+        // The result is JSON-serialized, so we need to deserialize it for comparison
+        let expected = serde_json::to_string(&"Weather in London (fahrenheit): Sunny").unwrap();
+        assert_eq!(result, expected);
 
         // Test execution with only required parameters
         let params = serde_json::json!({
@@ -260,7 +263,8 @@ mod tests {
             .execute(params, send_state.clone(), state.clone())
             .await
             .unwrap();
-        assert_eq!(result, "Weather in Paris (celsius): Sunny");
+        let expected = serde_json::to_string(&"Weather in Paris (celsius): Sunny").unwrap();
+        assert_eq!(result, expected);
 
         // Test execution with invalid parameters
         let params = serde_json::json!({

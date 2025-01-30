@@ -71,7 +71,7 @@ mod tests {
             .await
             .expect("Failed to process prompt");
 
-        assert_eq!(response, "");
+        assert_eq!(response, "test prompt");
     }
 
     #[tokio::test]

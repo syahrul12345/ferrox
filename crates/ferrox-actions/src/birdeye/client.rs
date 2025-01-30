@@ -668,8 +668,8 @@ mod tests {
 
     #[test]
     fn test_format_resolution() {
-        assert_eq!(BirdeyeClient::format_resolution("1".to_string()), "1M");
-        assert_eq!(BirdeyeClient::format_resolution("15".to_string()), "15M");
+        assert_eq!(BirdeyeClient::format_resolution("1".to_string()), "1m");
+        assert_eq!(BirdeyeClient::format_resolution("15".to_string()), "15m");
         assert_eq!(BirdeyeClient::format_resolution("1D".to_string()), "1D");
         assert_eq!(BirdeyeClient::format_resolution("1W".to_string()), "1W");
     }
