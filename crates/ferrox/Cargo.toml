@@ -4,7 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-async-trait = "0.1.85"
 teloxide = "^0.12"
 openai-api = { path = "../openai-api" }
 tokio = { version = "1.43.0", features = ["full"] }
