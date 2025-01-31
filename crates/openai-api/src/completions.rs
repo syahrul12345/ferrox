@@ -131,7 +131,7 @@ impl Client {
             .await?;
 
         let text = response.text().await?;
-        let completion: CompletionResponse = serde_json::from_str(&text)?;
+        let completion: CompletionResponse = serde_json::from_str(&text).unwrap();
         // Handle both regular responses and tool calls
         let first_choice = completion
             .choices
@@ -159,7 +159,9 @@ impl Client {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::models::{AnthropicModel, FunctionDefinition, OpenAIModel};
+    use crate::models::{
+        AnthropicModel, Choice, FunctionDefinition, OpenAIModel, ToolCall, ToolDefinition,
+    };
     use mockito;
     use serde_json::json;
 
@@ -252,26 +254,28 @@ mod tests {
             .with_status(200)
             .with_header("content-type", "application/json")
             .with_body(
-                json!({
-                    "id": "chatcmpl-123",
-                    "object": "chat.completion",
-                    "created": 1677652288,
-                    "choices": [{
-                        "index": 0,
-                        "message": {
-                            "role": "assistant",
-                            "content": null,
-                            "tool_calls": [{
-                                "id": "call_123",
-                                "function": {
-                                    "name": "calculator",
-                                    "arguments": "{\"a\":5,\"b\":3,\"operation\":\"add\"}"
-                                }
-                            }]
+                serde_json::to_value(CompletionResponse {
+                    id: "chatcmpl-123".to_string(),
+                    choices: vec![Choice {
+                        index: 0,
+                        message: Message {
+                            role: "assistant".to_string(),
+                            content: Some("Hello! How can I help you today?".to_string()),
+                            tool_calls: Some(vec![ToolCall {
+                                id: "call_123".to_string(),
+                                tool_type: "function".to_string(),
+                                function: ToolDefinition {
+                                    name: "calculator".to_string(),
+                                    arguments: "{\"a\":5,\"b\":3,\"operation\":\"add\"}"
+                                        .to_string(),
+                                },
+                            }]),
+                            tool_call_id: None,
                         },
-                        "finish_reason": "tool_calls"
-                    }]
+                        finish_reason: "stop".to_string(),
+                    }],
                 })
+                .unwrap()
                 .to_string(),
             )
             .create();

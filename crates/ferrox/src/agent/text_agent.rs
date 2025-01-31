@@ -63,6 +63,7 @@ where
                 + Sync,
         >,
     > {
+        println!("Sending prompt: {:?}", prompt);
         // Clone what we need for the async block
         let conversation_history = self.conversation_history.clone();
         let system_prompt = self.system_prompt.clone();
@@ -305,8 +306,6 @@ mod tests {
             TestState { counter: 0 },
         );
 
-        println!("Created text agent");
-
         {
             #[derive(Deserialize, Debug)]
             struct CalcParams {
@@ -316,7 +315,7 @@ mod tests {
             }
             async fn calculator(
                 params: CalcParams,
-                send_state: serde_json::Value,
+                _send_state: serde_json::Value,
                 state: AgentState<TestState>,
             ) -> Result<String, String> {
                 println!("Calculator called with params: {:?}", params);
@@ -573,7 +572,7 @@ mod tests {
         let agent = TextAgent::new(
             inner_agent,
             "You are a helpful assistant that explains technical concepts. \
-             Break down your explanations into 2-3 key points."
+             Break down your explanations into at least 3 key points."
                 .to_string(),
             api_key,
             Model::OpenAI(OpenAIModel::GPT35Turbo),
