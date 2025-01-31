@@ -14,8 +14,7 @@ pub struct CoinContractMarketChartRangeParams {
     id: String,
     contract_address: String,
     vs_currency: String,
-    from: u64,
-    to: u64,
+    days: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -171,7 +170,7 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
     pub fn new() -> Self {
         let mut actions = Vec::new();
 
-        // Add coin contract market chart range action
+        // Update coin contract market chart range action
         {
             async fn get_coin_contract_market_chart_range<S: Send + Sync + Clone + 'static>(
                 params: CoinContractMarketChartRangeParams,
@@ -183,13 +182,17 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                 })?;
 
                 let client = CoinGeckoProClient::new(api_key);
+
+                let to = chrono::Utc::now().timestamp() as u64;
+                let from = calculate_from_timestamp(to, &params.days)?;
+
                 client
                     .get_coin_contract_market_chart_range(
                         params.id,
                         params.contract_address,
                         params.vs_currency,
-                        params.from,
-                        params.to,
+                        from,
+                        to,
                     )
                     .await
             }
@@ -213,8 +216,12 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
                 "string",
                 true,
             )
-            .parameter("from", "From timestamp (Unix timestamp)", "integer", true)
-            .parameter("to", "To timestamp (Unix timestamp)", "integer", true)
+            .parameter(
+                "days",
+                "Number of days of data to return (1, 7, 14, 30, 90, 180, 365, max)",
+                "string",
+                true,
+            )
             .build();
 
             actions.push(Arc::new(action));
@@ -1001,4 +1008,29 @@ impl<S: Send + Sync + Clone + 'static> CoinGeckoActionGroup<S> {
     pub fn actions(&self) -> &[Arc<FunctionAction<S>>] {
         &self.actions
     }
+}
+
+// Add helper function to calculate from timestamp based on days
+fn calculate_from_timestamp(to: u64, days: &str) -> Result<u64, String> {
+    let duration = match days {
+        "1" => chrono::Duration::days(1),
+        "7" => chrono::Duration::days(7),
+        "14" => chrono::Duration::days(14),
+        "30" => chrono::Duration::days(30),
+        "90" => chrono::Duration::days(90),
+        "180" => chrono::Duration::days(180),
+        "365" => chrono::Duration::days(365),
+        "max" => chrono::Duration::days(365 * 8), // Maximum historical data
+        _ => {
+            return Err(
+                "Invalid days parameter. Use: 1, 7, 14, 30, 90, 180, 365, or max".to_string(),
+            )
+        }
+    };
+
+    let from = to
+        .checked_sub(duration.num_seconds() as u64)
+        .ok_or("Error calculating from timestamp")?;
+
+    Ok(from)
 }

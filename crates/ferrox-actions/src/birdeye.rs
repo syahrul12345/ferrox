@@ -18,8 +18,6 @@ pub struct TokenPriceParams {
 pub struct TokenPriceHistoryParams {
     address: String,
     resolution: String,
-    time_from: Option<i64>,
-    time_to: Option<i64>,
     limit: Option<i32>,
 }
 
@@ -32,16 +30,12 @@ pub struct MultiTokenPriceParams {
 pub struct TokenOhlcvParams {
     address: String,
     resolution: String, // "1" | "3" | "5" | "15" | "30" | "60" | "120" | "240" | "360" | "480" | "720" | "1D" | "3D" | "1W" | "1M"
-    time_from: i64,
-    time_to: i64,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct PairOhlcvParams {
     pair_address: String,
     resolution: String,
-    time_from: i64,
-    time_to: i64,
 }
 
 #[derive(Debug, Deserialize)]
@@ -188,12 +182,16 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
                 let api_key = std::env::var("BIRDEYE_API_KEY")
                     .map_err(|_| "BIRDEYE_API_KEY environment variable not set".to_string())?;
                 let client = BirdeyeClient::new(api_key);
+
+                let time_to = chrono::Utc::now().timestamp();
+                let time_from = calculate_time_from(time_to, &params.resolution)?;
+
                 client
                     .get_token_price_history(
                         params.address,
                         params.resolution,
-                        params.time_from,
-                        params.time_to,
+                        Some(time_from),
+                        Some(time_to),
                         params.limit,
                     )
                     .await
@@ -206,8 +204,12 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
             )
             .description("Get historical price data for a token")
             .parameter("address", "Token address", "string", true)
-            .parameter("time_from", "Start timestamp (Unix)", "integer", false)
-            .parameter("time_to", "End timestamp (Unix)", "integer", false)
+            .parameter(
+                "resolution",
+                "Time resolution (1, 3, 5, 15, 30, 60, 120, 240, 360, 480, 720, 1D, 3D, 1W, 1M)",
+                "string",
+                true,
+            )
             .parameter("limit", "Number of records to return", "integer", false)
             .build();
 
@@ -277,13 +279,12 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
                 let api_key = std::env::var("BIRDEYE_API_KEY")
                     .map_err(|_| "BIRDEYE_API_KEY environment variable not set".to_string())?;
                 let client = BirdeyeClient::new(api_key);
+
+                let time_to = chrono::Utc::now().timestamp();
+                let time_from = calculate_time_from(time_to, &params.resolution)?;
+
                 client
-                    .get_token_ohlcv(
-                        params.address,
-                        params.resolution,
-                        params.time_from,
-                        params.time_to,
-                    )
+                    .get_token_ohlcv(params.address, params.resolution, time_from, time_to)
                     .await
             }
 
@@ -300,8 +301,6 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
                 "string",
                 true,
             )
-            .parameter("time_from", "Start timestamp (Unix)", "integer", true)
-            .parameter("time_to", "End timestamp (Unix)", "integer", true)
             .build();
 
             actions.push(Arc::new(action));
@@ -317,13 +316,12 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
                 let api_key = std::env::var("BIRDEYE_API_KEY")
                     .map_err(|_| "BIRDEYE_API_KEY environment variable not set".to_string())?;
                 let client = BirdeyeClient::new(api_key);
+
+                let time_to = chrono::Utc::now().timestamp();
+                let time_from = calculate_time_from(time_to, &params.resolution)?;
+
                 client
-                    .get_pair_ohlcv(
-                        params.pair_address,
-                        params.resolution,
-                        params.time_from,
-                        params.time_to,
-                    )
+                    .get_pair_ohlcv(params.pair_address, params.resolution, time_from, time_to)
                     .await
             }
 
@@ -340,8 +338,6 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
                 "string",
                 true,
             )
-            .parameter("time_from", "Start timestamp (Unix)", "integer", true)
-            .parameter("time_to", "End timestamp (Unix)", "integer", true)
             .build();
 
             actions.push(Arc::new(action));
@@ -793,4 +789,29 @@ impl<S: Send + Sync + Clone + 'static> BirdeyeActionGroup<S> {
 
         Self { actions }
     }
+}
+
+// Add helper function to calculate time_from based on resolution
+fn calculate_time_from(time_to: i64, resolution: &str) -> Result<i64, String> {
+    let duration = match resolution {
+        "1" | "3" | "5" | "15" | "30" | "60" => {
+            let minutes: i64 = resolution
+                .parse()
+                .map_err(|_| "Invalid resolution format")?;
+            chrono::Duration::minutes(minutes * 100) // Get 100 data points
+        }
+        "120" | "240" | "360" | "480" | "720" => {
+            let minutes: i64 = resolution
+                .parse()
+                .map_err(|_| "Invalid resolution format")?;
+            chrono::Duration::minutes(minutes * 50) // Get 50 data points
+        }
+        "1D" => chrono::Duration::days(100),
+        "3D" => chrono::Duration::days(300),
+        "1W" => chrono::Duration::weeks(100),
+        "1M" => chrono::Duration::days(100 * 30),
+        _ => return Err("Invalid resolution".to_string()),
+    };
+
+    Ok(time_to - duration.num_seconds())
 }
