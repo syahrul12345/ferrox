@@ -187,8 +187,18 @@ where
                             .await
                             .map_err(|e| {
                                 format!("Failed to execute {}: {}", tool_call.function.name, e)
-                            })?;
+                            });
                         println!("Executed function {}", tool_call.function.name);
+                        let result = match result {
+                            Ok(result) => result,
+                            Err(e) => {
+                                println!(
+                                    "LLM called the function but failed to execute {}: {}",
+                                    tool_call.function.name, e
+                                );
+                                e.to_string()
+                            }
+                        };
                         prev_result = result.clone();
                         confirm_handler = action.confirm_handler.clone();
                         conversation.push(Message {
